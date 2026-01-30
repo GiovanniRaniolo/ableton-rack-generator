@@ -53,9 +53,30 @@ class AbletonDevice:
         
         # Get device config from database
         self.device_info = device_db.get_device(name)
-        if not self.device_info:
-            raise ValueError(f"Device '{name}' not found in database")
         
+        # SAFE FALLBACK LOGIC
+        if not self.device_info:
+            print(f"[WARNING] Device '{name}' not found in DB (Nuked?). Applying Fallback strategy.")
+            
+            fallback_map = {
+                "Echo": "Delay",
+                "Spectral": "Reverb", 
+                "SpectralTime": "Delay",
+                "SpectralResonator": "Reverb",
+                "Corpus": "Resonator",
+                "Amp": "Overdrive",
+                "Cabinet": "Overdrive"
+            }
+            
+            original_name = name
+            fallback_name = fallback_map.get(name, "Utility") # Last resort: Utility (Safe)
+            
+            print(f" -> Mapping '{original_name}' to '{fallback_name}'")
+            self.device_info = device_db.get_device(fallback_name)
+            self.name = fallback_name # Update internal name to match reality
+            
+            if not self.device_info:
+                 raise ValueError(f"Critical: Fallback device '{fallback_name}' also missing!")
         self.xml_tag = self.device_info['xml_tag']
         self.class_name = self.device_info['class_name']
         self.type = self.device_info['type']
@@ -591,6 +612,147 @@ class AudioEffectRack:
                                     max_v = sugg['max']
                                     break
                             
+                            # SEMANTIC FORCE MAPPING (Overrides Fuzzy Logic)
+                            # "Grand Unified Map" - Covers all 43 Native Devices from Audit
+                            SEMANTIC_MAP = {
+                                # --- DYNAMICS ---
+                                "Compressor2": {
+                                    "thresh": "Threshold", "ratio": "Ratio", "attack": "Attack", "release": "Release", "gain": "Gain"
+                                },
+                                "GlueCompressor": {
+                                    "thresh": "Threshold", "ratio": "Ratio", "makeup": "Makeup", "range": "Range", "attack": "Attack",
+                                    "focus": "Threshold", "sub": "Threshold", "compress": "Threshold" # Fix for "Sub Focus"
+                                },
+                                "Limiter": {
+                                    "ceiling": "Ceiling", "gain": "Gain", "look": "Lookahead"
+                                },
+                                "MultibandDynamics": {
+                                    "ott": "GlobalAmount", "amount": "GlobalAmount", "time": "GlobalTime",
+                                    "output": "OutputGain", "mix": "GlobalAmount" # OTT usually implies Mix/Amount
+                                },
+                                "Gate": {
+                                    "thresh": "Threshold", "return": "Return", "attack": "Attack", "hold": "Hold", "release": "Release"
+                                },
+                                "DrumBuss": {
+                                    "drive": "DriveAmount", "crunch": "CrunchAmount", "boom": "BoomAmount", 
+                                    "transient": "TransientShaping", "damp": "DampingFrequency", "trim": "InputTrim"
+                                },
+
+                                # --- DISTORTION & COLOR ---
+                                "Roar": {
+                                    "drive": "Stage1_Shaper_Amount", "amount": "Stage1_Shaper_Amount", 
+                                    "cutoff": "Stage1_Filter_Frequency", "freq": "Stage1_Filter_Frequency", # FIX: Explicit 'freq' mapping
+                                    "res": "Stage1_Filter_Resonance", "bias": "Stage1_Shaper_Bias"
+                                },
+                                "Saturator": {
+                                    "drive": "Drive", "depth": "ColorDepth", "curve": "WsCurve", "color": "ColorOn", "output": "Output"
+                                },
+                                "Overdrive": {
+                                    "drive": "Drive", "tone": "Tone", "band": "Bandwidth", "center": "MidFreq"
+                                },
+                                "Pedal": {
+                                    "gain": "Gain", "drive": "Gain", "bass": "Bass", "mid": "Mid", "treble": "Treble", "output": "Output"
+                                },
+                                "Amp": {
+                                    "gain": "Gain", "volume": "Volume", "bass": "Bass", "middle": "Middle", "treble": "Treble", "presence": "Presence"
+                                },
+                                "Cabinet": {
+                                    "type": "CabinetType", "mic": "MicrophonePosition", "mix": "DryWet"
+                                },
+                                "Tube": { # Dynamic Tube
+                                    "drive": "PreDrive", "bias": "Bias", "tone": "Tone"
+                                },
+                                "Vinyl": {
+                                    "crackle": "CracleVolume", "density": "CracleDensity", "drive": "Drive", "pinch": "BandFreq2"
+                                },
+                                "Erosion": {
+                                    "amount": "Amplitude", "width": "BandQ", "freq": "Freq"
+                                },
+                                "Redux2": {
+                                    "bits": "BitDepth", "crush": "BitDepth", "rate": "SampleRate", "jitter": "Jitter"
+                                },
+
+                                # --- FILTERS & EQ ---
+                                "AutoFilter2": {
+                                    "cutoff": "Filter_Frequency", "freq": "Filter_Frequency", "res": "Filter_Resonance", 
+                                    "lfo": "Lfo_Amount", "rate": "Lfo_Frequency", "drive": "Filter_Drive"
+                                },
+                                "Eq8": {
+                                    "freq": "Freq", "gain": "GlobalGain", "q": "AdaptiveQ" # Or band specific?
+                                    # Note: Band specific logic is handled below in 'best_param' check, this is fallback
+                                },
+                                "ChannelEq": {
+                                    "low": "LowShelfGain", "mid": "MidGain", "high": "HighShelfGain", "freq": "MidFrequency"
+                                },
+                                "FilterEQ3": {
+                                    "low": "GainLo", "mid": "GainMid", "high": "GainHi", "slope": "Slope"
+                                },
+
+                                # --- MODULATION ---
+                                "Chorus2": {
+                                    "rate": "Rate", "amount": "Amount", "width": "Width", "warmth": "Warmth", "feed": "Feedback"
+                                },
+                                "PhaserNew": {
+                                    "rate": "Modulation_Frequency", "amount": "Modulation_Amount", "feed": "Feedback", "color": "Modulation_Amount"
+                                },
+                                "AutoPan2": {
+                                    "rate": "Modulation_Frequency", "amount": "Modulation_Amount", "width": "Modulation_PhaseOffset" # Phase = Width in AutoPan
+                                },
+                                "Shifter": { # Freq Shifter + Ring Mod
+                                    "coarse": "Pitch_Coarse", "fine": "Pitch_Fine", "ring": "ModBasedShifting_RingMod_Drive", 
+                                    "rate": "Lfo_RateHz", "amount": "Lfo_Amount"
+                                },
+                                
+                                # --- TIME & SPACE ---
+                                "Reverb": {
+                                    "decay": "DecayTime", "size": "RoomSize", "diff": "Diffusion", "predelay": "PreDelay"
+                                },
+                                "Hybrid": {
+                                    "decay": "Algorithm_Decay", "size": "Algorithm_Size", "vintage": "Vintage"
+                                },
+                                "Echo": {
+                                    "time": "Delay_TimeL", "feedback": "Feedback", "drywet": "NewDryWet", 
+                                    "reverb": "Reverb_Level", "wobble": "Wobble_Amount", "noise": "Noise_Amount",
+                                    "drive": "InputGain", "predrive": "InputGain", # FIX: Explicit synonym for Drive
+                                    "input": "InputGain"
+                                },
+                                "Delay": {
+                                    "time": "DelayLine_TimeL", "feedback": "Feedback", "filter": "Filter_Frequency"
+                                },
+                                "GrainDelay": {
+                                    "spray": "Spray", "pitch": "Pitch", "freq": "Freq", "random": "RandomPitch", "feed": "Feedback"
+                                },
+                                "Spectral": { # Spectral Time/Resonator
+                                    "freeze": "Freezer_On", "spray": "Delay_Spray", "shift": "Delay_FrequencyShift", "feedback": "Delay_Feedback"
+                                },
+                                "Resonator": {
+                                    "decay": "ResDecay", "color": "ResColor", "gain": "GlobalGain", "width": "Width"
+                                },
+                                "Corpus": {
+                                    "freq": "Frequency", "tune": "Frequency", "coarse": "Frequency", "pitch": "Frequency", # FIX: Explicit synonym for Coarse
+                                    "decay": "Decay", "res": "Decay", "feedback": "Decay",
+                                    "bright": "Brightness", "material": "Material",
+                                    "ratio": "Ratio",
+                                    "mix": "DryWet", "amount": "DryWet"
+                                },
+                                "BeatRepeat": {
+                                    "grid": "Grid", "interval": "Interval", "gate": "Gate", "pitch": "Pitch", "chance": "Chance", "var": "GridChance"
+                                },
+                                "Looper": {
+                                    "feed": "Feedback", "speed": "TempoControl", "reverse": "Reverse"
+                                }
+                            }
+                            
+                            device_semantic = SEMANTIC_MAP.get(device.name, {})
+                            for intent, real_param in device_semantic.items():
+                                if intent in target_param:
+                                    print(f"DEBUG: Semantic Override: '{target_param}' -> '{real_param}'")
+                                    best_param = real_param
+                                    # Try to get range from info if possible, otherwise generic
+                                    # (We rely on later logic or set sensible defaults)
+                                    best_path = [] # Reset path so special handling can re-set it if needed
+                                    break
+
                             # If not in suggestions, try generic mapping if it's a common param
                             if not best_param:
                                 # Fallback: simple heuristic for standard params

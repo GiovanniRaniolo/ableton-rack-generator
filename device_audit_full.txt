@@ -1,0 +1,167 @@
+FULL DEVICE PARAMETER AUDIT
+===========================
+
+DEVICE: Amp
+  Tag: Amp
+  Params (10): On, AmpType, Bass, Middle, Treble, Presence, Gain, Volume, DualMono, DryWet
+--------------------------------------------------
+DEVICE: AutoFilter2
+  Tag: AutoFilter2
+  Params (42): On, Filter_Frequency, Filter_Resonance, Filter_Morph, Filter_Type, Filter_Slope, Filter_MorphSlope, Filter_Circuit, Filter_Drive, Filter_DjControl, Filter_VowelPitch, Filter_VowelFormant, Lfo_Amount, Lfo_Waveform, Lfo_TimeMode, Lfo_Frequency, Lfo_Time, Lfo_SyncedRate, Lfo_Sixteenth, Lfo_Phase, Lfo_PhaseOffset, Lfo_StereoMode, Lfo_Spin, Lfo_Morph, Lfo_Smoothing, Lfo_QuantizationMode, Lfo_Steps, Lfo_SahRate, Envelope_Amount, Envelope_Attack, Envelope_HoldOn, Envelope_Release, Envelope_SahOn, Envelope_SahRate, Output, SoftClipOn, DryWet, SideChainEq_On, SideChainEq_Mode, SideChainEq_Freq, SideChainEq_Q, SideChainEq_Gain
+--------------------------------------------------
+DEVICE: AutoPan2
+  Tag: AutoPan2
+  Params (20): On, Mode, Modulation_Amount, Modulation_Waveform, Modulation_Invert, Modulation_TimeMode, Modulation_Frequency, Modulation_Time, Modulation_SyncedRate, Modulation_Sixteenth, Modulation_Phase, Modulation_PhaseOffset, Modulation_StereoMode, Modulation_Spin, PanningWaveformShape, TremoloWaveformShape, AttackTime, DynamicFrequencyModulation, HarmonicMode, VintageMode
+--------------------------------------------------
+DEVICE: AutoShift
+  Tag: AutoShift
+  Params (44): On, Global_InputGain, Global_DryWet, Global_UseScale, MidiInput_Glide, MidiInput_PitchBendRange, MidiInput_AttackTime, MidiInput_ReleaseTime, MidiInput_Latch, PitchShift_ShiftSemitones, PitchShift_ShiftScaleDegrees, PitchShift_Detune, PitchShift_FormantShift, PitchShift_FormantFollow, Quantizer_Active, Quantizer_Smooth, Quantizer_SmoothingTime, Quantizer_Amount, Quantizer_RootNote, Quantizer_InternalScale, Lfo_Enabled, Lfo_OnsetRetrigger, Lfo_Delay, Lfo_Attack, Lfo_Waveform, Lfo_SyncOn, Lfo_RateHz, Lfo_SyncedRate, Vibrato_Attack, Vibrato_RateHz, Vibrato_Amount, Vibrato_Humanization, Modulation_LfoToPitchModAmount, Modulation_LfoToFormantModAmount, Modulation_LfoToVolumeModAmount, Modulation_LfoToPanModAmount, Modulation_MidiToPitchModSource, Modulation_MidiToFormantModSource, Modulation_MidiToVolumeModSource, Modulation_MidiToPanModSource, Modulation_MidiToPitchModAmount, Modulation_MidiToFormantModAmount, Modulation_MidiToVolumeModAmount, Modulation_MidiToPanModAmount
+--------------------------------------------------
+DEVICE: BeatRepeat
+  Tag: BeatRepeat
+  Params (18): On, Chance, Interval, Offset, Grid, BlockTripplets, GridChance, GridChanceType, Gate, DampVolume, DampPitch, BasePitch, MixType, WetLevel, FilterOn, MidFreq, BandWidth, InstantRepeat
+--------------------------------------------------
+DEVICE: Cabinet
+  Tag: Cabinet
+  Params (6): On, CabinetType, MicrophoneTypeSwitch, MicrophonePosition, DualMono, DryWet
+--------------------------------------------------
+DEVICE: ChannelEq
+  Tag: ChannelEq
+  Params (7): On, HighpassOn, LowShelfGain, MidGain, MidFrequency, HighShelfGain, Gain
+--------------------------------------------------
+DEVICE: Chorus2
+  Tag: Chorus2
+  Params (14): On, Mode, Shaping, Rate, Amount, Feedback, InvertFeedback, VibratoOffset, HighpassEnabled, HighpassFrequency, Width, Warmth, OutputGain, DryWet
+--------------------------------------------------
+DEVICE: Compressor2
+  Tag: Compressor2
+  Params (22): On, Threshold, Ratio, ExpansionRatio, Attack, Release, AutoReleaseControlOnOff, Gain, GainCompensation, DryWet, Model, LegacyModel, LogEnvelope, LegacyEnvFollowerMode, Knee, LookAhead, SideListen, SideChainEq_On, SideChainEq_Mode, SideChainEq_Freq, SideChainEq_Q, SideChainEq_Gain
+--------------------------------------------------
+DEVICE: Corpus
+  Tag: Corpus
+  Params (39): On, ResonanceType, ResonatorQuality, Frequency, Transpose, FineTranspose, Detune, Decay, FreqDamping, Radius, AmpFreq, Inharmonics, TubeOpening, Ratio, ExcitationX, ListeningXL, ListeningXR, LfoOnOff, LfoType, LfoSync, LfoRate, LfoSyncRate, LfoStereoMode, LfoSpin, LfoPhase, LfoOffset, LfoAmount, FilterOn, FilterMidFreq, FilterBandWidth, MidiPitch, MidiMode, PitchBendRange, MidiGate, DecayOnNoteOff, Drive, StereoWidth, Bleed, DryWet
+--------------------------------------------------
+DEVICE: Delay
+  Tag: Delay
+  Params (25): On, DelayLine_SmoothingMode, DelayLine_Link, DelayLine_PingPong, DelayLine_SyncL, DelayLine_SyncR, DelayLine_TimeL, DelayLine_TimeR, DelayLine_SimpleDelayTimeL, DelayLine_SimpleDelayTimeR, DelayLine_PingPongDelayTimeL, DelayLine_PingPongDelayTimeR, DelayLine_SyncedSixteenthL, DelayLine_SyncedSixteenthR, DelayLine_OffsetL, DelayLine_OffsetR, Feedback, Freeze, Filter_On, Filter_Frequency, Filter_Bandwidth, Modulation_Frequency, Modulation_AmountTime, Modulation_AmountFilter, DryWet
+--------------------------------------------------
+DEVICE: DrumBuss
+  Tag: DrumBuss
+  Params (14): On, EnableCompression, DriveAmount, DriveType, CrunchAmount, DampingFrequency, TransientShaping, BoomFrequency, BoomAmount, BoomDecay, BoomAudition, InputTrim, OutputGain, DryWet
+--------------------------------------------------
+DEVICE: Echo
+  Tag: Echo
+  Params (53): On, Delay_SyncL, Delay_TimeL, Delay_SyncedDivisionL, Delay_SyncedSixteenthL, Delay_SyncModeL, Delay_OffsetL, Delay_TimeR, Delay_SyncR, Delay_SyncedDivisionR, Delay_SyncedSixteenthR, Delay_SyncModeR, Delay_OffsetR, Delay_TimeLink, Delay_Repitch, Delay_RepitchSmoothingTime, Feedback, FeedbackInvert, ChannelMode, InputGain, OutputGain, Clipper_Dry, Gate_On, Gate_Threshold, Gate_Release, Ducking_On, Ducking_Threshold, Ducking_Release, Filter_On, Filter_HighPassFrequency, Filter_HighPassResonance, Filter_LowPassFrequency, Filter_LowPassResonance, Modulation_Waveform, Modulation_Frequency, Modulation_Sync, Modulation_SyncedRate, Modulation_PhaseOffset, Modulation_EnvelopeMix, Modulation_AmountDelay, Modulation_AmountFilter, Modulation_AmountDelayTimesFour, Reverb_Level, Reverb_Decay, Reverb_Location, Noise_On, Noise_Amount, Noise_Type, Wobble_On, Wobble_Amount, Wobble_Type, StereoWidth, DryWet
+--------------------------------------------------
+DEVICE: Eq8
+  Tag: Eq8
+  Params (4): On, GlobalGain, Scale, AdaptiveQ
+--------------------------------------------------
+DEVICE: Erosion
+  Tag: Erosion
+  Params (5): On, Mode, Freq, Amplitude, BandQ
+--------------------------------------------------
+DEVICE: FilterDelay
+  Tag: FilterDelay
+  Params (35): On, On1, FilterOn1, MidFreq1, BandWidth1, DelayTimeSwitch1, BeatDelayEnum1, BeatDelayOffset1, DelayTime1, Feedback1, Pan1, Volume1, On2, FilterOn2, MidFreq2, BandWidth2, DelayTimeSwitch2, BeatDelayEnum2, BeatDelayOffset2, DelayTime2, Feedback2, Pan2, Volume2, On3, FilterOn3, MidFreq3, BandWidth3, DelayTimeSwitch3, BeatDelayEnum3, BeatDelayOffset3, DelayTime3, Feedback3, Pan3, Volume3, DryVolume
+--------------------------------------------------
+DEVICE: FilterEQ3
+  Tag: FilterEQ3
+  Params (10): On, GainLo, GainMid, GainHi, FreqLo, FreqHi, LowOn, MidOn, HighOn, Slope
+--------------------------------------------------
+DEVICE: Gate
+  Tag: Gate
+  Params (10): On, Threshold, Attack, Hold, Release, Return, Gain, SideListen, FlipMode, LookAhead
+--------------------------------------------------
+DEVICE: GlueCompressor
+  Tag: GlueCompressor
+  Params (9): On, Threshold, Range, Makeup, Attack, Ratio, Release, DryWet, PeakClipIn
+--------------------------------------------------
+DEVICE: GrainDelay
+  Tag: GrainDelay
+  Params (11): On, Spray, Freq, Pitch, RandomPitch, Feedback, NewDryWet, SyncMode, BeatDelayEnum, BarDelayOffset, MsDelay
+--------------------------------------------------
+DEVICE: Hybrid
+  Tag: Hybrid
+  Params (54): On, PreDelay_Sync, PreDelay_Time, PreDelay_Sixteenth, PreDelay_FeedbackTime, PreDelay_FeedbackSixteenth, Algorithm_Type, Algorithm_Delay, Algorithm_Freeze, Algorithm_FreezeIn, Algorithm_Decay, Algorithm_Size, Algorithm_Damping, Algorithm_Diffusion, Algorithm_Modulation, Algorithm_Shape, Algorithm_BassMultiplier, Algorithm_BassCrossover, Algorithm_Shimmer, Algorithm_PitchShift, Algorithm_TidesAmount, Algorithm_TidesRate, Algorithm_TidesWaveform, Algorithm_TidesPhaseOffset, Algorithm_Quartz_LowDamping, Algorithm_Quartz_Distance, Algorithm_Prism_HighMultiplier, Algorithm_Prism_LowMultiplier, Algorithm_Prism_CrossoverFrequency, Algorithm_Prism_Sixth, Algorithm_Prism_Seventh, Eq_On, Eq_PreAlgo, Eq_LowBandType, Eq_LowBandFrequency, Eq_LowBandGain, Eq_LowBandSlope, Eq_Peak1Frequency, Eq_Peak1Gain, Eq_Peak1Q, Eq_Peak2Frequency, Eq_Peak2Gain, Eq_Peak2Q, Eq_HighBandType, Eq_HighBandFrequency, Eq_HighBandGain, Eq_HighBandSlope, Send, Routing, ConvoAlgoBlend, Vintage, StereoWidth, BassMono, DryWet
+--------------------------------------------------
+DEVICE: Limiter
+  Tag: Limiter
+  Params (13): On, Gain, Ceiling, Release, AutoRelease, LinkAmount, LinkAmountMidSide, Lookahead, Routing, Mode, Maximize, MaximizeThreshold, MaximizeOutput
+--------------------------------------------------
+DEVICE: Looper
+  Tag: Looper
+  Params (9): On, State, Feedback, Reverse, Monitor, Pitch, LocalQuantization, SongControl, TempoControl
+--------------------------------------------------
+DEVICE: MultibandDynamics
+  Tag: MultibandDynamics
+  Params (35): On, SplitLowMid, SplitMidHigh, SoftKnee, EnvelopeIsPeak, OutputGain, GlobalAmount, GlobalTime, GainLow, GainMid, GainHigh, InputGainLow, InputGainMid, InputGainHigh, ActiveLow, ActiveMid, ActiveHigh, AboveThresholdLow, AboveThresholdMid, AboveThresholdHigh, BelowThresholdLow, BelowThresholdMid, BelowThresholdHigh, AboveRatioLow, AboveRatioMid, AboveRatioHigh, BelowRatioLow, BelowRatioMid, BelowRatioHigh, AttackLow, AttackMid, AttackHigh, ReleaseLow, ReleaseMid, ReleaseHigh
+--------------------------------------------------
+DEVICE: Overdrive
+  Tag: Overdrive
+  Params (7): On, MidFreq, BandWidth, Drive, DryWet, Tone, PreserveDynamics
+--------------------------------------------------
+DEVICE: Pedal
+  Tag: Pedal
+  Params (10): On, Type, Gain, Output, Bass, Mid, Treble, MidFreq, Sub, DryWet
+--------------------------------------------------
+DEVICE: PhaserNew
+  Tag: PhaserNew
+  Params (31): On, Modulation_Amount, Modulation_Waveform, Modulation_Frequency, Modulation_Frequency2, Modulation_Sync, Modulation_Sync2, Modulation_SyncedRate, Modulation_SyncedRate2, Modulation_PhaseOffset, Modulation_SpinEnabled, Modulation_Spin, Modulation_DutyCycle, Modulation_LfoBlend, Modulation_EnvelopeEnabled, Modulation_EnvelopeAmount, Modulation_EnvelopeAttack, Modulation_EnvelopeRelease, Mode, Notches, FlangerDelayTime, DoublerDelayTime, ModulationBlend, CenterFrequency, Spread, Feedback, Warmth, SafeBassFrequency, InvertWet, OutputGain, DryWet
+--------------------------------------------------
+DEVICE: Redux2
+  Tag: Redux2
+  Params (10): On, SampleRate, Jitter, BitDepth, QuantizerShape, QuantizerDcShift, EnablePreFilter, EnablePostFilter, PostFilterValue, DryWet
+--------------------------------------------------
+DEVICE: Resonator
+  Tag: Resonator
+  Params (37): On, InFilterOn, InFilterFreq, InFilterMode, ResMode, ResDecay, ResConst, ResColor, Width, DryWet, GlobalGain, UseCurrentScale, ResOn1, ResNote, ResNoteScaleDegrees, ResTune1, ResGain1, ResOn2, ResPitch2, ResPitchScaleDegrees2, ResTune2, ResGain2, ResOn3, ResPitch3, ResPitchScaleDegrees3, ResTune3, ResGain3, ResOn4, ResPitch4, ResPitchScaleDegrees4, ResTune4, ResGain4, ResOn5, ResPitch5, ResPitchScaleDegrees5, ResTune5, ResGain5
+--------------------------------------------------
+DEVICE: Reverb
+  Tag: Reverb
+  Params (33): On, PreDelay, BandHighOn, BandLowOn, BandFreq, BandWidth, SpinOn, EarlyReflectModFreq, EarlyReflectModDepth, DiffuseDelay, ShelfHighOn, HighFilterType, ShelfHiFreq, ShelfHiGain, ShelfLowOn, ShelfLoFreq, ShelfLoGain, ChorusOn, SizeModFreq, SizeModDepth, DecayTime, AllPassGain, AllPassSize, FreezeOn, FlatOn, CutOn, RoomSize, SizeSmoothing, StereoSeparation, RoomType, MixReflect, MixDiffuse, MixDirect
+--------------------------------------------------
+DEVICE: Roar
+  Tag: Roar
+  Params (88): On, Input_InputGain, Input_ToneAmount, Input_ToneFrequency, Input_ColorOn, Input_Blend, Input_LowMidCrossover, Input_MidHighCrossover, Stage1_On, Stage1_Shaper_On, Stage1_Shaper_Type, Stage1_Shaper_Amount, Stage1_Shaper_Bias, Stage1_Shaper_Trim, Stage1_Filter_On, Stage1_Filter_Type, Stage1_Filter_Frequency, Stage1_Filter_Resonance, Stage1_Filter_Morph, Stage1_Filter_PeakGain, Stage1_Filter_PreOn, Stage2_On, Stage2_Shaper_On, Stage2_Shaper_Type, Stage2_Shaper_Amount, Stage2_Shaper_Bias, Stage2_Shaper_Trim, Stage2_Filter_On, Stage2_Filter_Type, Stage2_Filter_Frequency, Stage2_Filter_Resonance, Stage2_Filter_Morph, Stage2_Filter_PeakGain, Stage2_Filter_PreOn, Stage3_On, Stage3_Shaper_On, Stage3_Shaper_Type, Stage3_Shaper_Amount, Stage3_Shaper_Bias, Stage3_Shaper_Trim, Stage3_Filter_On, Stage3_Filter_Type, Stage3_Filter_Frequency, Stage3_Filter_Resonance, Stage3_Filter_Morph, Stage3_Filter_PeakGain, Stage3_Filter_PreOn, Feedback_FeedbackAmount, Feedback_FeedbackTimeMode, Feedback_FeedbackTime, Feedback_FeedbackSyncedRate, Feedback_FeedbackNote, Feedback_FeedbackFrequency, Feedback_FeedbackBandwidth, Feedback_FeedbackInvert, Feedback_FeedbackGateOn, ModulationSources_Lfo1_RateMode, ModulationSources_Lfo1_Rate, ModulationSources_Lfo1_SyncedRate, ModulationSources_Lfo1_Sixteenth, ModulationSources_Lfo1_Waveform, ModulationSources_Lfo1_Morph, ModulationSources_Lfo1_SmoothingAmount, ModulationSources_Lfo2_RateMode, ModulationSources_Lfo2_Rate, ModulationSources_Lfo2_SyncedRate, ModulationSources_Lfo2_Sixteenth, ModulationSources_Lfo2_Waveform, ModulationSources_Lfo2_Morph, ModulationSources_Lfo2_SmoothingAmount, ModulationSources_Envelope_Amount, ModulationSources_Envelope_Attack, ModulationSources_Envelope_HoldOn, ModulationSources_Envelope_Release, ModulationSources_Envelope_Threshold, ModulationSources_Envelope_Frequency, ModulationSources_Envelope_Width, ModulationSources_Noise_RateMode, ModulationSources_Noise_Rate, ModulationSources_Noise_SyncedRate, ModulationSources_Noise_Sixteenth, ModulationSources_Noise_Type, ModulationSources_Noise_SmoothingAmount, GlobalModulationAmount, Output_CompressionAmount, Output_CompressorHighpassFilterOn, Output_OutputGain, Output_DryWet
+--------------------------------------------------
+DEVICE: Saturator
+  Tag: Saturator
+  Params (19): On, PreDrive, PreDcFilter, Type, ColorOn, BaseDrive, ColorFrequency, ColorWidth, ColorDepth, PostClip, PostDrive, DryWet, BassShaperThreshold, WsDrive, WsLin, WsCurve, WsDamp, WsPeriod, WsDepth
+--------------------------------------------------
+DEVICE: Shifter
+  Tag: Shifter
+  Params (36): On, Lfo_Amount, Lfo_AmountPitch, Lfo_Waveform, Lfo_SyncOn, Lfo_RateHz, Lfo_SyncedRate, Lfo_SpinOn, Lfo_PhaseOffset, Lfo_SpinAmount, Lfo_Offset, Lfo_SHWidth, Lfo_DutyCycle, Pitch_Coarse, Pitch_Fine, Pitch_WindowSize, ModBasedShifting_Fine, ModBasedShifting_FShift_Coarse, ModBasedShifting_RingMod_Coarse, ModBasedShifting_RingMod_Drive, ModBasedShifting_RingMod_DriveAmount, MidiPitch_Glide, EnvelopeFollower_On, EnvelopeFollower_Attack, EnvelopeFollower_Release, EnvelopeFollower_AmountHz, EnvelopeFollower_AmountPitch, Delay_On, Delay_SyncOn, Delay_TimeSeconds, Delay_SyncedTime, Delay_Feedback, Global_ShifterMode, Global_Tone, Global_Wide, Global_DryWet
+--------------------------------------------------
+DEVICE: Spectral
+  Tag: Spectral
+  Params (27): On, Freezer_On, Freezer_FreezeOn, Freezer_SyncIntervalUnits, Freezer_SyncIntervalBeats, Freezer_SyncIntervalSeconds, Freezer_MainMode, Freezer_RetriggerMode, Freezer_FadeType, Freezer_FadeIn, Freezer_CrossfadePercent, Freezer_FadeOut, Freezer_Sensitivity, Delay_On, Delay_TimeSeconds, Delay_TimeUnit, Delay_TimeSixteenths, Delay_TimeDivisions, Delay_Feedback, Delay_Tilt, Delay_Spray, Delay_Mask, Delay_StereoSpread, Delay_FrequencyShift, Delay_DryWet, InputSendGain, DryWet
+--------------------------------------------------
+DEVICE: SpectrumAnalyzer
+  Tag: SpectrumAnalyzer
+  Params (1): On
+--------------------------------------------------
+DEVICE: StereoGain
+  Tag: StereoGain
+  Params (14): On, PhaseInvertL, PhaseInvertR, ChannelMode, StereoWidth, MidSideBalance, Mono, BassMono, BassMonoFrequency, Balance, Gain, LegacyGain, Mute, DcFilter
+--------------------------------------------------
+DEVICE: Transmute
+  Tag: Transmute
+  Params (20): On, MidiPitch_Transpose, MidiPitch_TransposeScaleDegrees, MidiPitch_Glide, PartialFrequencies_FrequencyHz, PartialFrequencies_FrequencyNote, PartialFrequencies_Shift, PartialFrequencies_PartialStretch, PartialFrequencies_QuantizeToScaleOrTuning, DecayDamping_DecayTime, DecayDamping_HighFreqDamp, DecayDamping_LowFreqDamp, Modulation_ModRate, Modulation_PitchModAmount, Global_NumHarmonics, Global_Unison, Global_UnisonAmount, Global_InputSend, Global_DryWet, Global_UseScale
+--------------------------------------------------
+DEVICE: Tube
+  Tag: Tube
+  Params (10): On, DryWet, PreDrive, PostDrive, Bias, AutoBias, AutoBiasAttack, AutoBiasRelease, Tone, Type
+--------------------------------------------------
+DEVICE: Tuner
+  Tag: Tuner
+  Params (2): On, TuningFreq
+--------------------------------------------------
+DEVICE: Vinyl
+  Tag: Vinyl
+  Params (14): On, Band2On, Gain2, BandFreq2, BandQ2, Band1On, Gain1, BandFreq1, BandQ1, Drive, SoftHard, NormalMono, CracleDensity, CracleVolume
+--------------------------------------------------
+DEVICE: Vocoder
+  Tag: Vocoder
+  Params (17): On, LowFrequency, HighFrequency, FormantShift, FilterBandWidth, Retro, LevelGate, OutputGain, EnvelopeRate, EnvelopeRelease, UvdThreshold, UvdSlow, UvdLevel, CarrierFlatten, MonoStereo, DryWet, ModulatorAmount
+--------------------------------------------------

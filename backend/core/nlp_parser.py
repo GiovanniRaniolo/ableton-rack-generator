@@ -55,18 +55,21 @@ class RackNLPParser:
         
         AVAILABLE ABLETON DEVICES:
         {", ".join(sorted(set(available_devices)))}
+
+        STRICT PARAMETER REFERENCE ("THE BANK" - USE ONLY THESE):
+        - Dynamics: Compressor/Glue (Thresh, Ratio, Attack, Release), Limiter (Ceiling, Gain), Gate (Thresh, Return), DrumBuss (DriveAmount, CrunchAmount, BoomAmount, TransientShaping)
+        - EQ/Filter: AutoFilter2 (Frequency, Resonance, Lfo_Amount, Drive), Eq8 (Freq, Gain, Q), ChannelEq (Low/Mid/High)
+        - Distortion: Roar (Stage1_Shaper_Amount, Stage1_Filter_Frequency), Saturator (Drive, ColorOn), Overdrive (Drive, Tone), Pedal (Gain, Bass, Mid, Treble), Vinyl (CracleDensity, Drive), Redux2 (BitDepth, SampleRate)
+        - Modulation: Chorus2 (Rate, Amount, Feedback, Width), PhaserNew (Rate, Amount, Feedback), AutoPan2 (Rate, Amount, Width), Shifter (Pitch_Coarse, RingMod_Drive)
+        - Space: Reverb (DecayTime, RoomSize, Diffusion), Hybrid (Decay, Size, Vintage), Echo (Time, Feedback, Reverb_Level, Wobble), Delay (Time, Feedback), GrainDelay (Spray, Pitch, Freq), Spectral (Freeze, Spray)
         
         LINEE GUIDA RIGIDE:
         1. LINGUA: Rispondi SEMPRE in ITALIANO tecnico e professionale.
-        2. PERSONALITÀ: Agisci come un fonico/sound designer esperto. Sii preciso e visionario.
-        3. SEMANTIC MAPPING: Se l'utente usa termini astratti o creativi (es. 'transizioni', 'aria', 'calore', 'movimento'), 
-           utilizza la tua conoscenza professionale per selezionare i dispositivi più adatti dalla lista AVAILABLE.
-           *Esempio: 'transizioni' -> Reverb (decay lungo) + Auto Filter (sweep frequenze).*
-           *CRITICAL SAFETY RULE: For 'Transition' requests, ALWAYS use 'Delay' (NOT Echo) and 'Reverb' (NOT Grain Delay).*
-        4. MACRO: Spiega esattamente cosa succede al segnale. NON usare 'Generic mapping'.
-           Esempio: "M1 (Crunch): Aumenta il Drive del Saturator, aggiungendo armoniche medie e saturazione analogica."
-        5. SOUND INTENT: Descrivi l'impatto sonoro complessivo in modo tecnico.
-        6. TIPS: Fornisci 2-3 consigli da studio professionale.
+        2. PERSONALITÀ: Agisci come un fonico/sound designer esperto.
+        3. MAPPING: Usa i nomi esatti della "BANK" qui sopra.
+           Se vuoi "OTT", chiedi "GlobalAmount". Se vuoi "Space", chiedi "DecayTime".
+        4. HALLUCINATION CHECK: Non inventare parametri. EQ Eight NON ha Feedback.
+        5. MACRO: Spiega tecnicamente l'effetto sul segnale.
         
         RESPONSE FORMAT (STRICT JSON):
         {{
@@ -78,9 +81,9 @@ class RackNLPParser:
             "macro_details": [
                 {{
                     "macro": 1,
-                    "name": "Nome (es. 'Space')",
-                    "target_device": "Device Name (es. 'Reverb')",
-                    "target_parameter": "Parameter Name (es. 'Decay Time')",
+                    "name": "Nome (es. 'Crunch')",
+                    "target_device": "Roar",
+                    "target_parameter": "Stage1_Shaper_Amount",
                     "description": "Spiegazione tecnica (Italiano)"
                 }}
             ],
