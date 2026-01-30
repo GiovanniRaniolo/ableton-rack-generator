@@ -1,0 +1,520 @@
+{
+  "devices": {
+    "audio_effects": {
+      "Auto Filter": {
+        "xml_tag": "AutoFilter2",
+        "class_name": "AutoFilter",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "Cutoff", "default": 1000.0, "min": 20.0, "max": 20000.0, "unit": "Hz"},
+          {"name": "Resonance", "default": 0.5, "min": 0.0, "max": 1.1},
+          {"name": "LfoAmount", "default": 0.0, "min": 0.0, "max": 100.0}
+        ],
+        "macro_suggestions": [{"param_name": "Cutoff", "min": 100, "max": 10000}]
+      },
+
+      "Auto Pan": {
+        "xml_tag": "AutoPan",
+        "class_name": "AutoPan",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "Amount", "default": 0.0, "min": 0.0, "max": 1.0},
+          {"name": "Rate", "default": 1.0, "min": 0.02, "max": 20.0},
+          {"name": "Shape", "default": 0.0, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": [{"param_name": "Amount", "min": 0, "max": 1}]
+      },
+      "Chorus-Ensemble": {
+        "xml_tag": "Chorus2",
+        "class_name": "Chorus",
+        "type": "audio_effect",
+        "parameters": [
+           {"name": "Amount", "default": 0.5, "min": 0.0, "max": 1.0},
+           {"name": "Rate", "default": 1.0, "min": 0.0, "max": 20.0},
+           {"name": "Warmth", "default": 0.0, "min": 0.0, "max": 1.0},
+           {"name": "DryWet", "default": 0.5, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": [{"param_name": "DryWet", "min": 0, "max": 0.8}]
+      },
+      "Chorus": {
+        "xml_tag": "Chorus",
+        "class_name": "Chorus",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "LFOAmount", "default": 0.0, "min": 0.0, "max": 1.0},
+          {"name": "LFORate", "default": 1.0, "min": 0.0, "max": 20.0},
+          {"name": "DryWet", "default": 0.5, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": [{"param_name": "DryWet", "min": 0, "max": 0.8}]
+      },
+      "Compressor": {
+        "xml_tag": "Compressor2",
+        "class_name": "Compressor",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "Threshold", "default": -18.0, "min": -60.0, "max": 0.0},
+          {"name": "Ratio", "default": 2.0, "min": 1.0, "max": 25.0},
+          {"name": "Attack", "default": 2.0, "min": 0.01, "max": 1000.0, "unit": "ms"},
+          {"name": "Release", "default": 50.0, "min": 1.0, "max": 3000.0, "unit": "ms"},
+          {"name": "Gain", "default": 0.0, "min": 0.0, "max": 24.0}
+        ],
+        "macro_suggestions": [{"param_name": "Threshold", "min": -40, "max": -10}]
+      },
+      "Amp": {
+        "xml_tag": "Amp",
+        "class_name": "Amp",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "Drive", "default": 6.0, "min": 0.0, "max": 10.0},
+          {"name": "Bass", "default": 0.0, "min": -10.0, "max": 10.0},
+          {"name": "Middle", "default": 0.0, "min": -10.0, "max": 10.0},
+          {"name": "Treble", "default": 0.0, "min": -10.0, "max": 10.0},
+          {"name": "Presence", "default": 0.0, "min": -10.0, "max": 10.0},
+          {"name": "Volume", "default": 6.0, "min": 0.0, "max": 10.0},
+          {"name": "DryWet", "default": 1.0, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": [{"param_name": "Drive", "min": 2, "max": 8}]
+      },
+      "Cabinet": {
+        "xml_tag": "Cabinet",
+        "class_name": "Cabinet",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "MicrophonePosition", "default": 1.0, "min": 0.0, "max": 2.0},
+          {"name": "DryWet", "default": 1.0, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": []
+      },
+      "Channel EQ": {
+         "xml_tag": "ChannelEq",
+         "class_name": "ChannelEq",
+         "type": "audio_effect",
+         "parameters": [
+            {"name": "HighGain", "default": 0.0, "min": -15.0, "max": 15.0},
+            {"name": "MidGain", "default": 0.0, "min": -15.0, "max": 15.0},
+            {"name": "LowGain", "default": 0.0, "min": -15.0, "max": 15.0}
+         ],
+         "macro_suggestions": [{"param_name": "MidGain", "min": -5, "max": 5}]
+      },
+      "Corpus": {
+        "xml_tag": "Corpus",
+        "class_name": "Corpus",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "ResonanceType", "default": 0.0, "min": 0.0, "max": 6.0},
+          {"name": "Brightness", "default": 0.0, "min": -1.0, "max": 1.0},
+          {"name": "Decay", "default": 0.5, "min": 0.0, "max": 1.0},
+          {"name": "Amount", "default": 1.0, "min": 0.0, "max": 1.0},
+          {"name": "DryWet", "default": 1.0, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": [{"param_name": "Brightness", "min": -0.5, "max": 0.5}]
+      },
+      "Drum Buss": {
+        "xml_tag": "DrumBuss",
+        "class_name": "DrumBuss",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "Drive", "default": 0.0, "min": 0.0, "max": 1.0},
+          {"name": "Crunch", "default": 0.0, "min": 0.0, "max": 1.0},
+          {"name": "Boom", "default": 0.0, "min": 0.0, "max": 1.0},
+          {"name": "DryWet", "default": 1.0, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": [{"param_name": "Drive", "min": 0, "max": 0.5}]
+      },
+      "Dynamic Tube": {
+        "xml_tag": "Tube",
+        "class_name": "Tube",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "Drive", "default": 0.0, "min": 0.0, "max": 1.0},
+          {"name": "Tone", "default": 0.0, "min": -1.0, "max": 1.0},
+          {"name": "Bias", "default": 0.0, "min": 0.0, "max": 1.0},
+          {"name": "DryWet", "default": 0.5, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": [{"param_name": "Drive", "min": 0, "max": 1}]
+      },
+      "Echo": {
+        "xml_tag": "Echo",
+        "class_name": "Echo",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "Feedback", "default": 0.5, "min": 0.0, "max": 1.5},
+          {"name": "DryWet", "default": 0.5, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": [{"param_name": "Feedback", "min": 0.2, "max": 0.8}]
+      },
+      "EQ Three": {
+        "xml_tag": "FilterEQ3",
+        "class_name": "FilterEQ3",
+        "type": "audio_effect",
+        "parameters": [
+           {"name": "GainLow", "default": 0.0, "min": -48.0, "max": 6.0},
+           {"name": "GainMid", "default": 0.0, "min": -48.0, "max": 6.0},
+           {"name": "GainHi", "default": 0.0, "min": -48.0, "max": 6.0}
+        ],
+        "macro_suggestions": [{"param_name": "GainMid", "min": -12, "max": 0}]
+      },
+      "External Audio Effect": {
+        "xml_tag": "ExternalAudioEffect",
+        "class_name": "ExternalAudioEffect",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "Gain", "default": 0.0, "min": -35.0, "max": 35.0},
+          {"name": "DryWet", "default": 1.0, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": []
+      },
+      "Filter Delay": {
+        "xml_tag": "FilterDelay",
+        "class_name": "FilterDelay",
+        "type": "audio_effect",
+        "parameters": [
+           {"name": "DryWet", "default": 0.5, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": []
+      },
+      "Frequency Shifter": {
+        "xml_tag": "FrequencyShifter",
+        "class_name": "FrequencyShifter",
+        "type": "audio_effect",
+        "parameters": [
+           {"name": "Frequency", "default": 0.0, "min": -1000.0, "max": 1000.0},
+           {"name": "Fine", "default": 0.0, "min": -500.0, "max": 500.0},
+           {"name": "DryWet", "default": 0.5, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": [{"param_name": "Frequency", "min": -100, "max": 100}]
+      },
+      "Grain Delay": {
+        "xml_tag": "GrainDelay",
+        "class_name": "GrainDelay",
+        "type": "audio_effect",
+        "parameters": [
+           {"name": "Pitch", "default": 0.0, "min": -36.0, "max": 12.0},
+           {"name": "Spray", "default": 0.0, "min": 0.0, "max": 500.0},
+           {"name": "Frequency", "default": 10.0, "min": 1.0, "max": 100.0},
+           {"name": "DryWet", "default": 0.5, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": [{"param_name": "Spray", "min": 0, "max": 50}]
+      },
+      "Hybrid Reverb": {
+        "xml_tag": "HybridReverb",
+        "class_name": "HybridReverb",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "Decay", "default": 2.0, "min": 0.1, "max": 20.0},
+          {"name": "DryWet", "default": 0.5, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": [{"param_name": "Decay", "min": 1, "max": 5}]
+      },
+      "Looper": {
+        "xml_tag": "Looper",
+        "class_name": "Looper",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "Feedback", "default": 1.0, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": []
+      },
+      "Multiband Dynamics": {
+         "xml_tag": "MultibandDynamics",
+         "class_name": "MultibandDynamics",
+         "type": "audio_effect",
+         "parameters": [
+            {"name": "Amount", "default": 1.0, "min": 0.0, "max": 1.0},
+            {"name": "OutputGain", "default": 0.0, "min": -36.0, "max": 36.0},
+            {"name": "GlobalAmount", "default": 1.0, "min": 0.0, "max": 1.0}
+         ],
+         "macro_suggestions": [
+            {"param_name": "OutputGain", "min": -12, "max": 12},
+            {"param_name": "GlobalAmount", "min": 0, "max": 1}
+         ]
+      },
+      "Pedal": {
+        "xml_tag": "Pedal",
+        "class_name": "Pedal",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "Type", "default": 0.0, "min": 0.0, "max": 2.0},
+          {"name": "Gain", "default": 0.3, "min": 0.0, "max": 1.0},
+          {"name": "Output", "default": 0.0, "min": -24.0, "max": 24.0},
+          {"name": "Bass", "default": 0.0, "min": -20.0, "max": 20.0},
+          {"name": "Mid", "default": 0.0, "min": -20.0, "max": 20.0},
+          {"name": "Treble", "default": 0.0, "min": -20.0, "max": 20.0},
+          {"name": "DryWet", "default": 1.0, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": [{"param_name": "Gain", "min": 0.1, "max": 0.6}]
+      },
+      "Resonators": {
+         "xml_tag": "Resonator",
+         "class_name": "Resonator",
+         "type": "audio_effect",
+         "parameters": [
+            {"name": "FilterFrequency", "default": 1000.0, "min": 50.0, "max": 15000.0},
+            {"name": "Width", "default": 2.0, "min": 0.1, "max": 20.0},
+            {"name": "Gain", "default": 0.0, "min": -24.0, "max": 24.0},
+            {"name": "DryWet", "default": 0.5, "min": 0.0, "max": 1.0}
+         ],
+         "macro_suggestions": [{"param_name": "DryWet", "min": 0, "max": 0.6}]
+      },
+      "Roar": {
+         "xml_tag": "Roar",
+         "class_name": "Roar",
+         "type": "audio_effect",
+         "parameters": [
+             {"name": "Stage1_Shaper_Amount", "default": 10.0, "min": 0.0, "max": 100.0},
+             {"name": "Stage1_Filter_Frequency", "default": 2000.0, "min": 20.0, "max": 20000.0},
+             {"name": "Output_DryWet", "default": 1.0, "min": 0.0, "max": 1.0}
+         ],
+         "macro_suggestions": [
+             {"param_name": "Stage1_Shaper_Amount", "min": 10, "max": 80},
+             {"param_name": "Stage1_Filter_Frequency", "min": 500, "max": 15000}
+         ]
+      },
+      "Shifter": {
+         "xml_tag": "Shifter",
+         "class_name": "Shifter",
+         "type": "audio_effect",
+         "parameters": [
+             {"name": "Coarse", "default": 0.0, "min": -24.0, "max": 24.0},
+             {"name": "Fine", "default": 0.0, "min": -100.0, "max": 100.0},
+             {"name": "DryWet", "default": 1.0, "min": 0.0, "max": 1.0}
+         ],
+         "macro_suggestions": [{"param_name": "Coarse", "min": -12, "max": 12}]
+      },
+      "Spectral Resonator": {
+         "xml_tag": "SpectralResonator",
+         "class_name": "SpectralResonator",
+         "type": "audio_effect",
+         "parameters": [
+            {"name": "Frequency", "default": 200.0, "min": 40.0, "max": 2000.0},
+            {"name": "Decay", "default": 1000.0, "min": 1.0, "max": 10000.0},
+             {"name": "DryWet", "default": 0.5, "min": 0.0, "max": 1.0}
+         ],
+         "macro_suggestions": []
+      },
+      "Spectral Time": {
+         "xml_tag": "SpectralTime",
+         "class_name": "SpectralTime",
+         "type": "audio_effect",
+         "parameters": [
+             {"name": "Freeze", "default": 0.0, "min": 0.0, "max": 1.0},
+             {"name": "DelayTime", "default": 100.0, "min": 1.0, "max": 5000.0},
+              {"name": "DryWet", "default": 0.5, "min": 0.0, "max": 1.0}
+         ],
+         "macro_suggestions": []
+      },
+      "Spectrum": {
+         "xml_tag": "SpectrumAnalyzer",
+         "class_name": "SpectrumAnalyzer",
+         "type": "audio_effect",
+         "parameters": [
+             {"name": "BlockSize", "default": 1.0, "min": 0.0, "max": 3.0}
+         ],
+         "macro_suggestions": []
+      },
+      "Tuner": {
+         "xml_tag": "Tuner",
+         "class_name": "Tuner",
+         "type": "audio_effect",
+         "parameters": [],
+         "macro_suggestions": []
+      },
+      "Vinyl Distortion": {
+         "xml_tag": "Vinyl",
+         "class_name": "Vinyl",
+         "type": "audio_effect",
+         "parameters": [
+             {"name": "TracingDrive", "default": 0.0, "min": 0.0, "max": 1.0},
+             {"name": "Pinch", "default": 0.0, "min": 0.0, "max": 1.0},
+             {"name": "Crack", "default": 0.0, "min": 0.0, "max": 1.0},
+              {"name": "DryWet", "default": 1.0, "min": 0.0, "max": 1.0}
+         ],
+         "macro_suggestions": [{"param_name": "Crack", "min": 0, "max": 0.5}]
+      },
+      "Vocoder": {
+         "xml_tag": "Vocoder",
+         "class_name": "Vocoder",
+         "type": "audio_effect",
+         "parameters": [
+             {"name": "Depth", "default": 1.0, "min": 0.0, "max": 2.0},
+             {"name": "DryWet", "default": 1.0, "min": 0.0, "max": 1.0}
+         ],
+         "macro_suggestions": [{"param_name": "Depth", "min": 0.5, "max": 1.5}]
+      },
+      "Delay": {
+        "xml_tag": "Delay",
+        "class_name": "Delay",
+        "type": "audio_effect",
+        "parameters": [
+           {"name": "Feedback", "default": 0.5, "min": 0.0, "max": 0.95},
+           {"name": "DryWet", "default": 0.5, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": [{"param_name": "Feedback", "min": 0.2, "max": 0.7}]
+      },
+      "Erosion": {
+        "xml_tag": "Erosion",
+        "class_name": "Erosion",
+        "type": "audio_effect",
+        "parameters": [
+           {"name": "Amount", "default": 10.0, "min": 0.0, "max": 255.0},
+           {"name": "Frequency", "default": 4000.0, "min": 80.0, "max": 15000.0},
+           {"name": "Width", "default": 2.0, "min": 0.1, "max": 10.0}
+        ],
+        "macro_suggestions": [{"param_name": "Amount", "min": 10, "max": 128}]
+      },
+      "EQ Eight": {
+        "xml_tag": "Eq8",
+        "class_name": "Eq8",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "GlobalGain", "default": 0.0, "min": -12.0, "max": 12.0},
+          {"name": "Freq", "default": 1000.0, "min": 50.0, "max": 18000.0},
+          {"name": "Gain", "default": 0.0, "min": -15.0, "max": 15.0},
+          {"name": "Q", "default": 0.71, "min": 0.1, "max": 18.0}
+        ],
+        "macro_suggestions": [
+          {"param_name": "Freq", "min": 100, "max": 10000},
+          {"param_name": "Gain", "min": -10, "max": 10}
+        ]
+      },
+      "Flanger": {
+         "xml_tag": "Flanger",
+         "class_name": "Flanger",
+         "type": "audio_effect",
+         "parameters": [
+            {"name": "Feedback", "default": 0.5, "min": 0.0, "max": 0.99},
+            {"name": "DryWet", "default": 0.5, "min": 0.0, "max": 1.0},
+            {"name": "Frequency", "default": 1.0, "min": 0.01, "max": 20.0}
+         ],
+         "macro_suggestions": [{"param_name": "Feedback", "min": 0.3, "max": 0.8}]
+      },
+       "Gate": {
+         "xml_tag": "Gate",
+         "class_name": "Gate",
+         "type": "audio_effect",
+         "parameters": [
+            {"name": "Threshold", "default": -40.0, "min": -80.0, "max": 0.0},
+            {"name": "Return", "default": 2.0, "min": 0.0, "max": 80.0},
+            {"name": "Attack", "default": 1.0, "min": 0.0, "max": 1000.0},
+            {"name": "Release", "default": 100.0, "min": 1.0, "max": 3000.0}
+         ],
+         "macro_suggestions": [{"param_name": "Threshold", "min": -50, "max": -20}]
+      },
+      "Glue Compressor": {
+        "xml_tag": "GlueCompressor",
+        "class_name": "GlueCompressor",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "Threshold", "default": 0.0, "min": -40.0, "max": 0.0, "unit": "dB"},
+          {"name": "Ratio", "default": 0.0, "min": 0.0, "max": 2.0},
+          {"name": "Attack", "default": 0.0, "min": 0.0, "max": 6.0},
+          {"name": "Release", "default": 0.0, "min": 0.0, "max": 4.0},
+          {"name": "Makeup", "default": 0.0, "min": 0.0, "max": 20.0},
+          {"name": "DryWet", "default": 1.0, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": [{"param_name": "Threshold", "min": -30, "max": -5}]
+      },
+      "Limiter": {
+        "xml_tag": "Limiter",
+        "class_name": "Limiter",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "Gain", "default": 0.0, "min": -24.0, "max": 24.0},
+          {"name": "Ceiling", "default": -0.3, "min": -24.0, "max": 0.0}
+        ],
+        "macro_suggestions": [{"param_name": "Gain", "min": 0, "max": 12}]
+      },
+      "Overdrive": {
+        "xml_tag": "Overdrive",
+        "class_name": "Overdrive",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "Drive", "default": 0.5, "min": 0.0, "max": 1.0},
+          {"name": "Tone", "default": 0.5, "min": 0.0, "max": 1.0},
+          {"name": "Dynamics", "default": 0.5, "min": 0.0, "max": 1.0},
+          {"name": "DryWet", "default": 0.5, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": [{"param_name": "Drive", "min": 0.2, "max": 0.8}]
+      },
+      "Phaser-Flanger": {
+         "xml_tag": "PhaserNew",
+         "class_name": "Phaser",
+         "type": "audio_effect",
+         "parameters": [
+            {"name": "CenterFrequency", "default": 1000.0, "min": 20.0, "max": 20000.0},
+            {"name": "Feedback", "default": 0.5, "min": 0.0, "max": 0.99},
+            {"name": "Spread", "default": 0.0, "min": 0.0, "max": 1.0},
+            {"name": "DryWet", "default": 0.5, "min": 0.0, "max": 1.0}
+         ],
+         "macro_suggestions": [{"param_name": "Feedback", "min": 0.1, "max": 0.8}]
+      },
+      "Phaser": {
+         "xml_tag": "Phaser",
+         "class_name": "Phaser",
+         "type": "audio_effect",
+         "parameters": [
+            {"name": "Frequency", "default": 1.0, "min": 0.0, "max": 20.0},
+            {"name": "Feedback", "default": 0.5, "min": 0.0, "max": 0.99},
+            {"name": "DryWet", "default": 0.5, "min": 0.0, "max": 1.0}
+         ],
+         "macro_suggestions": [{"param_name": "Feedback", "min": 0.1, "max": 0.8}]
+      },
+
+      "Redux": {
+        "xml_tag": "Redux2",
+        "class_name": "Redux",
+        "type": "audio_effect",
+        "parameters": [
+           {"name": "BitDepth", "default": 16.0, "min": 1.0, "max": 16.0},
+           {"name": "SampleRate", "default": 44100.0, "min": 1.0, "max": 44100.0}
+        ],
+        "macro_suggestions": [{"param_name": "BitDepth", "min": 16, "max": 1}]
+      },
+      "Redux Legacy": {
+        "xml_tag": "Redux",
+        "class_name": "Redux",
+        "type": "audio_effect",
+        "parameters": [
+           {"name": "BitDepth", "default": 16.0, "min": 1.0, "max": 16.0},
+           {"name": "SampleRate", "default": 20.0, "min": 1.0, "max": 100.0}
+        ],
+        "macro_suggestions": [{"param_name": "BitDepth", "min": 16, "max": 1}]
+      },
+      "Reverb": {
+        "xml_tag": "Reverb",
+        "class_name": "Reverb",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "DecayTime", "default": 2.0, "min": 0.2, "max": 60.0},
+          {"name": "MixDiffuse", "default": 0.3, "min": 0.0, "max": 1.0},
+          {"name": "RoomSize", "default": 0.5, "min": 0.0, "max": 1.0}
+        ],
+        "macro_suggestions": [{"param_name": "DecayTime", "min": 0.8, "max": 5.0}]
+      },
+      "Saturator": {
+        "xml_tag": "Saturator",
+        "class_name": "Saturator",
+        "type": "audio_effect",
+        "parameters": [
+          {"name": "PreDrive", "default": 0.0, "min": -36.0, "max": 36.0, "unit": "dB"},
+          {"name": "PostDrive", "default": 0.0, "min": -36.0, "max": 36.0, "unit": "dB"},
+          {"name": "DryWet", "default": 1.0, "min": 0.0, "max": 1.0},
+          {"name": "BaseDrive", "default": 0.0, "min": -36.0, "max": 36.0},
+          {"name": "WsCurve", "default": 0.0, "min": 0.0, "max": 100.0}
+        ],
+        "macro_suggestions": [{"param_name": "PreDrive", "min": 0.0, "max": 18.0}]
+      },
+      "Utility": {
+        "xml_tag": "StereoGain",
+        "class_name": "StereoGain",
+        "type": "audio_effect",
+        "parameters": [
+           {"name": "Gain", "default": 0.0, "min": -35.0, "max": 35.0},
+           {"name": "StereoWidth", "default": 1.0, "min": 0.0, "max": 2.0},
+           {"name": "Balance", "default": 0.0, "min": -1.0, "max": 1.0}
+        ],
+        "macro_suggestions": [{"param_name": "Gain", "min": -12, "max": 12}]
+      }
+    }
+  }
+}

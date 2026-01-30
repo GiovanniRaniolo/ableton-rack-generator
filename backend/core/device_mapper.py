@@ -1,0 +1,198 @@
+"""
+Device Database - Maps device names to XML structure and parameters
+"""
+
+import json
+import os
+from typing import Dict, List, Optional
+
+
+class DeviceDatabase:
+    """Database of Ableton device configurations"""
+    
+    def __init__(self, db_path: Optional[str] = None):
+        self.db_path = db_path or os.path.join(
+            os.path.dirname(__file__), '..', 'data', 'devices.json'
+        )
+        self.extracted_path = os.path.join(
+            os.path.dirname(__file__), '..', 'data', 'extracted_parameters.json'
+        )
+        self.devices = self._load_database()
+        self.extracted_params = self._load_extracted()
+        
+        audio_effects = self.devices.get("devices", {}).get("audio_effects", {})
+        print(f"DEVICE_DB_INFO: Loaded {len(audio_effects)} audio effects from {self.db_path}")
+        print(f"DEVICE_DB_INFO: 'Audio Effect Rack' in database? {'Audio Effect Rack' in audio_effects}")
+        
+        # Device name aliases for NLP
+        self.aliases = {
+            "comp": "Compressor",
+            "compressor": "Compressor",
+            "eq": "EQ Eight",
+            "eq8": "EQ Eight",
+            "eq eight": "EQ Eight",
+            "reverb": "Reverb",
+            "verb": "Reverb",
+            "rev": "Reverb",
+            "delay": "Delay",
+            "saturator": "Saturator",
+            "sat": "Saturator",
+            "saturation": "Saturator",
+            "filter": "Auto Filter",
+            "auto filter": "Auto Filter",
+            "gate": "Gate",
+            "limiter": "Limiter",
+            "glue": "Glue Compressor",
+            "glue compressor": "Glue Compressor",
+            "multiband": "Multiband Dynamics",
+            "chorus": "Chorus",
+            "flanger": "Flanger",
+            "phaser": "Phaser",
+            "pan": "Auto Pan",
+            "auto pan": "Auto Pan",
+            "erosion": "Erosion",
+            "echo": "Echo",
+            "hybrid reverb": "Hybrid Reverb",
+            "hybrid": "Hybrid Reverb",
+            "roar": "Roar",
+            "spectral time": "Spectral Time",
+            "spectral": "Spectral Time",
+            "multiband dynamics": "Multiband Dynamics",
+            "autofilter": "Auto Filter",
+            "eq8": "EQ Eight",
+            "audio effect rack": "Audio Effect Rack",
+            "rack": "Audio Effect Rack"
+        }
+
+    def _load_database(self) -> Dict:
+        """Load device database from JSON"""
+        try:
+            with open(self.db_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Warning: Could not load devices.json: {e}")
+            return {"devices": {"audio_effects": {}, "instruments": {}}}
+
+    def _load_extracted(self) -> Dict:
+        """Load extracted parameters from JSON"""
+        try:
+            if os.path.exists(self.extracted_path):
+                with open(self.extracted_path, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+        except Exception as e:
+            print(f"Warning: Could not load extracted parameters: {e}")
+        return {}
+
+    def get_device(self, name: str) -> Optional[Dict]:
+        """Get device configuration by name, merging with extracted params"""
+        audio_effects = self.devices.get("devices", {}).get("audio_effects", {})
+        print(f"DEBUG: Requesting device '{name}'. Available keys (total {len(audio_effects)}): {list(audio_effects.keys())[:5]}...")
+        
+        # Resolve canonical name using aliases first (case-insensitive)
+        canon = name
+        search_name = name.lower().strip()
+        
+        if search_name in self.aliases:
+            canon = self.aliases[search_name]
+        else:
+            # Check if it's a direct match (case-insensitive)
+            found = False
+            for k in audio_effects.keys():
+                if k.lower() == search_name:
+                    canon = k
+                    found = True
+                    break
+            
+        device = audio_effects.get(canon)
+        if not device:
+            # Try to build a basic device from extracted params if it exists there
+            actual_key = None
+            for k in self.extracted_params.keys():
+                if k.lower() == search_name:
+                    actual_key = k
+                    break
+            
+            if actual_key:
+                device = {
+                    "xml_tag": actual_key,
+                    "class_name": actual_key,
+                    "type": "audio_effect",
+                    "parameters": []
+                }
+                canon = actual_key
+            else:
+                return None
+
+        # Merge in extracted parameters that aren't already defined
+        # SMART MERGE: Re-enabled to support devices missing from devices.json (GrainDelay, Echo)
+        # BUT with strict filtering to prevent 'Ghost Parameter' crashes.
+        xml_tag = device.get("xml_tag", canon)
+        if xml_tag in self.extracted_params:
+            existing_names = {p["name"] for p in device.get("parameters", [])}
+            
+            # Dangerous parameters known to crash Live 12.3
+            BLACKLIST = {
+                "LegacyGain", "BranchSelectorRange", "WarpWait", "LaunchWait"
+            }
+            
+            for p_name in self.extracted_params[xml_tag]:
+                # Filter Logic
+                if p_name in existing_names: continue
+                if p_name in BLACKLIST: continue
+                # Skip array items like Bands.0, Bands.1 unless explicitly needed (usually internal)
+                if "." in p_name and p_name.split(".")[-1].isdigit(): continue 
+                
+                device["parameters"].append({
+                    "name": p_name,
+                    "default": 0.5,
+                    "min": 0.0,
+                    "max": 1.0
+                })
+        
+        return device
+    
+    def get_all_devices(self) -> Dict:
+        """Get all available devices"""
+        return self.devices.get("devices", {}).get("audio_effects", {})
+    
+    def device_count(self) -> int:
+        """Get total number of devices"""
+        return len(self.get_all_devices())
+    
+    def get_macro_suggestions(self, device_name: str) -> List[Dict]:
+        """Get suggested macro mappings for a device"""
+        device = self.get_device(device_name)
+        if not device:
+            return []
+        
+        suggestions = device.get("macro_suggestions", [])
+        
+        # If no suggestions, use first few parameters
+        if not suggestions and device.get("parameters"):
+            params = device["parameters"][:3]  # First 3 params
+            suggestions = []
+            for i, param in enumerate(params):
+                suggestions.append({
+                    "param_index": i,
+                    "param_name": param["name"],
+                    "min": param.get("min", 0.0),
+                    "max": param.get("max", 1.0)
+                })
+        
+        return suggestions
+    
+    def resolve_alias(self, name: str) -> str:
+        """Resolve device alias to canonical name"""
+        search_name = name.lower().strip()
+        
+        # 1. Direct Alias
+        if search_name in self.aliases:
+            return self.aliases[search_name]
+            
+        # 2. Direct casing match in audio_effects
+        audio_effects = self.devices.get("devices", {}).get("audio_effects", {})
+        for k in audio_effects.keys():
+            if k.lower() == search_name:
+                return k
+                
+        return name

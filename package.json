@@ -1,0 +1,19 @@
+{
+  "name": "ableton-rack-generator",
+  "version": "1.0.0",
+  "description": "Generate Ableton Effect Racks from natural language",
+  "scripts": {
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd backend && ..\\.venv\\Scripts\\python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000",
+    "frontend": "npm run dev --prefix frontend",
+    "install-all": "npm install && python -m venv .venv && .\\.venv\\Scripts\\pip install -r backend/requirements.txt && npm install --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "start": "cd backend && ..\\.venv\\Scripts\\python -m uvicorn main:app --host 127.0.0.1 --port 8000"
+  },
+  "keywords": ["ableton", "music", "production", "audio"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -1,0 +1,41 @@
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+.env
+
+# NodeJS
+node_modules/
+frontend/node_modules/
+dist/
+build/
+.DS_Store
+
+# Ableton Generated
+backend/generated/
+*.adg
+*.als
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# AI Agent Meta-data
+.agent/
+.agents/
+
+# Keys and Secrets
+*.pem
+*.key
+*.pub
+
+# Editor
+.vscode/
+.idea/
