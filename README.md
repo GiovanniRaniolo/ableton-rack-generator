@@ -1,159 +1,102 @@
-# 🎹 Ableton Rack Generator
 
-Generate Ableton Live Audio Effect Racks (`.adg` files) from natural language descriptions.
+# 🎛️ AI Ableton Rack Generator (Live 12.3+)
 
-## 🚀 How to Start (The Right Way)
+> **Generate production-ready Audio Effect Racks from natural language prompts.**  
+> *Now supporting the full Ableton Live 12.3 Standard/Suite arsenal (41+ Devices).*
 
+![Status](https://img.shields.io/badge/Status-Stable-green) ![Ableton](https://img.shields.io/badge/Ableton-Live%2012.3-black) ![Python](https://img.shields.io/badge/Python-3.11+-blue) ![License](https://img.shields.io/badge/License-MIT-purple)
 
-**Method 1: Automatic (Recommended)**
-```powershell
-.\start_dev.bat
-```
+## 🚀 What is this?
 
-**Method 2: Manual (Fail-Safe)**
-If the automatic script freezes or fails, use these two separate scripts:
-1. Double-click `run_backend.bat` (Keep this window open!)
-2. Double-click `run_frontend.bat` (Keep this window open!)
+This tool allows you to say:  
+> *"Create a crunchy, lo-fi drum bus compressor with a bit of tape wobble and a resonant filter sweep mapped to a macro."*
 
----
+And instantly get a **fully functional `.adg` file** (Ableton Device Group) that you can drag and drop directly into Live 12. No "forbidden icons", no crashes.
 
+Unlike other generative tools that just randomize parameters, this engine understands **sound design semantics**. It knows that "Crunch" on a Drum Buss is different from "Drive" on an Overdrive, and it maps them intelligently to Macro Controls.
 
 ---
 
-## 🚀 Quick Start (Single Command)
+## 🏗️ Technical Pillars
 
-Per avviare tutto il sistema (Backend + Frontend) con un solo comando:
+### 1. 🧬 DNA Cloning Strategy (The "Forbidden Icon" Fix)
+Ableton's `.adg` format is a complex, gzipped XML structure that changes between versions. Generating XML from scratch inevitably leads to corruption (the dreaded "Forbidden Icon").
+**Our Solution:** We don't build devices from scratch. We **clone** the exact XML "DNA" of native devices (Roar, Reverb, Echo, etc.) from a validated Live 12.3 source file. The AI injects parameter values into these pristine shells, guaranteeing 100% compatibility.
 
-1. Apri un terminale nella cartella root:
-2. Esegui:
-```bash
-npm run dev
-```
+### 2. 🧠 Grand Unified Semantic Map ("UX Expert Mode")
+LLMs are great at creativity but bad at technical specificity. If an LLM suggests "Set Cutoff to 50%", a standard script fails because the internal parameter might be named `Stage1_Filter_Frequency` (Roar) or `Filter_Freq` (Auto Filter).
+**Our Solution:** A comprehensive **Semantic Dictionary** maps human intent (Drive, Space, Wobble, Air) to the exact internal parameter ID for all 43 supported devices.
+- "Spray" -> maps correctly to Grain Delay's `Spray`.
+- "Frequency" -> maps correctly to Corpus' `Coarse` tune.
 
-Questo comando avvierà:
-- ✅ **API Backend** su `http://localhost:8000`
-- ✅ **Frontend Web** su `http://localhost:5173`
+### 3. 🛡️ Safe Fallback System
+The system is designed to never crash. If the AI hallucinates a device that doesn't exist (e.g. "SuperTube 3000"), the engine silently intercepts the request and substitutes a safe, sonic equivalent (e.g. `Saturator`), adding a "Ghost" tag to the logs but keeping the user's flow uninterrupted.
 
 ---
 
-### In caso di problemi (Esecuzione manuale):
-Se il comando sopra non funziona, puoi avviarli separatamente:
+## 🔌 Supported Devices (The "Full Arsenal")
+We support 41+ Native Audio Effects, including the new Live 12 additions:
+- **Distortion:** **Roar**, Saturator, Overdrive, Pedal, Drum Buss, Redux, Vinyl Distortion...
+- **Space:** **Hybrid Reverb**, **Spectral Time**, Echo, Grain Delay, Reverb...
+- **Modulation:** **Auto Shift**, Phaser-Flanger, Chorus-Ensemble, Corpus...
+- **Dynamics:** Glue Compressor, Multiband Dynamics, Limiter...
 
-#### 1. Avvia il Backend
-```powershell
-cd backend
-python -m uvicorn main:app --reload --port 8000
-```
+*(See `backend/data/cloned_devices_dna.json` for the raw DNA).*
 
-#### 2. Avvia il Frontend
-```powershell
-cd frontend
-npm run dev
-```
+---
 
-### Prima installazione?
-Se è la prima volta che scarichi la repo, installa prima le dipendenze:
-```bash
-npm install
-cd backend
-pip install -r requirements.txt
-```
+## 🛠️ Installation & Usage
 
-This starts:
-- ✅ FastAPI backend on `http://localhost:8000`
-- ✅ React frontend on `http://localhost:5173` (coming soon)
+### Prerequisites
+- Python 3.11+
+- Node.js (for Frontend)
+- Ableton Live 12 Standard/Suite
 
-### 3. Test API
+### Quick Start
+1.  **Clone the repo:**
+    ```bash
+    git clone https://github.com/GiovanniRaniolo/ableton-rack-generator.git
+    cd ableton-rack-generator
+    ```
 
-Open `http://localhost:8000/docs` for interactive API documentation.
+2.  **Install Backend:**
+    ```bash
+    cd backend
+    python -m venv .venv
+    .venv\Scripts\activate
+    pip install -r requirements.txt
+    ```
 
-#### Example Request:
+3.  **Configure API Key:**
+    Create a `.env` file in root or set your Google Gemini API key:
+    ```
+    GEMINI_API_KEY=your_key_here
+    ```
 
-```bash
-curl -X POST http://localhost:8000/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "prompt": "Master chain with compressor, EQ and reverb",
-    "macro_count": 8
-  }'
-```
+4.  **Run:**
+    ```bash
+    # Windows
+    .\run_backend.bat
+    ```
 
-#### Response:
-Downloads `custom_rack.adg` ready for Ableton Live!
+5.  **Generate:**
+    Use functionality via `curl` or the provided Frontend UI (coming soon).
+    ```bash
+    curl -X POST "http://localhost:8000/api/generate_rack" \
+         -H "Content-Type: application/json" \
+         -d '{"prompt": "A warm analog echo for dub techno chords"}'
+    ```
 
-## 📁 Project Structure
+---
 
-```
-ableton-rack-generator/
-├── backend/              # FastAPI server
-│   ├── main.py          # API endpoints
-│   ├── core/
-│   │   ├── adg_builder.py   # .adg XML generation
-│   │   ├── nlp_parser.py    # Natural language parsing
-│   │   └── device_mapper.py # Device database
-│   └── data/
-│       └── devices.json     # Device configurations
-├── frontend/            # React app (coming soon)
-└── package.json        # Root config with dev scripts
-```
+## 🤝 Contributing
 
-## 🎛️ Available Devices (45+)
-
-Attualmente il generatore supporta tutti i principali effetti audio nativi di **Ableton Live 12 Suite**:
-
-- **Dynamics**: Compressor, Glue Compressor, Limiter, Multiband Dynamics, Gate.
-- **EQ & Filters**: EQ Eight, EQ Three, Channel EQ, Auto Filter.
-- **Distortion & Saturation**: Roar (Live 12), Saturator, Overdrive, Erosion, Vinyl Distortion, Amp, Cabinet, Pedal, Dynamic Tube.
-- **Modulation**: Chorus-Ensemble, Chorus, Phaser-Flanger, Phaser, Flanger, Auto Pan.
-- **Drive & Delay**: Echo, Delay, Filter Delay, Grain Delay.
-- **Reverb**: Hybrid Reverb, Reverb, Corpus.
-- **Utilities & Others**: Utility (StereoGain), Redux (Modern & Legacy), Shifter, Spectral Time, Spectral Resonator, Vocoder, Resonators, Frequency Shifter, Spectrum, Tuner, Looper.
-
-## 🧠 Natural Language Examples
-
-```
-"Master chain with compressor, EQ and reverb"
-"Vocal rack: comp, eq, reverb"
-"Creative FX with saturator and delay"
-"Simple rack with EQ and filter"
-```
-
-## 📝 API Endpoints
-
-- `GET /` - Health check
-- `GET /devices` - List available devices
-- `POST /generate` - Generate .adg file
-- `GET /health` - Detailed health status
-
-## 🔧 Development
-
-### Backend Only:
-```bash
-npm run backend
-```
-
-### Frontend Only (when implemented):
-```bash
-npm run frontend
-```
-
-## 📦 Build for Production
-
-```bash
-npm run build
-```
-
-## 🎯 Roadmap
-
-- [x] Backend API
-- [x] Device database (45+ devices)
-- [x] NLP parser (Gemini Integration)
-- [x] .adg generation (Live 12.3 Parity)
-- [x] Macro mapping for secret parameters
-- [ ] React frontend (Phase 3)
-- [ ] Multi-chain support (Parallel Chains)
-- [ ] Preset templates
+We welcome contributions! Whether it's adding "DNA" for Max for Live devices, improving the semantic map, or building a better UI.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to set up the dev environment.
 
 ## 📄 License
 
-MIT
+MIT License. See [LICENSE](LICENSE) for details.
+
+---
+*Built with ❤️ for the Ableton Community.*
