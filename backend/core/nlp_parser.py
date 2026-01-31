@@ -6,6 +6,7 @@ import re
 import json
 import os
 from typing import Dict, List, Optional
+from core.builder import AudioEffectRack, Chain, AbletonDevice
 import google.genai as genai
 from google.genai import types
 from dotenv import load_dotenv

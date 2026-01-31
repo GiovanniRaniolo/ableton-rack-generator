@@ -13,7 +13,7 @@ import os
 import tempfile
 import time
 
-from core.adg_builder import AudioEffectRack, Chain, AbletonDevice
+from core.builder import AudioEffectRack, Chain, AbletonDevice
 from core.nlp_parser import RackNLPParser
 from core.device_mapper import DeviceDatabase
 
