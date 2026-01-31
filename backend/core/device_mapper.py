@@ -17,12 +17,28 @@ class DeviceDatabase:
         self.extracted_path = os.path.join(
             os.path.dirname(__file__), '..', 'data', 'extracted_parameters.json'
         )
+        self.cloned_dna_path = os.path.join(
+            os.path.dirname(__file__), '..', 'data', 'cloned_devices_dna.json'
+        )
         self.devices = self._load_database()
         self.extracted_params = self._load_extracted()
+        self.cloned_dna = self._load_cloned_dna()
         
-        audio_effects = self.devices.get("devices", {}).get("audio_effects", {})
-        print(f"DEVICE_DB_INFO: Loaded {len(audio_effects)} audio effects from {self.db_path}")
-        print(f"DEVICE_DB_INFO: 'Audio Effect Rack' in database? {'Audio Effect Rack' in audio_effects}")
+        # Ensure hierarchy exists
+        if "devices" not in self.devices: self.devices["devices"] = {}
+        if "audio_effects" not in self.devices["devices"]: self.devices["devices"]["audio_effects"] = {}
+        
+        audio_effects = self.devices["devices"]["audio_effects"]
+        
+        # Priority 1: Cloned DNA (Most accurate Physical Ranges)
+        if self.cloned_dna:
+            print(f"DEVICE_DB_INFO: Merging {len(self.cloned_dna)} high-precision devices from cloned DNA...")
+            for d_name, d_info in self.cloned_dna.items():
+                audio_effects[d_name] = d_info
+        
+        print(f"DEVICE_DB_INFO: Total {len(audio_effects)} audio effects online.")
+        print(f"DEVICE_DB_INFO: 'Delay' online? {'Delay' in audio_effects}")
+        print(f"DEVICE_DB_INFO: 'Auto Filter' online? {'Auto Filter' in audio_effects}")
         
         # Device name aliases for NLP
         self.aliases = {
@@ -73,6 +89,16 @@ class DeviceDatabase:
             print(f"Warning: Could not load devices.json: {e}")
             return {"devices": {"audio_effects": {}, "instruments": {}}}
 
+    def _load_cloned_dna(self) -> Dict:
+        """Load high-precision DNA from cloned_devices_dna.json"""
+        try:
+            if os.path.exists(self.cloned_dna_path):
+                with open(self.cloned_dna_path, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+        except Exception as e:
+            print(f"Warning: Could not load cloned_devices_dna.json: {e}")
+        return {}
+
     def _load_extracted(self) -> Dict:
         """Load extracted parameters from JSON"""
         try:
@@ -113,11 +139,23 @@ class DeviceDatabase:
                     break
             
             if actual_key:
+                # V24: Crucial fix - Don't create an empty skeleton. 
+                # Populate with extracted parameter names so adg_builder can create the XML nodes.
+                params_list = []
+                if actual_key in self.extracted_params:
+                    for p_name in self.extracted_params[actual_key]:
+                        params_list.append({
+                            "name": p_name,
+                            "default": 0.5,
+                            "min": 0.0,
+                            "max": 1.0
+                        })
+                
                 device = {
                     "xml_tag": actual_key,
                     "class_name": actual_key,
                     "type": "audio_effect",
-                    "parameters": []
+                    "parameters": params_list
                 }
                 canon = actual_key
             else:

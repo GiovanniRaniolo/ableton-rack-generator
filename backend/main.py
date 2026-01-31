@@ -119,34 +119,62 @@ async def generate_rack(request: GenerateRequest):
         # Create rack
         rack = AudioEffectRack(name="Custom Rack", device_db=device_db)
         
-        # Create chains based on spec
+        # 3. Build chains based on topology and macro plan (V18 String-Strict Collection)
+        all_required_devices = []
+        
+        # Extract from 'devices' list (can be [str] or [{"name": str}])
+        for dev in spec.get("devices", []):
+            d_name = dev.get("name") if isinstance(dev, dict) else dev
+            if d_name and d_name not in all_required_devices:
+                all_required_devices.append(d_name)
+        
+        # Extract from macro plan
+        for plan_item in spec.get("macro_details", []):
+            dev_name = plan_item.get("target_device")
+            if dev_name and dev_name not in all_required_devices:
+                all_required_devices.append(dev_name)
+        
+        # Extract from surgical_devices
+        for s_dev in spec.get("surgical_devices", []):
+            dev_name = s_dev.get("name")
+            if dev_name and dev_name not in all_required_devices:
+                all_required_devices.append(dev_name)
+
         num_chains = spec.get("chains", 1)
         if num_chains < 1: num_chains = 1
         
-        # If the AI suggested devices but only 1 chain, split them? 
-        # Actually, let's follow the spec's logic. If chains > 1, we might need to distribute devices.
-        # For now, let's create the requested number of chains.
+        # Parallel Distribution: If we have multiple chains, distribute devices
         for i in range(num_chains):
             chain_name = f"Chain {i+1}" if num_chains > 1 else "Main Chain"
             chain = Chain(name=chain_name)
             
-            # For the first chain (or if only 1), add all devices from spec
-            # In a more advanced version, AI could specify which device goes to which chain
-            if i == 0:
-                for device_name in spec["devices"]:
+            # Divide devices among chains if Parallel, otherwise put all in first chain
+            if i == 0 or num_chains > 1:
+                devices_for_this_chain = []
+                if num_chains == 1:
+                    devices_for_this_chain = all_required_devices
+                else:
+                    # Basic distribution: if we have 4 devices and 2 chains, put 2 in each
+                    # Or just follow the first chain convention for now, but safer to distribute
+                    chunk_size = max(1, len(all_required_devices) // num_chains)
+                    start_idx = i * chunk_size
+                    end_idx = start_idx + chunk_size if i < num_chains - 1 else len(all_required_devices)
+                    devices_for_this_chain = all_required_devices[start_idx:end_idx]
+
+                for device_name in devices_for_this_chain:
                     try:
                         device = AbletonDevice(device_name, device_db)
                         chain.add_device(device)
-                    except (ValueError, Exception) as e:
-                        raise HTTPException(status_code=400, detail=f"Device '{device_name}' could not be initialized: {str(e)}")
+                    except Exception as e:
+                        print(f"WARNING: Skipping device '{device_name}': {str(e)}")
             
             rack.add_chain(chain)
         
         # Set macro count
         rack.macro_count = request.macro_count or spec.get("macro_count", 8)
         
-        # Auto-generate macro mappings using AI plan
-        rack.auto_map_macros(spec.get("macro_details", []))
+        # Auto-generate macro mappings and initialize parameters (Surgical V5)
+        rack.auto_map_macros(spec)
         
         # Ensure 'generated' directory exists
         gen_dir = os.path.join(os.path.dirname(__file__), "generated")

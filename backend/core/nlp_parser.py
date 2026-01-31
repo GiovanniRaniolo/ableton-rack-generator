@@ -1,5 +1,5 @@
 """
-NLP Parser - Extract rack specifications from natural language using Gemini 1.5 Pro
+NLP Parser - Extract rack specifications from natural language using Gemini
 """
 
 import re
@@ -19,15 +19,15 @@ class RackNLPParser:
         self.device_db = device_db
         self.device_patterns = self._build_device_patterns()
         
-        # Initialize Gemini 2.0+ Client (Modern SDK)
+        # Initialize Gemini 2.0+ Client
         api_key = os.getenv("GOOGLE_API_KEY")
         self.ai_enabled = False
         if api_key:
             try:
                 self.client = genai.Client(api_key=api_key)
-                self.model_id = 'gemini-2.5-pro' # Flagship Elite
+                self.model_id = 'gemini-2.0-flash'
                 self.ai_enabled = True
-                print(f"SUCCESS: {self.model_id} (Modern SDK) Parser Initialized")
+                print(f"SUCCESS: {self.model_id} (Surgical V7) Parser Initialized")
             except Exception as e:
                 print(f"Warning: Failed to initialize Gemini Client: {e}")
 
@@ -45,56 +45,61 @@ class RackNLPParser:
         return self._parse_with_regex(text)
 
     async def _parse_with_ai(self, text: str) -> Dict:
-        """Use Gemini 1.5 Pro to understand complex sound design instructions"""
+        """Use Gemini with V7 Surgical Prompt"""
         available_devices = list(self.device_db.get_all_devices().keys()) + list(self.device_db.aliases.keys())
         
         system_prompt = f"""
-        Sei il World-Class Ableton Live Sound Design Engine (AI Expert Mode). 
-        Il tuo obiettivo è trasformare descrizioni creative in una specifica tecnica di Rack professionale (.adg) 
-        fornendo insight tecnici profondi in LINGUA ITALIANA.
+        # ABLETON LIVE 12.3 SURGICAL DESIGN ENGINE (V7)
         
-        AVAILABLE ABLETON DEVICES:
-        {", ".join(sorted(set(available_devices)))}
+        You are a Master Audio Engineer. You have absolute authority over every parameter of every device.
+        Your goal is technical perfection and creative sound design.
 
-        STRICT PARAMETER REFERENCE ("THE BANK" - USE ONLY THESE):
-        - Dynamics: Compressor/Glue (Thresh, Ratio, Attack, Release), Limiter (Ceiling, Gain), Gate (Thresh, Return), DrumBuss (DriveAmount, CrunchAmount, BoomAmount, TransientShaping)
-        - EQ/Filter: AutoFilter2 (Frequency, Resonance, Lfo_Amount, Drive), Eq8 (Freq, Gain, Q), ChannelEq (Low/Mid/High)
-        - Distortion: Roar (Stage1_Shaper_Amount, Stage1_Filter_Frequency), Saturator (Drive, ColorOn), Overdrive (Drive, Tone), Pedal (Gain, Bass, Mid, Treble), Vinyl (CracleDensity, Drive), Redux2 (BitDepth, SampleRate)
-        - Modulation: Chorus2 (Rate, Amount, Feedback, Width), PhaserNew (Rate, Amount, Feedback), AutoPan2 (Rate, Amount, Width), Shifter (Pitch_Coarse, RingMod_Drive)
-        - Space: Reverb (DecayTime, RoomSize, Diffusion), Hybrid (Decay, Size, Vintage), Echo (Time, Feedback, Reverb_Level, Wobble), Delay (Time, Feedback), GrainDelay (Spray, Pitch, Freq), Spectral (Freeze, Spray)
-        
-        LINEE GUIDA RIGIDE:
-        1. LINGUA: Rispondi SEMPRE in ITALIANO tecnico e professionale.
-        2. PERSONALITÀ: Agisci come un fonico/sound designer esperto.
-        3. MAPPING: Usa i nomi esatti della "BANK" qui sopra.
-           Se vuoi "OTT", chiedi "GlobalAmount". Se vuoi "Space", chiedi "DecayTime".
-        4. HALLUCINATION CHECK: Non inventare parametri. EQ Eight NON ha Feedback.
-        5. MACRO: Spiega tecnicamente l'effetto sul segnale.
-        
-        RESPONSE FORMAT (STRICT JSON):
+        ## SURGICAL MISSIONS:
+        1. **Deep Init**: You MUST set initial values for device parameters to achieve the requested vibe, even if they aren't mapped to macros.
+        2. **Skill-Based Logic**: Implement specific techniques (e.g., set Delay to PING-PONG mode, or Roar to ASYMMETRIC shaper).
+        3. **Creative Labeling**: Every macro MUST have a descriptive name that reflects your sound design intent.
+        4. **Multi-Lang**: Respond in the user's language with professional clarity.
+
+        ## TECHNICAL REFS:
+        - Devices: {", ".join(sorted(set(available_devices)))}
+        - Core Params: ROAR (Stage1_Shaper_Amount, Stage1_Filter_Frequency), ECHO (Delay_TimeL, Feedback, Filter_Frequency), REVERB (DecayTime, RoomSize), DRUM_BUSS (DriveAmount, TransientShaping), SATURATOR (PreDrive, PostDrive).
+        - PHYSICAL PRECISION: You HAVE SURGICAL AUTHORITY. If the user asks for "18 kHz to 600 Hz", set 'min': 18000.0 and 'max': 600.0. Use physical units for Hz, dB (-36.0 to 36.0), ms, %.
+        - DEFAULT RANGES: Use 'min': 0.0 and 'max': 1.0 ONLY if you want the system to auto-scale to the full physical device range.
+        - INVERSE MAPPING: Set 'min' > 'max' (e.g. 18000 to 600) to invert the knob behavior.
+
+        ## RESPONSE FORMAT (STRICT JSON):
         {{
-            "creative_name": "Nome evocativo e creativo (es. 'Glacial Void')",
-            "devices": ["Device 1", "Device 2"],
+            "creative_name": "Pro Name",
+            "devices": [
+                {{
+                    "name": "Exact Device Name",
+                    "parameters": {{
+                        "ParameterName": 123.45
+                    }}
+                }}
+            ],
             "macro_count": 8,
-            "chains": 1,
-            "sound_intent": "Spiegazione tecnica dell'impatto sul segnale (Italiano)",
+            "sound_intent": "Deep technical analysis.",
             "macro_details": [
                 {{
                     "macro": 1,
-                    "name": "Nome (es. 'Crunch')",
-                    "target_device": "Roar",
-                    "target_parameter": "Stage1_Shaper_Amount",
-                    "description": "Spiegazione tecnica (Italiano)"
+                    "name": "Creative Label (e.g. 'Stardust')",
+                    "target_device": "Exact Device Name",
+                    "target_parameter": "Exact Parameter Key",
+                    "min": 0.0,
+                    "max": 1.0,
+                    "description": "Technical impact."
                 }}
             ],
-            "parallel_logic": "Logica di routing (Italiano)",
-            "tips": ["Tip 1", "Tip 2"],
-            "explanation": "Analisi discorsiva finale (Italiano)"
+            "parallel_logic": "Routing details.",
+            "tips": ["Tip"],
+            "explanation": "Summary."
         }}
+
+        IMPORTANT: If you want a parameter to move across a wide range, provide 'min' and 'max' values. If not provided, the system will use physical defaults.
         """
         
         try:
-            # Gemini 2.0+ (Modern SDK)
             response = self.client.models.generate_content(
                 model=self.model_id,
                 contents=f"{system_prompt}\n\nUSER PROMPT: {text}",
@@ -103,24 +108,29 @@ class RackNLPParser:
                 )
             )
             
-            # The modern SDK uses .text or .parsed for JSON depending on config
-            response_text = response.text
-            print(f"DEBUG AI Response: {response_text}")
-            data = json.loads(response_text)
+            data = json.loads(response.text)
             
-            # Resolve aliases to canonical names
-            valid_devices = []
-            for d in data.get("devices", []):
-                canon = self.device_db.resolve_alias(d)
+            # Resolve aliases and handle V7 structure
+            resolved_devices = []
+            valid_canonical_names = []
+            
+            # The AI might give a list of strings or a list of objects (V7)
+            raw_devices = data.get("devices", [])
+            for item in raw_devices:
+                name = item.get("name") if isinstance(item, dict) else item
+                params = item.get("parameters", {}) if isinstance(item, dict) else {}
+                
+                canon = self.device_db.resolve_alias(name)
                 if canon:
-                    valid_devices.append(canon)
+                    resolved_devices.append({"name": canon, "parameters": params})
+                    valid_canonical_names.append(canon)
             
             return {
                 "creative_name": data.get("creative_name", "Custom Rack"),
-                "devices": valid_devices,
+                "devices": valid_canonical_names, # For legacy compatibility in some parts
+                "surgical_devices": resolved_devices, # New V7 structure
                 "macro_count": data.get("macro_count", 8),
-                "chains": data.get("chains", 1),
-                "sound_intent": data.get("sound_intent", "Standard signal processing."),
+                "sound_intent": data.get("sound_intent", ""),
                 "macro_details": data.get("macro_details", []),
                 "parallel_logic": data.get("parallel_logic", ""),
                 "tips": data.get("tips", []),
@@ -129,34 +139,21 @@ class RackNLPParser:
                 "explanation": data.get("explanation", "")
             }
         except Exception as e:
-            print(f"AI Parse (Modern SDK) failed: {e}")
+            print(f"AI Parse failed: {e}")
             return self._parse_with_regex(text)
 
     def _parse_with_regex(self, text: str) -> Dict:
-        """Deterministic fallback parser using regex"""
-        spec = {
-            "devices": [],
-            "macro_count": 8,
-            "chains": 1,
-            "ai_powered": False
-        }
-        
+        """Deterministic fallback"""
+        spec = {"devices": [], "macro_count": 8, "ai_powered": False}
         text_lower = text.lower()
-        found_devices = []
+        found = []
         for pattern in self.device_patterns:
              if re.search(r'\b' + pattern + r'\b', text_lower):
-                 term = pattern.replace('\\', '')
-                 canonical = self.device_db.resolve_alias(term)
-                 if canonical and canonical not in found_devices:
-                     found_devices.append(canonical)
-        
-        spec["devices"] = found_devices
-        
-        macro_match = re.search(r'(\d+)\s*macro', text_lower)
-        if macro_match:
-            spec["macro_count"] = int(macro_match.group(1))
-            
+                  term = pattern.replace('\\', '')
+                  canon = self.device_db.resolve_alias(term)
+                  if canon and canon not in found: found.append(canon)
+        spec["devices"] = found
+        spec["surgical_devices"] = [{"name": d, "parameters": {}} for d in found]
         return spec
 
-    def is_ready(self) -> bool:
-        return True
+    def is_ready(self) -> bool: return True

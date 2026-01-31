@@ -7,31 +7,114 @@ import gzip
 import os
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 from dataclasses import dataclass
+
+# --- V23 MASTER PARAMETER AUTHORITY ---
+# Explicitly defines scaling behavior for technical parameter keys.
+# This eliminates "guessing" and ensures 100% mathematical consistency.
+PARAMETER_AUTHORITY = {
+    # 1ms Offset + 5s Normalized (The "Ableton Time" standard)
+    "DelayLine_TimeL": "normalized_time_5s",
+    "DelayLine_TimeR": "normalized_time_5s",
+    "DelayLine_Time": "normalized_time_5s",
+    "DelayTime": "normalized_time_5s",
+    "DecayTime": "normalized_time_5s",
+    "PreDelay": "normalized_time_5s",
+    
+    # Physical Hz (No normalization, just kHz -> Hz conversion if needed)
+    "Filter_Frequency": "physical_hz",
+    "Filter_HiPassFrequency": "physical_hz",
+    "Filter_LowPassFrequency": "physical_hz",
+    "Frequency": "physical_hz",
+    "Freq": "physical_hz",
+    "CenterFreq": "physical_hz",
+    "Rate": "physical_hz", # For Chorus/Phaser, usually Hz
+    
+    # Physical dB
+    "PreDrive": "physical_db",
+    "PostDrive": "physical_db",
+    "Drive": "physical_db",
+    "OutputGain": "physical_db",
+    "GlobalGain": "physical_db",
+    "Gain": "physical_db",
+    "Output": "physical_db",
+    
+    # Enums (Menus)
+    "Mode": "enum",
+    "Type": "enum",
+    "FilterType": "enum",
+    "ShaperType": "enum",
+    "Routing": "enum",
+    "Method": "enum"
+}
+
+# --- V23 MASTER ENUM AUTHORITY ---
+# Maps AI strings to Ableton technical indices.
+ENUM_AUTHORITY = {
+    # Delay / Echo Modes
+    "classic": 0.0, "fade": 1.0, "repitch": 2.0, "digital": 0.0,
+    # Roar / Distortion Routings
+    "single": 0.0, "serial": 1.0, "parallel": 2.0, "multiband": 3.0, "feedback": 4.0,
+    # Chorus / Phaser Modes
+    "chorus": 0.0, "ensemble": 1.0, "vibrato": 2.0, "classic": 0.0, "modern": 1.0,
+    # Booleans
+    "on": 1.0, "off": 0.0, "true": 1.0, "false": 0.0, "enabled": 1.0, "disabled": 0.0
+}
 
 
 def prettify_xml(elem):
-    """Return a pretty-printed XML string matching Ableton's exact lexical style"""
-    rough_string = ET.tostring(elem, 'utf-8')
-    reparsed = minidom.parseString(rough_string)
-    # Ableton uses tabs
-    xml_str = reparsed.toprettyxml(indent="\t")
+    """Return an XML string with character-perfect Ableton 12.3 formatting"""
+    # V31: Structural Purity - Restore indentation
+    try:
+        ET.indent(elem, space="\t", level=0)
+    except AttributeError:
+        pass
+        
+    # V31: Initial serialization
+    rough_string = ET.tostring(elem, encoding='utf-8', xml_declaration=True).decode('utf-8')
     
-    # Ableton's lexical style:
-    # 1. Space before self-closing tag: <Tag />
-    # 2. UTF-8 header
-    # 3. Newlines between every tag (toprettyxml does mostly this)
+    # --- V31 THE ATOMIC RECONSTRUCTION ---
+    # Ableton 12.3 is EXTREMELY picky about:
+    # 1. Double quotes in the header.
+    # 2. Uppercase UTF-8.
+    # 3. NO alphabetization of the Ableton root tag attributes.
     
-    if xml_str.startswith('<?xml version="1.0" ?>'):
-        xml_str = xml_str.replace('<?xml version="1.0" ?>', '<?xml version="1.0" encoding="UTF-8"?>', 1)
+    # Find the body (everything after the first >)
+    header_end = rough_string.find("?>") + 2
+    body = rough_string[header_end:].strip()
     
-    # Add space before self-closing tags: "/>" -> " />"
-    # But only if not already there
-    import re
-    xml_str = re.sub(r'([^ ])/>', r'\1 />', xml_str)
+    # Mandatorily fix the Ableton root tag (it's always the first tag in the body)
+    # We must match the order in template_rack.xml exactly:
+    # MajorVersion, MinorVersion, SchemaChangeCount, Creator, Revision
     
-    return xml_str
+    # 1. Reconstruction
+    header = '<?xml version="1.0" encoding="UTF-8"?>'
+    
+    # 2. Extract the actual values from the current elem (to keep them dynamic if they ever change)
+    # But usually they are static from the template.
+    attrs = elem.attrib
+    mv = attrs.get("MajorVersion", "5")
+    miv = attrs.get("MinorVersion", "12.0_12300")
+    scc = attrs.get("SchemaChangeCount", "1")
+    cr = attrs.get("Creator", "Ableton Live 12.3")
+    rev = attrs.get("Revision", "49ca8995cfdbe384bd4648a2e0d5a14dba7b993d")
+    
+    root_tag = f'<Ableton MajorVersion="{mv}" MinorVersion="{miv}" SchemaChangeCount="{scc}" Creator="{cr}" Revision="{rev}">'
+    
+    # 3. Find the first tag in the body to join with our custom root
+    body_stripped = body.lstrip()
+    body_start = body_stripped.find(">") + 1
+    final_body = body_stripped[body_start:]
+    
+    # V34: NO NEWLINE between header and root, exactly as in working afternoon files
+    # Ableton 12.3 on Windows can be allergic to that first \n
+    xml_output = f'{header}{root_tag}{final_body}'
+    
+    # Final cleanup: space before self-closing tags
+    xml_output = xml_output.replace('/>', ' />')
+    
+    return xml_output
 
 
 @dataclass
@@ -42,6 +125,7 @@ class MacroMapping:
     param_path: List[str]  # e.g. ["Bands.0", "ParameterA", "Gain"]
     min_val: float
     max_val: float
+    label: str = "" # Creative name for the macro
 
 
 class AbletonDevice:
@@ -81,12 +165,37 @@ class AbletonDevice:
         self.class_name = self.device_info['class_name']
         self.type = self.device_info['type']
         self.mappings: Dict[tuple, MacroMapping] = {} # Keyed by param path tuple
+        self.parameter_overrides: Dict[str, float] = {} # Keyed by param name
     
+    def set_initial_parameter(self, name: str, value: float):
+        """Set an initial value for a parameter (Surgical Control)"""
+        self.parameter_overrides[name] = value
+
     def add_mapping(self, param_path: List[str], mapping: MacroMapping):
         self.mappings[tuple(param_path)] = mapping
 
     def _create_parameter(self, name: str, value: float, min_val: float = 0.0, max_val: float = 127.0, param_path: List[str] = []) -> ET.Element:
         """Create a full Ableton parameter element with optional macro mapping"""
+        
+        # SURGICAL INITIALIZATION: Look for overrides from the AI
+        if name in self.parameter_overrides:
+            val = self.parameter_overrides[name]
+            
+            # V23 MASTER TRANSLATOR (String-to-Enum)
+            if isinstance(val, str):
+                val_lower = val.lower().strip()
+                if val_lower in ENUM_AUTHORITY:
+                    value = ENUM_AUTHORITY[val_lower]
+                    print(f"DEBUG: V23 Enum Translator: '{val}' -> {value}")
+                else:
+                    try:
+                        value = float(val)
+                    except (ValueError, TypeError):
+                        print(f"[WARNING] V23 Guard: Rejecting unknown string '{val}' for {name}. Using default.")
+            else:
+                value = val
+            print(f"DEBUG: Surgical Initialization for {self.name}.{name} -> {value}")
+
         elem = ET.Element(name)
         ET.SubElement(elem, "LomId").set("Value", "0")
         
@@ -95,6 +204,12 @@ class AbletonDevice:
         mapping = self.mappings.get(full_path)
         
         if mapping:
+            # --- MACRO CONTROL CONNECTOR (V12) ---
+            connector = ET.SubElement(elem, "MacroControlConnector")
+            connector.set("Id", "0")
+            ET.SubElement(connector, "SourceDeviceId").set("Value", "0")
+            ET.SubElement(connector, "SourceEnum").set("Value", str(mapping.macro_index))
+            
             key_midi = ET.SubElement(elem, "KeyMidi")
             ET.SubElement(key_midi, "PersistentKeyString").set("Value", "")
             ET.SubElement(key_midi, "IsNote").set("Value", "false")
@@ -107,60 +222,66 @@ class AbletonDevice:
             # Use mapping ranges!
             min_val = mapping.min_val
             max_val = mapping.max_val
-        
-        is_bool = name in ["On", "IsOn", "EditMode", "Speaker", "IsSoloed", "SoftClip", "SaturatorSoftClip"]
-        
-        if is_bool:
-            val_str = "true" if value > 0.5 else "false"
-        else:
-            # Ableton prefers "0" over "0.0" for integer values
-            if value == int(value):
-                val_str = str(int(value))
-            else:
-                val_str = str(value)
             
-        ET.SubElement(elem, "Manual").set("Value", val_str)
+            # EXTRA SAFETY (V23): Ensure mapping ranges are numeric
+            try:
+                min_val = float(min_val)
+                max_val = float(max_val)
+            except:
+                min_val, max_val = 0.0, 1.0
         
-        # Automation target always present
-        auto_target = ET.SubElement(elem, "AutomationTarget")
-        auto_target.set("Id", "0")
-        ET.SubElement(auto_target, "LockEnvelope").set("Value", "0")
+        is_bool = name in ["On", "IsOn", "EditMode", "Speaker", "IsSoloed", "SoftClip", "SaturatorSoftClip", "Freeze"]
+        is_enum = PARAMETER_AUTHORITY.get(name) == "enum" or name in ["Mode", "Type", "Routing", "Method", "FilterType", "ShaperType"]
         
         if is_bool:
             # Booleans use MidiCCOnOffThresholds, NO ModulationTarget, NO MidiControllerRange
+            try:
+                if isinstance(value, str):
+                    val_str = "true" if value.lower() in ["true", "on", "1", "1.0"] else "false"
+                else:
+                    val_str = "true" if float(value) > 0.5 else "false"
+            except:
+                val_str = "false"
+            
+            ET.SubElement(elem, "Manual").set("Value", val_str)
+            auto_target = ET.SubElement(elem, "AutomationTarget")
+            auto_target.set("Id", "0")
+            ET.SubElement(auto_target, "LockEnvelope").set("Value", "0")
+            
             midi_thresh = ET.SubElement(elem, "MidiCCOnOffThresholds")
             ET.SubElement(midi_thresh, "Min").set("Value", "64")
             ET.SubElement(midi_thresh, "Max").set("Value", "127")
         else:
-            # Reals/Ints use MidiControllerRange and ModulationTarget
-            midi_range = ET.SubElement(elem, "MidiControllerRange")
-            ET.SubElement(midi_range, "Min").set("Value", str(min_val))
-            ET.SubElement(midi_range, "Max").set("Value", str(max_val))
+            # Numeric/Enum Parameters
+            try:
+                numeric_val = float(value)
+                if numeric_val == int(numeric_val):
+                    val_str = str(int(numeric_val))
+                else:
+                    # Precision check for Ableton
+                    val_str = f"{numeric_val:.8f}".rstrip('0').rstrip('.') if "." in str(numeric_val) else str(numeric_val)
+            except (ValueError, TypeError):
+                val_str = "0"
             
-            mod_target = ET.SubElement(elem, "ModulationTarget")
-            mod_target.set("Id", "0")
-            ET.SubElement(mod_target, "LockEnvelope").set("Value", "0")
+            ET.SubElement(elem, "Manual").set("Value", val_str)
+            auto_target = ET.SubElement(elem, "AutomationTarget")
+            auto_target.set("Id", "0")
+            ET.SubElement(auto_target, "LockEnvelope").set("Value", "0")
+            
+            # CRITICAL (V24): ONLY add mapping tags if it's NOT an enum AND (it's mapped OR it's a standard numeric param)
+            # Enums/Menus NEVER have these tags in native devices.
+            if not is_enum:
+                midi_range = ET.SubElement(elem, "MidiControllerRange")
+                ET.SubElement(midi_range, "Min").set("Value", str(min_val))
+                ET.SubElement(midi_range, "Max").set("Value", str(max_val))
+                
+                mod_target = ET.SubElement(elem, "ModulationTarget")
+                mod_target.set("Id", "0")
+                ET.SubElement(mod_target, "LockEnvelope").set("Value", "0")
         
         return elem
 
-    def to_preset_xml(self) -> ET.Element:
-        """Generate full AbletonDevicePreset XML"""
-        preset = ET.Element("AbletonDevicePreset")
-        preset.set("Id", self.device_id)
-        
-        ET.SubElement(preset, "OverwriteProtectionNumber").set("Value", "3075")
-        device_wrapper = ET.SubElement(preset, "Device")
-        device_elem = ET.SubElement(device_wrapper, self.xml_tag)
-        device_elem.set("Id", "0")
-        
-        # Standard Device Header
-        ET.SubElement(device_elem, "LomId").set("Value", "0")
-        ET.SubElement(device_elem, "LomIdView").set("Value", "0")
-        ET.SubElement(device_elem, "IsExpanded").set("Value", "true")
-        ET.SubElement(device_elem, "BreakoutIsExpanded").set("Value", "false")
-        
-        # On parameter
-        device_elem.append(self._create_parameter("On", 1.0, 0.0, 1.0))
+    # Removed ghost to_preset_xml
         
     def _add_metadata_fields(self, elem: ET.Element, class_name: str, is_mixer: bool = False):
         """Add standard Ableton metadata fields to a device element"""
@@ -200,10 +321,10 @@ class AbletonDevice:
         ET.SubElement(elem, "ViewData").set("Value", "{}")
         ET.SubElement(elem, "OverwriteProtectionNumber").set("Value", "3075")
 
-    def to_preset_xml(self) -> ET.Element:
-        """Generate full AbletonDevicePreset XML"""
+    def to_preset_xml(self, preset_id: str = "0") -> ET.Element:
+        """Generate full AbletonDevicePreset XML with a specific preset ID"""
         preset = ET.Element("AbletonDevicePreset")
-        preset.set("Id", "0")
+        preset.set("Id", preset_id)
         ET.SubElement(preset, "OverwriteProtectionNumber").set("Value", "3075")
         
         device_wrapper = ET.SubElement(preset, "Device")
@@ -304,7 +425,7 @@ class AbletonDevice:
     def to_node_xml(self) -> ET.Element:
         """Generate runtime XML for the device (without Preset wrapper)"""
         device_elem = ET.Element(self.xml_tag)
-        device_elem.set("Id", "0")
+        device_elem.set("Id", self.device_id)
         
         # Standard Device Header
         ET.SubElement(device_elem, "LomId").set("Value", "0")
@@ -372,6 +493,8 @@ class Chain:
         ET.SubElement(branch, "LomIdView").set("Value", "0")
         ET.SubElement(branch, "IsExpanded").set("Value", "true")
         ET.SubElement(branch, "BreakoutIsExpanded").set("Value", "false")
+        ET.SubElement(branch, "OverwriteProtectionNumber").set("Value", "3075")
+        ET.SubElement(branch, "UserName").set("Value", self.name)
         
         # Prepare helper device for parameter creation (use dummy if empty)
         helper_device = self.devices[0] if self.devices else None
@@ -388,14 +511,33 @@ class Chain:
         ET.SubElement(branch, "LastSelectedTimeableIndex").set("Value", "0")
         ET.SubElement(branch, "LastSelectedClipEnvelopeIndex").set("Value", "0")
         
-        # Metadata for AudioEffectBranch
-        helper_device._add_metadata_fields(branch, "AudioEffectBranch", is_mixer=True)
+        # Metadata for AudioEffectBranch (Minimal for branches)
+        source_ctx = ET.SubElement(branch, "SourceContext")
+        branch_ctx = ET.SubElement(source_ctx, "BranchSourceContext")
+        branch_ctx.set("Id", "0")
+        ET.SubElement(branch_ctx, "OriginalFileRef")
+        ET.SubElement(branch_ctx, "BrowserContentPath").set("Value", "")
+        ET.SubElement(branch_ctx, "LocalFiltersJson").set("Value", "")
+        ET.SubElement(branch_ctx, "PresetRef")
+        ET.SubElement(branch_ctx, "BranchDeviceId").set("Value", "")
             
         # Device Chain (CRITICAL Missing Component)
         device_chain = ET.SubElement(branch, "DeviceChain")
         
-        # Mixer
-        mixer_device = ET.SubElement(device_chain, "Mixer")
+        # Main Device List
+        devices_list = ET.SubElement(device_chain, "Devices")
+        if self.devices:
+            for dev in self.devices:
+                # Use rack counter if provided
+                if hasattr(device_db, "get_next_device_id"):
+                    dev.device_id = device_db.get_next_device_id()
+                devices_list.append(dev.to_node_xml())
+
+        # Signal Modulations (Empty)
+        ET.SubElement(device_chain, "SignalModulations")
+
+        # Mixer (Peer to DeviceChain in modern branches)
+        mixer_device = ET.SubElement(branch, "Mixer")
         mixer_xml = ET.SubElement(mixer_device, "AudioBranchMixerDevice")
         mixer_xml.set("Id", "0")
         
@@ -423,15 +565,6 @@ class Chain:
         ET.SubElement(rout, "UpperDisplayString").set("Value", "No Output")
         ET.SubElement(rout, "LowerDisplayString").set("Value", "")
         
-        # Main Device List
-        devices_list = ET.SubElement(device_chain, "Devices")
-        if self.devices:
-            for dev in self.devices:
-                devices_list.append(dev.to_node_xml())
-
-        # Signal Modulators (Empty)
-        ET.SubElement(device_chain, "SignalModulations")
-
         # Branch Selector & View Metadata (CRITICAL for Rack Validity)
         selector_range = ET.SubElement(branch, "BranchSelectorRange")
         ET.SubElement(selector_range, "Min").set("Value", "0")
@@ -443,15 +576,6 @@ class Chain:
         ET.SubElement(branch, "DocumentColorIndex").set("Value", "0")
         ET.SubElement(branch, "AutoColored").set("Value", "true")
         ET.SubElement(branch, "AutoColorScheme").set("Value", "0")
-        
-        source_ctx = ET.SubElement(branch, "SourceContext")
-        branch_ctx = ET.SubElement(source_ctx, "BranchSourceContext")
-        branch_ctx.set("Id", "0")
-        ET.SubElement(branch_ctx, "OriginalFileRef")
-        ET.SubElement(branch_ctx, "BrowserContentPath").set("Value", "")
-        ET.SubElement(branch_ctx, "LocalFiltersJson").set("Value", "")
-        ET.SubElement(branch_ctx, "PresetRef")
-        ET.SubElement(branch_ctx, "BranchDeviceId").set("Value", "")
 
         return branch
 
@@ -465,16 +589,28 @@ class Chain:
         
         # DevicePresets
         device_presets = ET.SubElement(branch, "DevicePresets")
-        for idx, device in enumerate(self.devices):
-            preset = device.to_preset_xml()
-            preset.set("Id", str(idx))
+        for i, device in enumerate(self.devices):
+            # Devices in presets typically start at Id="0" relative to the preset
+            # But the preset itself needs a unique global ID
+            device.device_id = str(i)
+            
+            global_preset_id = "0"
+            if hasattr(device_db, "get_next_preset_id"):
+                global_preset_id = device_db.get_next_preset_id()
+                
+            preset = device.to_preset_xml(preset_id=global_preset_id)
             device_presets.append(preset)
             
         # MixerPreset (REQUIRED for parallel chains)
-        mixer_preset = ET.SubElement(branch, "MixerPreset")
+        # In Golden Sample, Mixer is also an AbletonDevicePreset
+        mixer_preset_root = ET.SubElement(branch, "MixerPreset")
         
-        mixer_preset_wrapper = ET.SubElement(mixer_preset, "AbletonDevicePreset")
-        mixer_preset_wrapper.set("Id", "0")
+        global_mixer_preset_id = "0"
+        if hasattr(device_db, "get_next_preset_id"):
+            global_mixer_preset_id = device_db.get_next_preset_id()
+
+        mixer_preset_wrapper = ET.SubElement(mixer_preset_root, "AbletonDevicePreset")
+        mixer_preset_wrapper.set("Id", global_mixer_preset_id)
         ET.SubElement(mixer_preset_wrapper, "OverwriteProtectionNumber").set("Value", "3075")
         
         mixer_device_wrapper = ET.SubElement(mixer_preset_wrapper, "Device")
@@ -496,13 +632,16 @@ class Chain:
         mixer_device.append(helper_device._create_parameter("On", 1.0, 0.0, 1.0))
         
         ET.SubElement(mixer_device, "ModulationSourceCount").set("Value", "0")
+        # ParametersListWrapper
         ET.SubElement(mixer_device, "ParametersListWrapper").set("LomId", "0")
         ET.SubElement(mixer_device, "Pointee").set("Id", "0")
-        ET.SubElement(mixer_device, "LastSelectedTimeableIndex").set("Value", "0")
-        ET.SubElement(mixer_device, "LastSelectedClipEnvelopeIndex").set("Value", "0")
         
-        # Mixer Metadata
-        helper_device._add_metadata_fields(mixer_device, "AudioBranchMixerDevice", is_mixer=True)
+        # Last Preset Ref (V35 GOLDEN)
+        last_ref_val = ET.SubElement(mixer_device, "LastPresetRef")
+        last_ref = ET.SubElement(last_ref_val, "Value")
+        def_ref = ET.SubElement(last_ref, "AbletonDefaultPresetRef")
+        def_ref.set("Id", "0")
+        ET.SubElement(def_ref, "DeviceId").set("Name", "AudioBranchMixerDevice")
         
         # Speaker (Mandatory for Mixer)
         mixer_device.append(helper_device._create_parameter("Speaker", 1.0, 0.0, 1.0))
@@ -562,6 +701,18 @@ class AudioEffectRack:
         self.chains: List[Chain] = []
         self.macro_count = 8  # Visible macros (max 16 total)
         self.macro_mappings: List[MacroMapping] = []
+        self.device_id_counter = 1 # Rack is 0, devices start at 1
+        self.preset_id_counter = 20 # Start high for presets
+    
+    def get_next_device_id(self) -> str:
+        did = str(self.device_id_counter)
+        self.device_id_counter += 1
+        return did
+
+    def get_next_preset_id(self) -> str:
+        pid = str(self.preset_id_counter)
+        self.preset_id_counter += 1
+        return pid
     
     def add_chain(self, chain: Chain):
         """Add a chain to the rack"""
@@ -571,12 +722,35 @@ class AudioEffectRack:
         """Add a macro control mapping"""
         self.macro_mappings.append(mapping)
     
-    def auto_map_macros(self, ai_mapping_plan: list = None):
+    def auto_map_macros(self, nlp_resp: dict = None):
         """
-        Automatically map macros to parameters.
-        Prioritizes AI Mapping Plan if provided, otherwise falls back to database suggestions.
+        Automatically map macros and initialize parameters.
+        Prioritizes AI Surgical Plan if provided.
         """
+        if not nlp_resp: return
+        
+        ai_mapping_plan = nlp_resp.get("macro_details", [])
+        surgical_devices = nlp_resp.get("surgical_devices", [])
+        
+        # 0. DEEP INITIALIZATION: Apply surgical parameter overrides
+        for s_dev in surgical_devices:
+            dev_name = s_dev.get("name", "").lower()
+            params = s_dev.get("parameters", {})
+            
+            # Find the actual device in the rack
+            for chain in self.chains:
+                for device in chain.devices:
+                    # Ironclad matching: remove spaces and non-alpha characters
+                    d_norm = device.name.lower().replace(" ", "").replace("-", "").replace("_", "")
+                    s_norm = dev_name.replace(" ", "").replace("-", "").replace("_", "")
+                    
+                    if s_norm in d_norm or d_norm in s_norm:
+                        print(f"DEBUG: Surgical Init Match: '{dev_name}' -> '{device.name}'")
+                        for p_name, p_val in params.items():
+                            device.set_initial_parameter(p_name, p_val)
+
         macro_idx = 0
+        used_macros = set()
         mapped_devices = set()
 
         # 1. Try to follow AI Plan
@@ -585,18 +759,33 @@ class AudioEffectRack:
             for plan_item in ai_mapping_plan:
                 if macro_idx >= 16: break
                 
-                target_dev_name = plan_item.get("target_device", "").lower()
-                target_param = plan_item.get("target_parameter", "").lower()
+                raw_target_dev = plan_item.get("target_device") or ""
+                raw_target_param = plan_item.get("target_parameter") or ""
+                
+                target_dev_name = str(raw_target_dev).lower().replace(" ", "").replace("_", "").replace("-", "")
+                target_param = str(raw_target_param).lower()
+                
+                if not target_dev_name or not target_param:
+                    print(f"DEBUG: Skipping invalid macro plan item: {plan_item}")
+                    continue
+                
+                if not target_dev_name or not target_param:
+                    print(f"DEBUG: Skipping invalid macro plan item: {plan_item}")
+                    continue
+                
+                # V12: Track matches to avoid re-mapping if multiple devices match
+                local_found = False
                 
                 # Find matching device in any chain
-                found_match = False
                 for chain in self.chains:
                     for device in chain.devices:
-                        # Fuzzy match device name (e.g. "Reverb" in "Reverb2")
-                        if target_dev_name in device.name.lower() or device.name.lower() in target_dev_name:
+                        if local_found: break # Only one device instance per plan item
+                        
+                        # Ironclad matching: remove spaces and suffixes
+                        d_name_norm = device.name.lower().replace(" ", "").replace("_", "").replace("-", "").replace("2", "").replace("new", "")
+                        
+                        if target_dev_name in d_name_norm or d_name_norm in target_dev_name:
                             # Try to find parameter
-                            # Note: This is tricky without a full parameter map. 
-                            # We will try to map to 'known' params first via fuzzy search on suggestions
                             suggestions = self.device_db.get_macro_suggestions(device.name)
                             
                             best_param = None
@@ -645,7 +834,10 @@ class AudioEffectRack:
                                     "res": "Stage1_Filter_Resonance", "bias": "Stage1_Shaper_Bias"
                                 },
                                 "Saturator": {
-                                    "drive": "Drive", "depth": "ColorDepth", "curve": "WsCurve", "color": "ColorOn", "output": "Output"
+                                    "drive": "PreDrive", "depth": "ColorDepth", "curve": "WsCurve", "color": "ColorOn", "output": "PostDrive"
+                                },
+                                "Delay": {
+                                    "time": "DelayLine_TimeL", "feedback": "Feedback", "drywet": "DryWet"
                                 },
                                 "Overdrive": {
                                     "drive": "Drive", "tone": "Tone", "band": "Bandwidth", "center": "MidFreq"
@@ -704,17 +896,26 @@ class AudioEffectRack:
                                 },
                                 
                                 # --- TIME & SPACE ---
+                                 "Echo": {
+                                     "time": "Delay_TimeL", "feedback": "Feedback", "drywet": "DryWet", 
+                                     "reverb": "Reverb_Level", "wobble": "Wobble_Amount", "noise": "Noise_Amount",
+                                     "drive": "InputGain", "predrive": "InputGain", "grit": "InputGain",
+                                     "cutoff": "Filter_Frequency", "filter": "Filter_Frequency", "freq": "Filter_Frequency"
+                                 },
                                 "Reverb": {
-                                    "decay": "DecayTime", "size": "RoomSize", "diff": "Diffusion", "predelay": "PreDelay"
+                                    "decay": "DecayTime", "tail": "DecayTime", "coda": "DecayTime", 
+                                    "size": "RoomSize", "diff": "Diffusion", "predelay": "PreDelay",
+                                    "mix": "DryWet", "drywet": "DryWet"
                                 },
-                                "Hybrid": {
-                                    "decay": "Algorithm_Decay", "size": "Algorithm_Size", "vintage": "Vintage"
+                                "Eq8": {
+                                    "freq": "Freq", "gain": "GlobalGain", "q": "AdaptiveQ",
+                                    "low": "Freq", "high": "Freq" # Will be adjusted by path logic
                                 },
-                                "Echo": {
-                                    "time": "Delay_TimeL", "feedback": "Feedback", "drywet": "NewDryWet", 
-                                    "reverb": "Reverb_Level", "wobble": "Wobble_Amount", "noise": "Noise_Amount",
-                                    "drive": "InputGain", "predrive": "InputGain", # FIX: Explicit synonym for Drive
-                                    "input": "InputGain"
+                                "Roar": {
+                                    "drive": "Stage1_Shaper_Amount", "amount": "Stage1_Shaper_Amount", "grit": "Stage1_Shaper_Amount",
+                                    "cutoff": "Stage1_Filter_Frequency", "freq": "Stage1_Filter_Frequency",
+                                    "res": "Stage1_Filter_Resonance", "bias": "Stage1_Shaper_Bias",
+                                    "tone": "Stage1_Filter_Frequency"
                                 },
                                 "Delay": {
                                     "time": "DelayLine_TimeL", "feedback": "Feedback", "filter": "Filter_Frequency"
@@ -743,94 +944,231 @@ class AudioEffectRack:
                                 }
                             }
                             
-                            device_semantic = SEMANTIC_MAP.get(device.name, {})
-                            for intent, real_param in device_semantic.items():
-                                if intent in target_param:
-                                    print(f"DEBUG: Semantic Override: '{target_param}' -> '{real_param}'")
-                                    best_param = real_param
-                                    # Try to get range from info if possible, otherwise generic
-                                    # (We rely on later logic or set sensible defaults)
-                                    best_path = [] # Reset path so special handling can re-set it if needed
-                                    break
+                            # --- SEMANTIC MASTER (V6/V10) ---
+                            # Normalize key for semantic lookup (no spaces, all lower)
+                            s_key = device.name.lower().replace(" ", "").replace("_", "").replace("-", "")
+                            # Map aliases to the target keys in SEMANTIC_MAP (lowercase)
+                            if "autofilter" in s_key: s_key = "autofilter2"
+                            if "chorus" in s_key: s_key = "chorus2"
+                            if "autopan" in s_key: s_key = "autopan2"
+                            if "drumbuss" in s_key: s_key = "drumbuss"
+                            if "phaser" in s_key: s_key = "phasernew"
+                            if "redux" in s_key: s_key = "redux2"
 
-                            # If not in suggestions, try generic mapping if it's a common param
+                            # Normalize SEMANTIC_MAP for this device (V10: Lowercase keys)
+                            device_semantic = {}
+                            for k, v in SEMANTIC_MAP.items():
+                                if k.lower().replace(" ", "").replace("_", "").replace("-", "") == s_key:
+                                    device_semantic = v
+                                    break
+                            
+                            for intent, real_param in device_semantic.items():
+                                if intent.lower() == target_param or intent.lower() in target_param:
+                                    print(f"DEBUG: Surgical Semantic Match: '{target_param}' -> '{real_param}'")
+                                    best_param = real_param
+                                    best_path = [] 
+                                    break
+                            
+                            # C. Global Resolver (V21: Backup for missing device maps)
+                            if best_param == target_param:
+                                global_map = {
+                                    "frequency": "Filter_Frequency", "cutoff": "Filter_Frequency", 
+                                    "freq": "Filter_Frequency", "resonance": "Filter_Resonance",
+                                    "res": "Filter_Resonance", "drive": "DriveAmount",
+                                    "output": "OutputGain", "gain": "OutputGain",
+                                    "time": "DelayLine_TimeL", "feedback": "Feedback", "drywet": "DryWet"
+                                }
+                                lookup = target_param.lower().strip()
+                                for g_key, g_val in global_map.items():
+                                     if g_key in lookup or lookup in g_key:
+                                          best_param = g_val
+                                          print(f"DEBUG: V21 Global Resolver: '{target_param}' -> '{best_param}'")
+                                          break
+
+                            # --- DIRECT PARAMETER LOOKUP (V10) ---
+                            # If still no match, try to find the parameter directly in the device's DNA
                             if not best_param:
-                                # Fallback: simple heuristic for standard params
+                                device_params = device.device_info.get("parameters", [])
+                                for p in device_params:
+                                    p_name = p["name"]
+                                    p_name_lower = p_name.lower()
+                                    if target_param == p_name_lower or target_param in p_name_lower or p_name_lower in target_param:
+                                        print(f"DEBUG: Direct DNA Match: '{target_param}' -> '{p_name}'")
+                                        best_param = p_name
+                                        best_path = []
+                                        break
+
+                            # If not in suggestions or semantic, try generic heuristics
+                            if not best_param:
                                 if "dec" in target_param: best_param = "DecayTime"
                                 elif "dry" in target_param or "wet" in target_param: best_param = "DryWet"
-                                elif "freq" in target_param: best_param = "Frequency"
+                                elif "freq" in target_param: best_param = "Filter_Frequency" if "Auto" in device.name else "Frequency"
                                 elif "gain" in target_param: best_param = "Gain"
                                 elif "amount" in target_param: best_param = "Amount"
                                 
                             if best_param:
                                 # Special handling for complex devices like EQ8
-                                if device.xml_tag == "Eq8":
-                                     if any(x in best_param for x in ["Freq", "Gain", "Q"]):
-                                         best_path = ["Bands.0", "ParameterA"]
-                                         if "Freq" in best_param: best_param = "Freq"
-                                         if "Gain" in best_param: best_param = "Gain"
-                                         if "Q" in best_param: best_param = "Q"
-                            
-                                mapping = MacroMapping(
-                                    macro_index=macro_idx,
-                                    device_id=device.device_id,
-                                    param_path=best_path + [best_param],
-                                    min_val=min_v,
-                                    max_val=max_v
-                                )
-                                device.add_mapping(mapping.param_path, mapping)
-                                self.add_macro_mapping(mapping)
-                                macro_idx += 1
-                                found_match = True
-                                break # Done with this plan item
-                    if found_match: break
+                                if device.xml_tag == "Eq8" and any(x in best_param for x in ["Freq", "Gain", "Q"]):
+                                     best_path = ["Bands.0", "ParameterA"]
+                                     if "Freq" in best_param: best_param = "Freq"
+                                     if "Gain" in best_param: best_param = "Gain"
+                                     if "Q" in best_param: best_param = "Q"
+                            if not best_param:
+                                print(f"DEBUG: Could not resolve parameter '{target_param}' for {device.name}. Skipping mapping.")
+                                continue
 
-        # 2. Fill remaining slots with Auto-Logic (Fallback)
-        if macro_idx < 8:
-            for chain_idx, chain in enumerate(self.chains):
-                for device_idx, device in enumerate(chain.devices):
-                    suggestions = self.device_db.get_macro_suggestions(device.name)
-                    
-                    for suggestion in suggestions:
-                        if macro_idx >= 8: break # Only auto-fill up to 8
-                        
-                        # Verify we haven't already mapped this exact param (naive check)
-                        # Ideally we check self.macro_mappings but let's just populate
-                        
-                        param_name = suggestion['param_name']
-                        p_path = []
-                        
-                        # Handle nested paths for specific devices
-                        if device.xml_tag == "Eq8":
-                            # EQ Eight uses Bands.0, Bands.1, etc.
-                            if any(x in param_name for x in ["Freq", "Gain", "Q"]):
-                                 p_path = ["Bands.0", "ParameterA"]
-                                 # If the param_name was "1 Frequency A", use "Freq"
-                                 if "Freq" in param_name: param_name = "Freq"
-                                 if "Gain" in param_name: param_name = "Gain"
-                                 if "Q" in param_name: param_name = "Q"
-                                 
-                        elif device.xml_tag == "MultibandDynamics":
-                            # Handle specific band mappings if suggested
-                            if "Mid" in param_name:
-                                 p_path = ["SideChainAndSplitter", "SplitMidHigh"] # Simplified
-                            elif "Low" in param_name:
-                                 pass # Top level often works for OutputGain
+                            # Determine Target Macro Index (V11: Diamond Precision)
+                            target_macro_idx = plan_item.get("macro")
+                            if target_macro_idx is not None:
+                                target_macro_idx = int(target_macro_idx) - 1
+                            else:
+                                # Find next free macro that isn't already claimed
+                                while macro_idx < 16 and macro_idx in used_macros:
+                                    macro_idx += 1
+                                target_macro_idx = macro_idx
                             
-                            # Fix for OutputGain which is often mapped
-                            if param_name == "OutputGain":
-                                 p_path = []
-                        
+                            if target_macro_idx < 0: target_macro_idx = 0
+                            if target_macro_idx >= 16: break
+                            
+                            used_macros.add(target_macro_idx)
+
+                            # --- MAPPING GUARD ---
+                            # Prevent mapping the SAME parameter twice, but ALLOW the same macro 
+                            # to map to multiple DIFFERENT parameters (Multi-Target Power)
+                            full_path = tuple(best_path + [best_param])
+                            if full_path in device.mappings:
+                                found_match = True
+                                break
+
+                            # Determine labels and ranges (SURGICAL PRIORITY)
+                            macro_label = plan_item.get("name") or plan_item.get("label") or best_param
+                            min_v = plan_item.get("min")
+                            max_v = plan_item.get("max")
+                            
+                            # --- SURGICAL SCALER (V7/V11) ---
+                            device_params = device.device_info.get("parameters", [])
+                            matched_p = next((p for p in device_params if p["name"] == best_param), None)
+                            
+                            # --- UNIVERSAL MASTER SCALER (V23) ---
+                            # DETERMINISTIC scaling based on parameter identity, not just value ranges.
+                            if matched_p:
+                                p_max = matched_p.get("max", 1.0)
+                                p_min = matched_p.get("min", 0.0)
+                                authority_type = PARAMETER_AUTHORITY.get(best_param)
+                                
+                                # Case A: Normalized Time (1ms UI = 0.0 XML, Max UI = 1.0 XML)
+                                if authority_type == "normalized_time_5s" or (
+                                    any(x in best_param for x in ["TimeL", "TimeR", "Time", "DecayTime"]) and "Rate" not in best_param and p_max <= 60.0
+                                ):
+                                    print(f"DEBUG: V23.1 Authority (Time): Normalizing '{best_param}' -> 0-1 (of {p_max}s)")
+                                    p_max_ms = p_max * 1000.0
+                                    
+                                    # Hybrid Detection (ms vs s)
+                                    def to_ms(v, p_max_val):
+                                        if v is None: return 1.0
+                                        if v == 1.0: return 1.0 # The explicit floor
+                                        if v < p_max_val: return v * 1000.0 # e.g. 0.001s or 4.95s
+                                        return v # e.g. 127ms or 4950ms
+                                        
+                                    raw_ms_min = to_ms(min_v, p_max)
+                                    raw_ms_max = to_ms(max_v, p_max)
+                                    
+                                    min_v = max(0.0, (raw_ms_min - 1.0) / p_max_ms)
+                                    max_v = max(0.0, (raw_ms_max - 1.0) / p_max_ms)
+
+                                # Case B: Physical Hz
+                                elif authority_type == "physical_hz" or ("Freq" in best_param and p_max > 100):
+                                    if min_v < 200.0 and max_v < 200.0 and min_v > 0:
+                                        print(f"DEBUG: V23 Authority (Hz): Scaling kHz -> Hz Physical for '{best_param}'")
+                                        min_v *= 1000.0
+                                        max_v *= 1000.0
+                                    else:
+                                        print(f"DEBUG: V23 Authority (Hz): Already in Hz physical range for '{best_param}'")
+
+                                # Case C: Physical dB
+                                elif authority_type == "physical_db":
+                                    print(f"DEBUG: V23 Authority (dB): Keeping Physical values for '{best_param}'")
+
+                                # Case D: Generic Normalized (0-1 AI to Physics)
+                                elif (0.0 <= min_v <= 1.0) and (0.0 <= max_v <= 1.0) and (p_max - p_min > 1.1):
+                                    print(f"DEBUG: V23 Scaling '{best_param}' AI 0-1 to Physical [{p_min}, {p_max}]")
+                                    orig_min, orig_max = min_v, max_v
+                                    min_v = p_min + (p_max - p_min) * orig_min
+                                    max_v = p_min + (p_max - p_min) * orig_max
+                            else:
+                                # Safe default for unknown devices
+                                min_v = 0.0 if min_v is None else min_v
+                                max_v = 1.0 if max_v is None else max_v
+
+                            # Flat Range Protection (Units-aware)
+                            if min_v == max_v and min_v is not None:
+                                 # For normalized time params, use tiny increment
+                                 increment = 0.0001 if (matched_p and matched_p.get("max", 1.0) <= 60.0) else 1.0
+                                 max_v = min_v + increment
+
+                            mapping = MacroMapping(
+                                macro_index=target_macro_idx,
+                                device_id="0", # V12: Source is always Rack
+                                param_path=best_path + [best_param],
+                                min_val=min_v,
+                                max_val=max_v,
+                                label=macro_label
+                            )
+                            print(f"✅ SURGICAL MAPPING: Macro {target_macro_idx} -> {device.name}.{best_param} ('{macro_label}')")
+                            device.add_mapping(best_path + [best_param], mapping)
+                            self.add_macro_mapping(mapping)
+                            
+                            # Mark macro as used
+                            used_macros.add(target_macro_idx)
+                            
+                            # Increment macro_idx only if we are using the default loop index
+                            if "macro" not in plan_item:
+                                macro_idx += 1
+                                
+                            local_found = True
+                            break 
+                    if local_found: break
+
+        # 2. Fill remaining slots with Auto-Logic (ONLY IF NO AI PLAN)
+        # V17 Titanium Policy: Early exit if AI plan exists to prevent GHOST mappings.
+        if ai_mapping_plan and len(ai_mapping_plan) > 0:
+            print(f"DEBUG: V17 Titanium - Surgical Plan confirmed. Blocking all fallback mappings.")
+            return
+
+        if macro_idx < 16:
+            print(f"DEBUG: No AI plan. Filling empty rack with suggestions...")
+            for chain in self.chains:
+                for device in chain.devices:
+                    suggestions = self.device_db.get_macro_suggestions(device.name)
+                    for suggestion in suggestions:
+                        # V14: RIGOROUS SLOT PROTECTION
+                        while macro_idx < 16 and macro_idx in used_macros:
+                            macro_idx += 1
+                                
+                            if macro_idx >= 8: break
+                            
+                            param_name = suggestion['param_name']
+                            p_path = []
+                            
+                            # Guard: Don't map what's already mapped
+                            if tuple(p_path + [param_name]) in device.mappings:
+                                continue
+
+                        # ... (Device specific path logic)
+                        if device.xml_tag == "Eq8" and any(x in param_name for x in ["Freq", "Gain", "Q"]):
+                             p_path = ["Bands.0", "ParameterA"]
+                             param_name = param_name.replace("1 ", "").replace(" A", "")
+
                         mapping = MacroMapping(
                             macro_index=macro_idx,
-                            device_id=device.device_id,
+                            device_id="0", # V12: Source is always Rack
                             param_path=p_path + [param_name],
                             min_val=suggestion['min'],
-                            max_val=suggestion['max']
+                            max_val=suggestion['max'],
+                            label=param_name # Fallback label
                         )
-                        
+                        print(f"ℹ️ FALLBACK MAPPING: Macro {macro_idx} -> {device.name}.{param_name}")
                         device.add_mapping(mapping.param_path, mapping)
-                        
                         self.add_macro_mapping(mapping)
                         macro_idx += 1
     
@@ -893,8 +1231,15 @@ class AudioEffectRack:
             raise ValueError("Invalid Template: AudioEffectGroupDevice not found")
             
         # 1. Update Macro Count
-        num_macros = rack.find("NumVisibleMacroControls/Value")
-        if num_macros: num_macros.set("Value", str(self.macro_count))
+        # SEARCH ROBUSTLY: some templates might have it as a sub-value or direct attribute
+        num_macros = rack.find("NumVisibleMacroControls")
+        if num_macros is not None:
+            num_macros.set("Value", str(self.macro_count))
+        else:
+            # Fallback path for different template versions
+            num_macros_val = rack.find("NumVisibleMacroControls/Value")
+            if num_macros_val is not None:
+                num_macros_val.set("Value", str(self.macro_count))
         
         # 2. CLEAR Runtime BRANCHES (Crucial Step: Must be empty for Saved Rack)
         branches_elem = rack.find("Branches")
@@ -912,20 +1257,33 @@ class AudioEffectRack:
                 bp_list.remove(child)
                 
         # Inject our new chains as PRESETS
+        # V35: Reset counters for fresh generation
+        self.device_id_counter = 1
+        self.preset_id_counter = 20
         for i, chain in enumerate(self.chains):
-            bp_list.append(chain.to_branch_preset_xml(branch_id=i, device_db=self.device_db))
+            bp_list.append(chain.to_branch_preset_xml(branch_id=i, device_db=self))
 
         # 4. Update Macros (Names, Defaults, etc.)
         # Macro Display Names
         for i in range(16):
+            # SEARCH ROBUSTLY: some templates might have it differently
             dn = rack.find(f"MacroDisplayNames.{i}")
-            if dn:
+            if dn is not None:
                 val = f"Macro {i+1}"
+                found_mapping = False
                 for m in self.macro_mappings:
                     if m.macro_index == i:
-                        val = m.param_path[-1] 
+                        val = m.label if m.label else m.param_path[-1]
+                        found_mapping = True
                         break
+                
+                print(f"DEBUG: Setting Macro {i} Label -> '{val}' (Found Mapping: {found_mapping})")
                 dn.set("Value", val)
+            else:
+                # Try sub-element path if direct tag fails (rare in Live 12 but safe)
+                sub_dn = rack.find(f"MacroDisplayNames.{i}/Value")
+                if sub_dn is not None:
+                     sub_dn.set("Value", val)
 
         return root
 
@@ -937,22 +1295,25 @@ class AudioEffectRack:
         return root
     
     def save(self, filepath: str):
-        """Save rack as .adg file"""
+        """Save rack as .adg file with character-perfect structural integrity"""
         # Generate XML
         xml_tree = self.to_xml()
         
-        # Pretty print with tabs
+        # V34: Character-Perfect Serialization
         xml_string = prettify_xml(xml_tree)
         
-        # Standardize line endings to standard CRLF (\r\n)
-        xml_string = xml_string.replace('\r\r\n', '\n').replace('\r\n', '\n').replace('\n', '\r\n')
+        # V34 CRITICAL: Standardize line endings to CRLF for Windows/Ableton 12.3
+        # Ensure absolute CRLF and no trailing/leading garbage
+        xml_string = xml_string.replace('\r', '').replace('\n', '\r\n').strip()
         
-        # If the user's system produces \r\r\n upon saving or something, we should be aware.
-        # But for now, let's use the most standard Windows line endings.
-        
-        # Compress with gzip (mtime=0 for deterministic output)
+        # Compress with gzip 
+        # FNAME flag set (via filename arg) to match 'afternoon' success files
         import gzip
-        with gzip.GzipFile(filepath, 'wb', compresslevel=9, mtime=0) as f:
-            f.write(xml_string.encode('utf-8'))
+        with open(filepath, 'wb') as f:
+            # We use the filename without extension or hash to keep it clean
+            fname = os.path.basename(filepath).split('_')[0]
+            with gzip.GzipFile(filename=fname, mode='wb', fileobj=f, compresslevel=9, mtime=0) as gz:
+                gz.write(xml_string.encode('utf-8'))
         
-        print(f"SUCCESS: Saved: {filepath}")
+        print(f"SUCCESS: Saved V35 'Golden DNA' Rack: {filepath}")
+        print(f"DEBUG: XML START: {xml_string[:100]}")
