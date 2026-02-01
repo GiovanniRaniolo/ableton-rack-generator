@@ -1,0 +1,146 @@
+{
+    "xml_tag": "Compressor2",
+    "class_name": "Compressor",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Threshold",
+            "default": 1.0,
+            "min": 0.0003162277571,
+            "max": 1.99526238
+        },
+        {
+            "name": "Ratio",
+            "default": 4.0,
+            "min": 1.0,
+            "max": 3.4028232635611926e+38
+        },
+        {
+            "name": "ExpansionRatio",
+            "default": 1.14999998,
+            "min": 1.0,
+            "max": 2.0
+        },
+        {
+            "name": "Attack",
+            "default": 1.0,
+            "min": 0.009999999776,
+            "max": 1000.0
+        },
+        {
+            "name": "Release",
+            "default": 30.0,
+            "min": 1.0,
+            "max": 3000.0
+        },
+        {
+            "name": "AutoReleaseControlOnOff",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Gain",
+            "default": 0.0,
+            "min": -36.0,
+            "max": 36.0
+        },
+        {
+            "name": "GainCompensation",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "DryWet",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Model",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "LegacyModel",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "LogEnvelope",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "LegacyEnvFollowerMode",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "Knee",
+            "default": 6.0,
+            "min": 0.0,
+            "max": 18.0
+        },
+        {
+            "name": "LookAhead",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "SideListen",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "SideChainEq_On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "SideChainEq_Mode",
+            "default": 5.0,
+            "min": 0.0,
+            "max": 5.0
+        },
+        {
+            "name": "SideChainEq_Freq",
+            "default": 80.0,
+            "min": 30.0,
+            "max": 15000.0
+        },
+        {
+            "name": "SideChainEq_Q",
+            "default": 0.7071067691,
+            "min": 0.1000000015,
+            "max": 12.0
+        },
+        {
+            "name": "SideChainEq_Gain",
+            "default": 0.0,
+            "min": -15.0,
+            "max": 15.0
+        }
+    ],
+    "macro_suggestions": [
+        {
+            "param_name": "Threshold",
+            "min": -40,
+            "max": -10
+        }
+    ]
+}

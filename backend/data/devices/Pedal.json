@@ -1,0 +1,74 @@
+{
+    "xml_tag": "Pedal",
+    "class_name": "Pedal",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Type",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "Gain",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Output",
+            "default": 0.0,
+            "min": -20.0,
+            "max": 20.0
+        },
+        {
+            "name": "Bass",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "Mid",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "Treble",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "MidFreq",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "Sub",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "DryWet",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        }
+    ],
+    "macro_suggestions": [
+        {
+            "param_name": "Gain",
+            "min": 0.1,
+            "max": 0.6
+        }
+    ]
+}

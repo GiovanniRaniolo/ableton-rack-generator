@@ -1,0 +1,56 @@
+{
+    "xml_tag": "Overdrive",
+    "class_name": "Overdrive",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "MidFreq",
+            "default": 1250.0,
+            "min": 50.0,
+            "max": 20000.0
+        },
+        {
+            "name": "BandWidth",
+            "default": 6.5,
+            "min": 0.5,
+            "max": 9.0
+        },
+        {
+            "name": "Drive",
+            "default": 50.0,
+            "min": 0.0,
+            "max": 100.0
+        },
+        {
+            "name": "DryWet",
+            "default": 50.0,
+            "min": 0.0,
+            "max": 100.0
+        },
+        {
+            "name": "Tone",
+            "default": 50.0,
+            "min": 0.0,
+            "max": 100.0
+        },
+        {
+            "name": "PreserveDynamics",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        }
+    ],
+    "macro_suggestions": [
+        {
+            "param_name": "Drive",
+            "min": 0.2,
+            "max": 0.8
+        }
+    ]
+}

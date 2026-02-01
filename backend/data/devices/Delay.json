@@ -1,0 +1,164 @@
+{
+    "xml_tag": "Delay",
+    "class_name": "Delay",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "DelayLine_SmoothingMode",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "DelayLine_Link",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "DelayLine_PingPong",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "DelayLine_SyncL",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "DelayLine_SyncR",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "DelayLine_TimeL",
+            "default": 0.3749999404,
+            "min": 0.001000000047,
+            "max": 5.0
+        },
+        {
+            "name": "DelayLine_TimeR",
+            "default": 0.3749999404,
+            "min": 0.001000000047,
+            "max": 5.0
+        },
+        {
+            "name": "DelayLine_SimpleDelayTimeL",
+            "default": 100.0,
+            "min": 1.0,
+            "max": 300.0
+        },
+        {
+            "name": "DelayLine_SimpleDelayTimeR",
+            "default": 100.0,
+            "min": 1.0,
+            "max": 300.0
+        },
+        {
+            "name": "DelayLine_PingPongDelayTimeL",
+            "default": 1.0,
+            "min": 1.0,
+            "max": 999.0
+        },
+        {
+            "name": "DelayLine_PingPongDelayTimeR",
+            "default": 1.0,
+            "min": 1.0,
+            "max": 999.0
+        },
+        {
+            "name": "DelayLine_SyncedSixteenthL",
+            "default": 2.0,
+            "min": 0.0,
+            "max": 7.0
+        },
+        {
+            "name": "DelayLine_SyncedSixteenthR",
+            "default": 3.0,
+            "min": 0.0,
+            "max": 7.0
+        },
+        {
+            "name": "DelayLine_OffsetL",
+            "default": 0.0,
+            "min": -0.3330000043,
+            "max": 0.3330000043
+        },
+        {
+            "name": "DelayLine_OffsetR",
+            "default": 0.0,
+            "min": -0.3330000043,
+            "max": 0.3330000043
+        },
+        {
+            "name": "Feedback",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 0.9499999881
+        },
+        {
+            "name": "Freeze",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Filter_On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Filter_Frequency",
+            "default": 999.999878,
+            "min": 49.9999962,
+            "max": 18000.0059
+        },
+        {
+            "name": "Filter_Bandwidth",
+            "default": 8.0,
+            "min": 0.5,
+            "max": 9.0
+        },
+        {
+            "name": "Modulation_Frequency",
+            "default": 0.5,
+            "min": 0.01000000071,
+            "max": 39.9999962
+        },
+        {
+            "name": "Modulation_AmountTime",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_AmountFilter",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "DryWet",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        }
+    ],
+    "macro_suggestions": [
+        {
+            "param_name": "Feedback",
+            "min": 0.2,
+            "max": 0.7
+        }
+    ]
+}

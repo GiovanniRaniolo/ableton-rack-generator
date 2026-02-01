@@ -31,6 +31,32 @@ class RackNLPParser:
             except Exception as e:
                 print(f"Warning: Failed to initialize Gemini Client: {e}")
 
+        # V50 KNOWLEDGE INJECTION
+        self.knowledge_base = ""
+        try:
+            kb_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'knowledge', 'MANUAL_EXTRACT.txt')
+            if os.path.exists(kb_path):
+                with open(kb_path, 'r', encoding='utf-8') as f:
+                    self.knowledge_base = f.read()
+                print(f"SUCCESS: Loaded Knowledge Base ({len(self.knowledge_base)} chars)")
+            else:
+                print("Warning: MANUAL_EXTRACT.txt not found.")
+        except Exception as e:
+            print(f"Warning: Failed to load Knowledge Base: {e}")
+
+        # V51 PROTOCOL INJECTION
+        self.behavior_protocol = ""
+        try:
+            proto_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'knowledge', 'AI_BEHAVIOR_PROTOCOL.md')
+            if os.path.exists(proto_path):
+                with open(proto_path, 'r', encoding='utf-8') as f:
+                    self.behavior_protocol = f.read()
+                print(f"SUCCESS: Loaded AI Behavior Protocol ({len(self.behavior_protocol)} chars)")
+            else:
+                print("Warning: AI_BEHAVIOR_PROTOCOL.md not found.")
+        except Exception as e:
+            print(f"Warning: Failed to load AI Behavior Protocol: {e}")
+
     def _build_device_patterns(self) -> List[str]:
         """Build regex patterns for deterministic fallback"""
         all_names = list(self.device_db.get_all_devices().keys())
@@ -57,73 +83,18 @@ class RackNLPParser:
                     surgical_dict_text += f'        - "{alias}" -> Use `{target}` (for {dev})\n'
 
         system_prompt = f"""
-        # ABLETON LIVE 12.3 MUSICAL SURGICAL ENGINE (V40)
-        
-        You are a Master Audio Design AI. Your task is to generate perfectly calibrated Audio Effect Racks. 
-        You MUST follow the "Musical Semantic Protocols" to ensure mappings are expressive and safe.
+        {self.behavior_protocol}
 
-        ## 🏛️ MUSICAL SEMANTIC PROTOCOLS:
-        1. **Hz PROTOCOL (Frequencies)**:
-           - NEVER use linear math. Use Logarithmic context.
-           - High-Pass sweep: min=20.0, max=18000.0. 
-           - Sub-bass focus: min=20.0, max=250.0. 
-        2. **dB PROTOCOL (Volumes/Gain)**:
-           - SAFETY FLOOR: Never start a gain macro at -inf unless it's a "Mute".
-           - Neutral Trim: min=-36.0, max=6.0. 
-           - Heavy Drive: min=0.0, max=24.0.
-        You MUST follow the "Musical Semantic Protocols" for all values.
+        ## 📚 REFERENCE KNOWLEDGE (OFFICIAL MANUAL):
+        Use this knowledge to set accurate parameter values and types.
+        {self.knowledge_base[:300000]} 
 
-        ## 📖 SURGICAL PARAMETER DICTIONARY (LABEL -> INTERNAL):
-        Use these internal names for mapping even if the user uses manual labels:
-{surgical_dict_text}
+        ## 🔧 SURGICAL PARAMETER DICTIONARY (USER CUSTOM ALIASES):
+        Use these internal mappings to ensure precision:
+        {surgical_dict_text}
 
-        ## 🔬 MUSICAL SEMANTIC PROTOCOLS:
-        1. **Hz Protocol**: Use logarithmic scaling (20Hz to 18kHz). Filters sweep UP (40 -> 18k) or DOWN (18k -> 40).
-        2. **dB Protocol**: Gain ranges MUST NOT start at -inf. Use a safety floor (e.g., -36dB to 0dB or -70dB to 6dB).
-        3. **Discrete Protocol**: Beat Repeat Grid (0-15), Auto Filter Type (0-9). Do NOT use floating points for these.
-        4. **Sidechain Law**: When "Ducking" or "Sidechain" is mentioned, prioritize mapping `Sidechain_Gain` or `Sidechain_Mix`.
-
-        ## 🎨 STATIC SOUND SCULPTING (PRESET DESIGN):
-        You are also a PRESET DESIGNER. You must initialize device parameters to define the "texture" even if they are NOT mapped to Macros.
-        - If user wants "Dark", set Filter Freq to 400Hz (Static) even if no Macro controls it.
-        - If user wants "Wide", set StereoWidth/Spread to max.
-        - **CRITICAL**: Do not leave unmapped parameters at default (vanilla) values. SCULPT THE SOUND.
-
-        ## 📝 RESPONSE FORMAT (STRICT JSON):
-        {{
-            "creative_name": "Surgical Rack",
-            "devices": ["Auto Filter", "Compressor", "Reverb"],
-            "surgical_devices": [
-                {{ 
-                    "name": "Auto Filter", 
-                    "parameters": {{ 
-                        "Filter_Frequency": 400.0,       // Static Setting (Dark Tone)
-                        "Filter_Type": 1.0               // Static Setting (OSR)
-                    }} 
-                }},
-                {{
-                    "name": "Reverb",
-                    "parameters": {{
-                        "DecayTime": 4.5,                // Static Setting (Massive Space)
-                        "DryWet": 0.35
-                    }}
-                }}
-            ],
-            "macro_details": [
-                {{
-                    "macro": 1,
-                    "name": "The Void",
-                    "target_device": "Auto Filter",
-                    "target_parameter": "Filter_Frequency",
-                    "min": 18000.0,
-                    "max": 40.0
-                }}
-            ],
-            "sound_intent": "Dark, industrial, and glitchy atmosphere.",
-            "musical_logic_explanation": "Technical reasoning. E.g. Set Reverb Decay to 4.5s statically to create the 'Cathedral' space."
-        }}
-
-        Available Devices: {", ".join(sorted(set(available_devices)))}
+        ## 🎛️ AVAILABLE DEVICES:
+        {", ".join(sorted(set(available_devices)))}
         """
         
         try:

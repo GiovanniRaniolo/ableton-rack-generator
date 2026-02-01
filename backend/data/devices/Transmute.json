@@ -1,0 +1,128 @@
+{
+    "xml_tag": "Transmute",
+    "class_name": "Transmute",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "MidiPitch_Transpose",
+            "default": 0.0,
+            "min": -48.0,
+            "max": 48.0
+        },
+        {
+            "name": "MidiPitch_TransposeScaleDegrees",
+            "default": 0.0,
+            "min": -28.0,
+            "max": 28.0
+        },
+        {
+            "name": "MidiPitch_Glide",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 20.0
+        },
+        {
+            "name": "PartialFrequencies_FrequencyHz",
+            "default": 110.0,
+            "min": 8.19999886,
+            "max": 1999.99976
+        },
+        {
+            "name": "PartialFrequencies_FrequencyNote",
+            "default": 45.0,
+            "min": 0.0,
+            "max": 96.0
+        },
+        {
+            "name": "PartialFrequencies_Shift",
+            "default": 0.0,
+            "min": -48.0,
+            "max": 48.0
+        },
+        {
+            "name": "PartialFrequencies_PartialStretch",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "PartialFrequencies_QuantizeToScaleOrTuning",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "DecayDamping_DecayTime",
+            "default": 0.2219999582,
+            "min": 0.001000000047,
+            "max": 20.0
+        },
+        {
+            "name": "DecayDamping_HighFreqDamp",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "DecayDamping_LowFreqDamp",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_ModRate",
+            "default": 0.09999999404,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_PitchModAmount",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 4.0
+        },
+        {
+            "name": "Global_NumHarmonics",
+            "default": 256.0,
+            "min": 1.0,
+            "max": 256.0
+        },
+        {
+            "name": "Global_Unison",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 3.0
+        },
+        {
+            "name": "Global_UnisonAmount",
+            "default": 0.1000000015,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Global_InputSend",
+            "default": 0.0,
+            "min": -24.0,
+            "max": 24.0
+        },
+        {
+            "name": "Global_DryWet",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Global_UseScale",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        }
+    ],
+    "macro_suggestions": []
+}

@@ -1,0 +1,128 @@
+{
+    "xml_tag": "Saturator",
+    "class_name": "Saturator",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "PreDrive",
+            "default": 0.0,
+            "min": -36.0,
+            "max": 36.0
+        },
+        {
+            "name": "PreDcFilter",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Type",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 7.0
+        },
+        {
+            "name": "ColorOn",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "BaseDrive",
+            "default": 0.0,
+            "min": -36.0,
+            "max": 36.0
+        },
+        {
+            "name": "ColorFrequency",
+            "default": 1000.0,
+            "min": 29.9999962,
+            "max": 18500.0
+        },
+        {
+            "name": "ColorWidth",
+            "default": 0.3000000119,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ColorDepth",
+            "default": 0.0,
+            "min": -24.0,
+            "max": 24.0
+        },
+        {
+            "name": "PostClip",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "PostDrive",
+            "default": 0.0,
+            "min": -36.0,
+            "max": 0.0
+        },
+        {
+            "name": "DryWet",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "BassShaperThreshold",
+            "default": -50.0,
+            "min": -50.0,
+            "max": 0.0
+        },
+        {
+            "name": "WsDrive",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "WsLin",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "WsCurve",
+            "default": 0.05000000075,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "WsDamp",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "WsPeriod",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "WsDepth",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        }
+    ],
+    "macro_suggestions": [
+        {
+            "param_name": "PreDrive",
+            "min": 0.0,
+            "max": 18.0
+        }
+    ]
+}

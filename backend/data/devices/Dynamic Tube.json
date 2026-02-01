@@ -1,0 +1,74 @@
+{
+    "xml_tag": "Tube",
+    "class_name": "Tube",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "DryWet",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "PreDrive",
+            "default": 0.0,
+            "min": -15.0,
+            "max": 15.0
+        },
+        {
+            "name": "PostDrive",
+            "default": 0.0,
+            "min": -15.0,
+            "max": 15.0
+        },
+        {
+            "name": "Bias",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "AutoBias",
+            "default": 0.0,
+            "min": -3.0,
+            "max": 3.0
+        },
+        {
+            "name": "AutoBiasAttack",
+            "default": 5.0,
+            "min": 1.0,
+            "max": 400.0
+        },
+        {
+            "name": "AutoBiasRelease",
+            "default": 35.0,
+            "min": 1.0,
+            "max": 1500.0
+        },
+        {
+            "name": "Tone",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "Type",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 2.0
+        }
+    ],
+    "macro_suggestions": [
+        {
+            "param_name": "PreDrive",
+            "min": 0,
+            "max": 1
+        }
+    ]
+}

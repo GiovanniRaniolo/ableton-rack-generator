@@ -1,0 +1,230 @@
+{
+    "xml_tag": "Resonator",
+    "class_name": "Resonator",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "InFilterOn",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "InFilterFreq",
+            "default": 500.0,
+            "min": 50.0,
+            "max": 8000.0
+        },
+        {
+            "name": "InFilterMode",
+            "default": 2.0,
+            "min": 0.0,
+            "max": 3.0
+        },
+        {
+            "name": "ResMode",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ResDecay",
+            "default": 50.0,
+            "min": 0.0,
+            "max": 100.0
+        },
+        {
+            "name": "ResConst",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ResColor",
+            "default": 90.0,
+            "min": 0.0,
+            "max": 100.0
+        },
+        {
+            "name": "Width",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "DryWet",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "GlobalGain",
+            "default": 0.0,
+            "min": -15.0,
+            "max": 15.0
+        },
+        {
+            "name": "UseCurrentScale",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ResOn1",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ResNote",
+            "default": 48.0,
+            "min": 12.0,
+            "max": 84.0
+        },
+        {
+            "name": "ResNoteScaleDegrees",
+            "default": 0.0,
+            "min": -21.0,
+            "max": 21.0
+        },
+        {
+            "name": "ResTune1",
+            "default": 0.0,
+            "min": -50.0,
+            "max": 50.0
+        },
+        {
+            "name": "ResGain1",
+            "default": 1.0,
+            "min": 0.0003162277571,
+            "max": 1.99526238
+        },
+        {
+            "name": "ResOn2",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ResPitch2",
+            "default": 0.0,
+            "min": -24.0,
+            "max": 24.0
+        },
+        {
+            "name": "ResPitchScaleDegrees2",
+            "default": 0.0,
+            "min": -21.0,
+            "max": 21.0
+        },
+        {
+            "name": "ResTune2",
+            "default": 0.0,
+            "min": -50.0,
+            "max": 50.0
+        },
+        {
+            "name": "ResGain2",
+            "default": 1.0,
+            "min": 0.0003162277571,
+            "max": 1.99526238
+        },
+        {
+            "name": "ResOn3",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ResPitch3",
+            "default": 0.0,
+            "min": -24.0,
+            "max": 24.0
+        },
+        {
+            "name": "ResPitchScaleDegrees3",
+            "default": 0.0,
+            "min": -21.0,
+            "max": 21.0
+        },
+        {
+            "name": "ResTune3",
+            "default": 0.0,
+            "min": -50.0,
+            "max": 50.0
+        },
+        {
+            "name": "ResGain3",
+            "default": 1.0,
+            "min": 0.0003162277571,
+            "max": 1.99526238
+        },
+        {
+            "name": "ResOn4",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ResPitch4",
+            "default": 0.0,
+            "min": -24.0,
+            "max": 24.0
+        },
+        {
+            "name": "ResPitchScaleDegrees4",
+            "default": 0.0,
+            "min": -21.0,
+            "max": 21.0
+        },
+        {
+            "name": "ResTune4",
+            "default": 0.0,
+            "min": -50.0,
+            "max": 50.0
+        },
+        {
+            "name": "ResGain4",
+            "default": 1.0,
+            "min": 0.0003162277571,
+            "max": 1.99526238
+        },
+        {
+            "name": "ResOn5",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ResPitch5",
+            "default": 0.0,
+            "min": -24.0,
+            "max": 24.0
+        },
+        {
+            "name": "ResPitchScaleDegrees5",
+            "default": 0.0,
+            "min": -21.0,
+            "max": 21.0
+        },
+        {
+            "name": "ResTune5",
+            "default": 0.0,
+            "min": -50.0,
+            "max": 50.0
+        },
+        {
+            "name": "ResGain5",
+            "default": 1.0,
+            "min": 0.0003162277571,
+            "max": 1.99526238
+        }
+    ],
+    "macro_suggestions": []
+}

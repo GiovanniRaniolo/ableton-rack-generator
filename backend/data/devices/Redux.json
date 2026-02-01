@@ -1,0 +1,74 @@
+{
+    "xml_tag": "Redux2",
+    "class_name": "Redux",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "SampleRate",
+            "default": 40000.0,
+            "min": 20.0,
+            "max": 40000.0
+        },
+        {
+            "name": "Jitter",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "BitDepth",
+            "default": 16.0,
+            "min": 1.0,
+            "max": 16.0
+        },
+        {
+            "name": "QuantizerShape",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "QuantizerDcShift",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "EnablePreFilter",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "EnablePostFilter",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "PostFilterValue",
+            "default": 0.0,
+            "min": -4.0,
+            "max": 4.0
+        },
+        {
+            "name": "DryWet",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        }
+    ],
+    "macro_suggestions": [
+        {
+            "param_name": "BitDepth",
+            "min": 16,
+            "max": 1
+        }
+    ]
+}

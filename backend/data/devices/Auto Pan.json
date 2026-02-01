@@ -1,0 +1,134 @@
+{
+    "xml_tag": "AutoPan2",
+    "class_name": "AutoPan",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Mode",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_Amount",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_Waveform",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 8.0
+        },
+        {
+            "name": "Modulation_Invert",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_TimeMode",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 5.0
+        },
+        {
+            "name": "Modulation_Frequency",
+            "default": 1.0,
+            "min": 0.1000000015,
+            "max": 60.0000114
+        },
+        {
+            "name": "Modulation_Time",
+            "default": 1.00000012,
+            "min": 0.1000000015,
+            "max": 200.0
+        },
+        {
+            "name": "Modulation_SyncedRate",
+            "default": 6.0,
+            "min": 0.0,
+            "max": 21.0
+        },
+        {
+            "name": "Modulation_Sixteenth",
+            "default": 16.0,
+            "min": 1.0,
+            "max": 64.0
+        },
+        {
+            "name": "Modulation_Phase",
+            "default": 180.0,
+            "min": 0.0,
+            "max": 360.0
+        },
+        {
+            "name": "Modulation_PhaseOffset",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 360.0
+        },
+        {
+            "name": "Modulation_StereoMode",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_Spin",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 0.5
+        },
+        {
+            "name": "PanningWaveformShape",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "TremoloWaveformShape",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "AttackTime",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 5.0
+        },
+        {
+            "name": "DynamicFrequencyModulation",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "HarmonicMode",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "VintageMode",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        }
+    ],
+    "macro_suggestions": [
+        {
+            "param_name": "Modulation_Amount",
+            "min": 0,
+            "max": 1
+        }
+    ]
+}

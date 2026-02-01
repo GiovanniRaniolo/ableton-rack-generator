@@ -1,0 +1,170 @@
+{
+    "xml_tag": "Spectral",
+    "class_name": "Spectral",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Freezer_On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Freezer_FreezeOn",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Freezer_SyncIntervalUnits",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Freezer_SyncIntervalBeats",
+            "default": 6.0,
+            "min": 0.0,
+            "max": 21.0
+        },
+        {
+            "name": "Freezer_SyncIntervalSeconds",
+            "default": 0.4999999404,
+            "min": 0.01999999955,
+            "max": 10.0
+        },
+        {
+            "name": "Freezer_MainMode",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Freezer_RetriggerMode",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Freezer_FadeType",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Freezer_FadeIn",
+            "default": 0.002000000095,
+            "min": 0.002000000095,
+            "max": 10.0
+        },
+        {
+            "name": "Freezer_CrossfadePercent",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Freezer_FadeOut",
+            "default": 0.03999999538,
+            "min": 0.01999999955,
+            "max": 10.0
+        },
+        {
+            "name": "Freezer_Sensitivity",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Delay_On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Delay_TimeSeconds",
+            "default": 0.2500000298,
+            "min": 0.009999999776,
+            "max": 3.0
+        },
+        {
+            "name": "Delay_TimeUnit",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 4.0
+        },
+        {
+            "name": "Delay_TimeSixteenths",
+            "default": 3.0,
+            "min": 1.0,
+            "max": 16.0
+        },
+        {
+            "name": "Delay_TimeDivisions",
+            "default": 15.0,
+            "min": 0.0,
+            "max": 21.0
+        },
+        {
+            "name": "Delay_Feedback",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Delay_Tilt",
+            "default": 0.0,
+            "min": -2.0,
+            "max": 2.0
+        },
+        {
+            "name": "Delay_Spray",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 0.400000006
+        },
+        {
+            "name": "Delay_Mask",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "Delay_StereoSpread",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Delay_FrequencyShift",
+            "default": 0.0,
+            "min": -400.0,
+            "max": 400.0
+        },
+        {
+            "name": "Delay_DryWet",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "InputSendGain",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "DryWet",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        }
+    ],
+    "macro_suggestions": []
+}

@@ -1,0 +1,98 @@
+{
+    "xml_tag": "Vinyl",
+    "class_name": "Vinyl",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Band2On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Gain2",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "BandFreq2",
+            "default": 684.0,
+            "min": 50.0,
+            "max": 18000.0
+        },
+        {
+            "name": "BandQ2",
+            "default": 0.3199999928,
+            "min": 0.1000000015,
+            "max": 3.0
+        },
+        {
+            "name": "Band1On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Gain1",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "BandFreq1",
+            "default": 7500.0,
+            "min": 50.0,
+            "max": 18000.0
+        },
+        {
+            "name": "BandQ1",
+            "default": 3.0,
+            "min": 0.1000000015,
+            "max": 3.0
+        },
+        {
+            "name": "Drive",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "SoftHard",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "NormalMono",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "CracleDensity",
+            "default": 10.0,
+            "min": 0.0,
+            "max": 50.0
+        },
+        {
+            "name": "CracleVolume",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        }
+    ],
+    "macro_suggestions": [
+        {
+            "param_name": "Crack",
+            "min": 0,
+            "max": 0.5
+        }
+    ]
+}

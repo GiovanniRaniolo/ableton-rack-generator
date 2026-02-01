@@ -1,0 +1,242 @@
+{
+    "xml_tag": "Corpus",
+    "class_name": "Corpus",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ResonanceType",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 6.0
+        },
+        {
+            "name": "ResonatorQuality",
+            "default": 2.0,
+            "min": 0.0,
+            "max": 3.0
+        },
+        {
+            "name": "Frequency",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Transpose",
+            "default": 0.0,
+            "min": -48.0,
+            "max": 48.0
+        },
+        {
+            "name": "FineTranspose",
+            "default": 0.0,
+            "min": -50.0,
+            "max": 50.0
+        },
+        {
+            "name": "Detune",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "Decay",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "FreqDamping",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "Radius",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "AmpFreq",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "Inharmonics",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "TubeOpening",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Ratio",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ExcitationX",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ListeningXL",
+            "default": 0.1000000015,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ListeningXR",
+            "default": 0.8999999762,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "LfoOnOff",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "LfoType",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 6.0
+        },
+        {
+            "name": "LfoSync",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "LfoRate",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "LfoSyncRate",
+            "default": 4.0,
+            "min": 0.0,
+            "max": 21.0
+        },
+        {
+            "name": "LfoStereoMode",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "LfoSpin",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 0.5
+        },
+        {
+            "name": "LfoPhase",
+            "default": 180.0,
+            "min": 0.0,
+            "max": 360.0
+        },
+        {
+            "name": "LfoOffset",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 360.0
+        },
+        {
+            "name": "LfoAmount",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "FilterOn",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "FilterMidFreq",
+            "default": 1000.0,
+            "min": 50.0,
+            "max": 18000.0
+        },
+        {
+            "name": "FilterBandWidth",
+            "default": 4.0,
+            "min": 0.5,
+            "max": 9.0
+        },
+        {
+            "name": "MidiPitch",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "MidiMode",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "PitchBendRange",
+            "default": 5.0,
+            "min": 0.0,
+            "max": 24.0
+        },
+        {
+            "name": "MidiGate",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "DecayOnNoteOff",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Drive",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "StereoWidth",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Bleed",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "DryWet",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        }
+    ],
+    "macro_suggestions": []
+}

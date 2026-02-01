@@ -1,0 +1,547 @@
+{
+    "xml_tag": "Roar",
+    "class_name": "Roar",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Input_InputGain",
+            "default": 1.0,
+            "min": 0.06309573352,
+            "max": 15.8489332
+        },
+        {
+            "name": "Input_ToneAmount",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "Input_ToneFrequency",
+            "default": 180.000015,
+            "min": 79.9999924,
+            "max": 1999.99976
+        },
+        {
+            "name": "Input_ColorOn",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Input_Blend",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Input_LowMidCrossover",
+            "default": 199.999985,
+            "min": 19.9999981,
+            "max": 4999.99902
+        },
+        {
+            "name": "Input_MidHighCrossover",
+            "default": 1999.99976,
+            "min": 199.999985,
+            "max": 18000.0059
+        },
+        {
+            "name": "Stage1_On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage1_Shaper_On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage1_Shaper_Type",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 11.0
+        },
+        {
+            "name": "Stage1_Shaper_Amount",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage1_Shaper_Bias",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage1_Shaper_Trim",
+            "default": 1.0,
+            "min": 0.06309573352,
+            "max": 15.8489332
+        },
+        {
+            "name": "Stage1_Filter_On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage1_Filter_Type",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 8.0
+        },
+        {
+            "name": "Stage1_Filter_Frequency",
+            "default": 15999.998,
+            "min": 19.9999981,
+            "max": 19999.9961
+        },
+        {
+            "name": "Stage1_Filter_Resonance",
+            "default": 0.1000000015,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage1_Filter_Morph",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage1_Filter_PeakGain",
+            "default": 1.0,
+            "min": 0.2511886358,
+            "max": 3.98107195
+        },
+        {
+            "name": "Stage1_Filter_PreOn",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage2_On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage2_Shaper_On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage2_Shaper_Type",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 11.0
+        },
+        {
+            "name": "Stage2_Shaper_Amount",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage2_Shaper_Bias",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage2_Shaper_Trim",
+            "default": 1.0,
+            "min": 0.06309573352,
+            "max": 15.8489332
+        },
+        {
+            "name": "Stage2_Filter_On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage2_Filter_Type",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 8.0
+        },
+        {
+            "name": "Stage2_Filter_Frequency",
+            "default": 15999.998,
+            "min": 19.9999981,
+            "max": 19999.9961
+        },
+        {
+            "name": "Stage2_Filter_Resonance",
+            "default": 0.1000000015,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage2_Filter_Morph",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage2_Filter_PeakGain",
+            "default": 1.0,
+            "min": 0.2511886358,
+            "max": 3.98107195
+        },
+        {
+            "name": "Stage2_Filter_PreOn",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage3_On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage3_Shaper_On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage3_Shaper_Type",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 11.0
+        },
+        {
+            "name": "Stage3_Shaper_Amount",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage3_Shaper_Bias",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage3_Shaper_Trim",
+            "default": 1.0,
+            "min": 0.06309573352,
+            "max": 15.8489332
+        },
+        {
+            "name": "Stage3_Filter_On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage3_Filter_Type",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 8.0
+        },
+        {
+            "name": "Stage3_Filter_Frequency",
+            "default": 15999.998,
+            "min": 19.9999981,
+            "max": 19999.9961
+        },
+        {
+            "name": "Stage3_Filter_Resonance",
+            "default": 0.1000000015,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage3_Filter_Morph",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Stage3_Filter_PeakGain",
+            "default": 1.0,
+            "min": 0.2511886358,
+            "max": 3.98107195
+        },
+        {
+            "name": "Stage3_Filter_PreOn",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Feedback_FeedbackAmount",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Feedback_FeedbackTimeMode",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 4.0
+        },
+        {
+            "name": "Feedback_FeedbackTime",
+            "default": 0.01818181947,
+            "min": 0.001000000047,
+            "max": 0.5
+        },
+        {
+            "name": "Feedback_FeedbackSyncedRate",
+            "default": -4.0,
+            "min": -7.0,
+            "max": 0.0
+        },
+        {
+            "name": "Feedback_FeedbackNote",
+            "default": 33.0,
+            "min": 12.0,
+            "max": 84.0
+        },
+        {
+            "name": "Feedback_FeedbackFrequency",
+            "default": 999.999878,
+            "min": 49.9999962,
+            "max": 18000.0059
+        },
+        {
+            "name": "Feedback_FeedbackBandwidth",
+            "default": 8.0,
+            "min": 0.5,
+            "max": 9.0
+        },
+        {
+            "name": "Feedback_FeedbackInvert",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Feedback_FeedbackGateOn",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ModulationSources_Lfo1_RateMode",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 4.0
+        },
+        {
+            "name": "ModulationSources_Lfo1_Rate",
+            "default": 1.00000012,
+            "min": 0.01000000071,
+            "max": 9.99999905
+        },
+        {
+            "name": "ModulationSources_Lfo1_SyncedRate",
+            "default": 0.0,
+            "min": -6.0,
+            "max": 3.0
+        },
+        {
+            "name": "ModulationSources_Lfo1_Sixteenth",
+            "default": 8.0,
+            "min": 1.0,
+            "max": 64.0
+        },
+        {
+            "name": "ModulationSources_Lfo1_Waveform",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 4.0
+        },
+        {
+            "name": "ModulationSources_Lfo1_Morph",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "ModulationSources_Lfo1_SmoothingAmount",
+            "default": 0.0500000082,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ModulationSources_Lfo2_RateMode",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 4.0
+        },
+        {
+            "name": "ModulationSources_Lfo2_Rate",
+            "default": 1.00000012,
+            "min": 0.01000000071,
+            "max": 9.99999905
+        },
+        {
+            "name": "ModulationSources_Lfo2_SyncedRate",
+            "default": 0.0,
+            "min": -6.0,
+            "max": 3.0
+        },
+        {
+            "name": "ModulationSources_Lfo2_Sixteenth",
+            "default": 8.0,
+            "min": 1.0,
+            "max": 64.0
+        },
+        {
+            "name": "ModulationSources_Lfo2_Waveform",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 4.0
+        },
+        {
+            "name": "ModulationSources_Lfo2_Morph",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "ModulationSources_Lfo2_SmoothingAmount",
+            "default": 0.0500000082,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ModulationSources_Envelope_Amount",
+            "default": 1.0,
+            "min": 1.0,
+            "max": 63.0957451
+        },
+        {
+            "name": "ModulationSources_Envelope_Attack",
+            "default": 0.001000000047,
+            "min": 0.0,
+            "max": 0.1000000015
+        },
+        {
+            "name": "ModulationSources_Envelope_HoldOn",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ModulationSources_Envelope_Release",
+            "default": 0.1000000238,
+            "min": 0.009999999776,
+            "max": 3.0
+        },
+        {
+            "name": "ModulationSources_Envelope_Threshold",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ModulationSources_Envelope_Frequency",
+            "default": 999.999878,
+            "min": 49.9999962,
+            "max": 18000.0059
+        },
+        {
+            "name": "ModulationSources_Envelope_Width",
+            "default": 8.0,
+            "min": 0.5,
+            "max": 9.0
+        },
+        {
+            "name": "ModulationSources_Noise_RateMode",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 4.0
+        },
+        {
+            "name": "ModulationSources_Noise_Rate",
+            "default": 1.00000012,
+            "min": 0.01000000071,
+            "max": 9.99999905
+        },
+        {
+            "name": "ModulationSources_Noise_SyncedRate",
+            "default": -2.0,
+            "min": -6.0,
+            "max": 3.0
+        },
+        {
+            "name": "ModulationSources_Noise_Sixteenth",
+            "default": 4.0,
+            "min": 1.0,
+            "max": 64.0
+        },
+        {
+            "name": "ModulationSources_Noise_Type",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 3.0
+        },
+        {
+            "name": "ModulationSources_Noise_SmoothingAmount",
+            "default": 0.0500000082,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "GlobalModulationAmount",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "Output_CompressionAmount",
+            "default": 0.25,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Output_CompressorHighpassFilterOn",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Output_OutputGain",
+            "default": 0.9999998212,
+            "min": 0.003981071059,
+            "max": 3.98107052
+        },
+        {
+            "name": "Output_DryWet",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        }
+    ],
+    "macro_suggestions": [
+        {
+            "param_name": "Stage1_Shaper_Amount",
+            "min": 10,
+            "max": 80
+        },
+        {
+            "param_name": "Stage1_Filter_Frequency",
+            "min": 500,
+            "max": 15000
+        }
+    ]
+}

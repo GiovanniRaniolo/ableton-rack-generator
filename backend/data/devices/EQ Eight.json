@@ -1,0 +1,43 @@
+{
+    "xml_tag": "Eq8",
+    "class_name": "Eq8",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "GlobalGain",
+            "default": 0.0,
+            "min": -12.0,
+            "max": 12.0
+        },
+        {
+            "name": "Scale",
+            "default": 1.0,
+            "min": -2.0,
+            "max": 2.0
+        },
+        {
+            "name": "AdaptiveQ",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        }
+    ],
+    "macro_suggestions": [
+        {
+            "param_name": "Freq",
+            "min": 100,
+            "max": 10000
+        },
+        {
+            "param_name": "GlobalGain",
+            "min": -10,
+            "max": 10
+        }
+    ]
+}

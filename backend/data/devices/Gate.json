@@ -1,0 +1,74 @@
+{
+    "xml_tag": "Gate",
+    "class_name": "Gate",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Threshold",
+            "default": 0.2511886358,
+            "min": 0.0003162277571,
+            "max": 1.99526238
+        },
+        {
+            "name": "Attack",
+            "default": 3.5,
+            "min": 0.01999999955,
+            "max": 150.0
+        },
+        {
+            "name": "Hold",
+            "default": 10.0,
+            "min": 1.0,
+            "max": 1500.0
+        },
+        {
+            "name": "Release",
+            "default": 15.0,
+            "min": 0.1000000015,
+            "max": 3000.0
+        },
+        {
+            "name": "Return",
+            "default": 3.0,
+            "min": 0.0,
+            "max": 24.0
+        },
+        {
+            "name": "Gain",
+            "default": -40.0,
+            "min": -75.0,
+            "max": 0.0
+        },
+        {
+            "name": "SideListen",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "FlipMode",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "LookAhead",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 2.0
+        }
+    ],
+    "macro_suggestions": [
+        {
+            "param_name": "Threshold",
+            "min": -50,
+            "max": -20
+        }
+    ]
+}

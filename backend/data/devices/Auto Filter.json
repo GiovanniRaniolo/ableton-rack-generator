@@ -1,0 +1,266 @@
+{
+    "xml_tag": "AutoFilter2",
+    "class_name": "AutoFilter",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Filter_Frequency",
+            "default": 9999.99805,
+            "min": 19.9999981,
+            "max": 19999.9961
+        },
+        {
+            "name": "Filter_Resonance",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Filter_Morph",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Filter_Type",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 9.0
+        },
+        {
+            "name": "Filter_Slope",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Filter_MorphSlope",
+            "default": 2.0,
+            "min": 0.0,
+            "max": 3.0
+        },
+        {
+            "name": "Filter_Circuit",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 3.0
+        },
+        {
+            "name": "Filter_Drive",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Filter_DjControl",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "Filter_VowelPitch",
+            "default": 0.0,
+            "min": -36.0,
+            "max": 36.0
+        },
+        {
+            "name": "Filter_VowelFormant",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Lfo_Amount",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Lfo_Waveform",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 7.0
+        },
+        {
+            "name": "Lfo_TimeMode",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 5.0
+        },
+        {
+            "name": "Lfo_Frequency",
+            "default": 1.0,
+            "min": 0.1000000015,
+            "max": 60.0000114
+        },
+        {
+            "name": "Lfo_Time",
+            "default": 1.00000012,
+            "min": 0.1000000015,
+            "max": 200.0
+        },
+        {
+            "name": "Lfo_SyncedRate",
+            "default": 4.0,
+            "min": 0.0,
+            "max": 21.0
+        },
+        {
+            "name": "Lfo_Sixteenth",
+            "default": 16.0,
+            "min": 1.0,
+            "max": 64.0
+        },
+        {
+            "name": "Lfo_Phase",
+            "default": 4.0,
+            "min": 0.0,
+            "max": 360.0
+        },
+        {
+            "name": "Lfo_PhaseOffset",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 360.0
+        },
+        {
+            "name": "Lfo_StereoMode",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Lfo_Spin",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 0.5
+        },
+        {
+            "name": "Lfo_Morph",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "Lfo_Smoothing",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Lfo_QuantizationMode",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "Lfo_Steps",
+            "default": 8.0,
+            "min": 2.0,
+            "max": 64.0
+        },
+        {
+            "name": "Lfo_SahRate",
+            "default": -4.0,
+            "min": -6.0,
+            "max": 0.0
+        },
+        {
+            "name": "Envelope_Amount",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "Envelope_Attack",
+            "default": 0.001000000047,
+            "min": 0.0,
+            "max": 0.1000000015
+        },
+        {
+            "name": "Envelope_HoldOn",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Envelope_Release",
+            "default": 0.25,
+            "min": 0.0,
+            "max": 3.0
+        },
+        {
+            "name": "Envelope_SahOn",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Envelope_SahRate",
+            "default": -4.0,
+            "min": -6.0,
+            "max": 0.0
+        },
+        {
+            "name": "Output",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "SoftClipOn",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "DryWet",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "SideChainEq_On",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "SideChainEq_Mode",
+            "default": 5.0,
+            "min": 0.0,
+            "max": 5.0
+        },
+        {
+            "name": "SideChainEq_Freq",
+            "default": 199.999985,
+            "min": 29.9999962,
+            "max": 15000.001
+        },
+        {
+            "name": "SideChainEq_Q",
+            "default": 0.7071067095,
+            "min": 0.1000000015,
+            "max": 11.999999
+        },
+        {
+            "name": "SideChainEq_Gain",
+            "default": 0.0,
+            "min": -15.0,
+            "max": 15.0
+        }
+    ],
+    "macro_suggestions": [
+        {
+            "param_name": "Filter_Frequency",
+            "min": 100,
+            "max": 10000
+        }
+    ]
+}

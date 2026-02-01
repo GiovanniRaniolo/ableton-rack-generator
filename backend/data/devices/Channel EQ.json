@@ -1,0 +1,56 @@
+{
+    "xml_tag": "ChannelEq",
+    "class_name": "ChannelEq",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "HighpassOn",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "LowShelfGain",
+            "default": 0.9999999404,
+            "min": 0.1800000072,
+            "max": 5.60000134
+        },
+        {
+            "name": "MidGain",
+            "default": 1.0,
+            "min": 0.25,
+            "max": 4.0
+        },
+        {
+            "name": "MidFrequency",
+            "default": 1500.00012,
+            "min": 119.999985,
+            "max": 7500.00049
+        },
+        {
+            "name": "HighShelfGain",
+            "default": 0.9999999404,
+            "min": 0.1800000072,
+            "max": 5.60000134
+        },
+        {
+            "name": "Gain",
+            "default": 1.0,
+            "min": 0.25,
+            "max": 4.0
+        }
+    ],
+    "macro_suggestions": [
+        {
+            "param_name": "MidGain",
+            "min": -5,
+            "max": 5
+        }
+    ]
+}

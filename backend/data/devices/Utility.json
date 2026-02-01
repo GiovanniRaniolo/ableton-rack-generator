@@ -1,0 +1,98 @@
+{
+    "xml_tag": "StereoGain",
+    "class_name": "StereoGain",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "PhaseInvertL",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "PhaseInvertR",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ChannelMode",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 3.0
+        },
+        {
+            "name": "StereoWidth",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 4.0
+        },
+        {
+            "name": "MidSideBalance",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "Mono",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "BassMono",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "BassMonoFrequency",
+            "default": 120.0,
+            "min": 50.0,
+            "max": 500.0
+        },
+        {
+            "name": "Balance",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "Gain",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 56.2341309
+        },
+        {
+            "name": "LegacyGain",
+            "default": 0.0,
+            "min": -35.0,
+            "max": 35.0
+        },
+        {
+            "name": "Mute",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "DcFilter",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        }
+    ],
+    "macro_suggestions": [
+        {
+            "param_name": "Gain",
+            "min": -12,
+            "max": 12
+        }
+    ]
+}

@@ -1,0 +1,229 @@
+{
+    "xml_tag": "MultibandDynamics",
+    "class_name": "MultibandDynamics",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "SplitLowMid",
+            "default": 120.0,
+            "min": 30.0,
+            "max": 3000.0
+        },
+        {
+            "name": "SplitMidHigh",
+            "default": 2500.0,
+            "min": 300.000061,
+            "max": 14999.998
+        },
+        {
+            "name": "SoftKnee",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "EnvelopeIsPeak",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "OutputGain",
+            "default": 0.0,
+            "min": -24.0,
+            "max": 24.0
+        },
+        {
+            "name": "GlobalAmount",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "GlobalTime",
+            "default": 1.0,
+            "min": 0.1000000015,
+            "max": 10.0
+        },
+        {
+            "name": "GainLow",
+            "default": 0.0,
+            "min": -24.0,
+            "max": 24.0
+        },
+        {
+            "name": "GainMid",
+            "default": 0.0,
+            "min": -24.0,
+            "max": 24.0
+        },
+        {
+            "name": "GainHigh",
+            "default": 0.0,
+            "min": -24.0,
+            "max": 24.0
+        },
+        {
+            "name": "InputGainLow",
+            "default": 0.0,
+            "min": -24.0,
+            "max": 24.0
+        },
+        {
+            "name": "InputGainMid",
+            "default": 0.0,
+            "min": -24.0,
+            "max": 24.0
+        },
+        {
+            "name": "InputGainHigh",
+            "default": 0.0,
+            "min": -24.0,
+            "max": 24.0
+        },
+        {
+            "name": "ActiveLow",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ActiveMid",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ActiveHigh",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "AboveThresholdLow",
+            "default": -20.0,
+            "min": -80.0,
+            "max": 0.0
+        },
+        {
+            "name": "AboveThresholdMid",
+            "default": -20.0,
+            "min": -80.0,
+            "max": 0.0
+        },
+        {
+            "name": "AboveThresholdHigh",
+            "default": -20.0,
+            "min": -80.0,
+            "max": 0.0
+        },
+        {
+            "name": "BelowThresholdLow",
+            "default": -60.0,
+            "min": -80.0,
+            "max": 0.0
+        },
+        {
+            "name": "BelowThresholdMid",
+            "default": -60.0,
+            "min": -80.0,
+            "max": 0.0
+        },
+        {
+            "name": "BelowThresholdHigh",
+            "default": -60.0,
+            "min": -80.0,
+            "max": 0.0
+        },
+        {
+            "name": "AboveRatioLow",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "AboveRatioMid",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "AboveRatioHigh",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "BelowRatioLow",
+            "default": 0.0,
+            "min": -3.0,
+            "max": 1.0
+        },
+        {
+            "name": "BelowRatioMid",
+            "default": 0.0,
+            "min": -3.0,
+            "max": 1.0
+        },
+        {
+            "name": "BelowRatioHigh",
+            "default": 0.0,
+            "min": -3.0,
+            "max": 1.0
+        },
+        {
+            "name": "AttackLow",
+            "default": 50.0,
+            "min": 0.1000000015,
+            "max": 5000.0
+        },
+        {
+            "name": "AttackMid",
+            "default": 10.0,
+            "min": 0.1000000015,
+            "max": 5000.0
+        },
+        {
+            "name": "AttackHigh",
+            "default": 5.0,
+            "min": 0.1000000015,
+            "max": 5000.0
+        },
+        {
+            "name": "ReleaseLow",
+            "default": 300.0,
+            "min": 0.1000000015,
+            "max": 5000.0
+        },
+        {
+            "name": "ReleaseMid",
+            "default": 200.0,
+            "min": 0.1000000015,
+            "max": 5000.0
+        },
+        {
+            "name": "ReleaseHigh",
+            "default": 100.0,
+            "min": 0.1000000015,
+            "max": 5000.0
+        }
+    ],
+    "macro_suggestions": [
+        {
+            "param_name": "OutputGain",
+            "min": -12,
+            "max": 12
+        },
+        {
+            "param_name": "GlobalAmount",
+            "min": 0,
+            "max": 1
+        }
+    ]
+}

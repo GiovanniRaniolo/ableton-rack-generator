@@ -1,0 +1,332 @@
+{
+    "xml_tag": "Hybrid",
+    "class_name": "Hybrid",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "PreDelay_Sync",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "PreDelay_Time",
+            "default": 0.01000000164,
+            "min": 0.0,
+            "max": 4.0
+        },
+        {
+            "name": "PreDelay_Sixteenth",
+            "default": 2.0,
+            "min": 0.0,
+            "max": 16.0
+        },
+        {
+            "name": "PreDelay_FeedbackTime",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 0.9499999881
+        },
+        {
+            "name": "PreDelay_FeedbackSixteenth",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 0.9499999881
+        },
+        {
+            "name": "Algorithm_Type",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 4.0
+        },
+        {
+            "name": "Algorithm_Delay",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Algorithm_Freeze",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Algorithm_FreezeIn",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Algorithm_Decay",
+            "default": 3.5,
+            "min": 0.1000000015,
+            "max": 60.0
+        },
+        {
+            "name": "Algorithm_Size",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Algorithm_Damping",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Algorithm_Diffusion",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Algorithm_Modulation",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Algorithm_Shape",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Algorithm_BassMultiplier",
+            "default": 1.0,
+            "min": 0.25,
+            "max": 4.0
+        },
+        {
+            "name": "Algorithm_BassCrossover",
+            "default": 440.0,
+            "min": 79.9999924,
+            "max": 999.999878
+        },
+        {
+            "name": "Algorithm_Shimmer",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Algorithm_PitchShift",
+            "default": 12.0,
+            "min": -12.0,
+            "max": 12.0
+        },
+        {
+            "name": "Algorithm_TidesAmount",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Algorithm_TidesRate",
+            "default": 22.0,
+            "min": 0.0,
+            "max": 29.0
+        },
+        {
+            "name": "Algorithm_TidesWaveform",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Algorithm_TidesPhaseOffset",
+            "default": 90.0,
+            "min": 0.0,
+            "max": 180.0
+        },
+        {
+            "name": "Algorithm_Quartz_LowDamping",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Algorithm_Quartz_Distance",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Algorithm_Prism_HighMultiplier",
+            "default": 1.0,
+            "min": 0.1000000015,
+            "max": 4.99999952
+        },
+        {
+            "name": "Algorithm_Prism_LowMultiplier",
+            "default": 1.0,
+            "min": 0.1000000015,
+            "max": 4.99999952
+        },
+        {
+            "name": "Algorithm_Prism_CrossoverFrequency",
+            "default": 799.999939,
+            "min": 399.999969,
+            "max": 5499.99951
+        },
+        {
+            "name": "Algorithm_Prism_Sixth",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Algorithm_Prism_Seventh",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Eq_On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Eq_PreAlgo",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Eq_LowBandType",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Eq_LowBandFrequency",
+            "default": 79.9999924,
+            "min": 19.9999981,
+            "max": 19999.9961
+        },
+        {
+            "name": "Eq_LowBandGain",
+            "default": 1.0,
+            "min": 0.25,
+            "max": 4.0
+        },
+        {
+            "name": "Eq_LowBandSlope",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 9.0
+        },
+        {
+            "name": "Eq_Peak1Frequency",
+            "default": 699.999451,
+            "min": 19.9999981,
+            "max": 19999.9961
+        },
+        {
+            "name": "Eq_Peak1Gain",
+            "default": 1.0,
+            "min": 0.25,
+            "max": 4.0
+        },
+        {
+            "name": "Eq_Peak1Q",
+            "default": 0.7071067691,
+            "min": 0.1000000015,
+            "max": 4.0
+        },
+        {
+            "name": "Eq_Peak2Frequency",
+            "default": 1500.00012,
+            "min": 19.9999981,
+            "max": 19999.9961
+        },
+        {
+            "name": "Eq_Peak2Gain",
+            "default": 1.0,
+            "min": 0.25,
+            "max": 4.0
+        },
+        {
+            "name": "Eq_Peak2Q",
+            "default": 0.7071067691,
+            "min": 0.1000000015,
+            "max": 4.0
+        },
+        {
+            "name": "Eq_HighBandType",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Eq_HighBandFrequency",
+            "default": 5000.0,
+            "min": 19.9999981,
+            "max": 19999.9961
+        },
+        {
+            "name": "Eq_HighBandGain",
+            "default": 1.0,
+            "min": 0.25,
+            "max": 4.0
+        },
+        {
+            "name": "Eq_HighBandSlope",
+            "default": 4.0,
+            "min": 0.0,
+            "max": 9.0
+        },
+        {
+            "name": "Send",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Routing",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 3.0
+        },
+        {
+            "name": "ConvoAlgoBlend",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Vintage",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 4.0
+        },
+        {
+            "name": "StereoWidth",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "BassMono",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "DryWet",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        }
+    ],
+    "macro_suggestions": []
+}

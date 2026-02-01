@@ -1,0 +1,14 @@
+{
+    "xml_tag": "SpectrumAnalyzer",
+    "class_name": "SpectrumAnalyzer",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        }
+    ],
+    "macro_suggestions": []
+}

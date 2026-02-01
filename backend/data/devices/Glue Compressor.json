@@ -1,0 +1,68 @@
+{
+    "xml_tag": "GlueCompressor",
+    "class_name": "GlueCompressor",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Threshold",
+            "default": 0.0,
+            "min": -40.0,
+            "max": 0.0
+        },
+        {
+            "name": "Range",
+            "default": 70.0,
+            "min": 0.0,
+            "max": 70.0
+        },
+        {
+            "name": "Makeup",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 20.0
+        },
+        {
+            "name": "Attack",
+            "default": 3.0,
+            "min": 0.0,
+            "max": 6.0
+        },
+        {
+            "name": "Ratio",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "Release",
+            "default": 3.0,
+            "min": 0.0,
+            "max": 6.0
+        },
+        {
+            "name": "DryWet",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "PeakClipIn",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        }
+    ],
+    "macro_suggestions": [
+        {
+            "param_name": "Threshold",
+            "min": -30,
+            "max": -5
+        }
+    ]
+}

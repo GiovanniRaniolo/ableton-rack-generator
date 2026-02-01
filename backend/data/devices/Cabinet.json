@@ -1,0 +1,44 @@
+{
+    "xml_tag": "Cabinet",
+    "class_name": "Cabinet",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "CabinetType",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 4.0
+        },
+        {
+            "name": "MicrophoneTypeSwitch",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "MicrophonePosition",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "DualMono",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "DryWet",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        }
+    ],
+    "macro_suggestions": []
+}

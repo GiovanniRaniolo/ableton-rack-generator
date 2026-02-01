@@ -1,0 +1,116 @@
+{
+    "xml_tag": "Vocoder",
+    "class_name": "Vocoder",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "LowFrequency",
+            "default": 80.0,
+            "min": 20.0000019,
+            "max": 1999.99963
+        },
+        {
+            "name": "HighFrequency",
+            "default": 12000.0,
+            "min": 200.0,
+            "max": 17999.9961
+        },
+        {
+            "name": "FormantShift",
+            "default": 0.0,
+            "min": -36.0,
+            "max": 36.0
+        },
+        {
+            "name": "FilterBandWidth",
+            "default": 1.0,
+            "min": 0.1000000015,
+            "max": 2.0
+        },
+        {
+            "name": "Retro",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "LevelGate",
+            "default": -60.0,
+            "min": -60.0,
+            "max": 12.0
+        },
+        {
+            "name": "OutputGain",
+            "default": 0.0,
+            "min": -24.0,
+            "max": 24.0
+        },
+        {
+            "name": "EnvelopeRate",
+            "default": 1.0,
+            "min": 1.0,
+            "max": 1000.0
+        },
+        {
+            "name": "EnvelopeRelease",
+            "default": 150.0,
+            "min": 10.0,
+            "max": 30000.0
+        },
+        {
+            "name": "UvdThreshold",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "UvdSlow",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "UvdLevel",
+            "default": 0.0003162277571,
+            "min": 0.0003162277571,
+            "max": 1.0
+        },
+        {
+            "name": "CarrierFlatten",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "MonoStereo",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "DryWet",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ModulatorAmount",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 2.0
+        }
+    ],
+    "macro_suggestions": [
+        {
+            "param_name": "Depth",
+            "min": 0.5,
+            "max": 1.5
+        }
+    ]
+}

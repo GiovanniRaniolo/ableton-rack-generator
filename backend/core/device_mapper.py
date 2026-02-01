@@ -20,6 +20,9 @@ class DeviceDatabase:
         self.cloned_dna_path = os.path.join(
             os.path.dirname(__file__), '..', 'data', 'cloned_devices_dna.json'
         )
+        self.devices_dir = os.path.join(
+            os.path.dirname(__file__), '..', 'data', 'devices'
+        )
         self.devices = self._load_database()
         self.extracted_params = self._load_extracted()
         self.cloned_dna = self._load_cloned_dna()
@@ -91,6 +94,24 @@ class DeviceDatabase:
                 "Dry/Wet": "DryWet",
                 "Blend": "ConvoAlgoBlend"
             },
+            "AutoFilter": {
+                "Frequency": "Filter_Frequency",
+                "Freq": "Filter_Frequency",
+                "Resonance": "Filter_Resonance",
+                "Res": "Filter_Resonance",
+                "Drive": "Filter_Drive",
+                "LFO Amount": "Lfo_Amount",
+                "LFO Rate": "Lfo_Frequency"
+            },
+            "Auto Filter": {
+                "Frequency": "Filter_Frequency",
+                "Freq": "Filter_Frequency",
+                "Resonance": "Filter_Resonance",
+                "Res": "Filter_Resonance",
+                "Drive": "Filter_Drive",
+                "LFO Amount": "Lfo_Amount",
+                "LFO Rate": "Lfo_Frequency"
+            },
             "AutoShift": {
                 "Shift": "PitchShift_ShiftSemitones",
                 "Glide": "MidiInput_Glide",
@@ -114,8 +135,10 @@ class DeviceDatabase:
                 "Interval": "Interval",
                 "Chance": "Chance",
                 "Gate": "Gate",
-                "Pitch": "Pitch",
-                "Variation": "Variation"
+                "Pitch": "BasePitch",     # FIXED V53: Internal name is BasePitch
+                "Transpose": "BasePitch",
+                "Variation": "Variation",
+                "Var": "Variation"
             },
             "Roar": {
                 "Drive": "Stage1_Shaper_Trim",
@@ -132,17 +155,102 @@ class DeviceDatabase:
                 "Color": "Warmth",
                 "Sync": "Modulation_Sync",
                 "Rate": "Modulation_Frequency"
+            },
+            "Corpus": {
+                "Tune": "Transpose",
+                "Coarse": "Transpose",
+                "Fine": "FineTranspose",
+                "Spread": "StereoWidth",
+                "Width": "StereoWidth",
+                "Opening": "TubeOpening",
+                "Ratio": "Ratio",
+                "Brightness": "Radius",  # Heuristic mapping based on common usage
+                "Hit": "ExcitationX",    # Position of hit
+                "Listening": "ListeningXL" # Position of listening
+            },
+            "Drum Buss": {
+                "Drive": "DriveAmount",
+                "Crunch": "CrunchAmount",
+                "Boom": "BoomAmount",
+                "Boom Freq": "BoomFrequency",
+                "Transients": "TransientShaping",
+                "Damp": "DampingFrequency"
+            },
+            "EQ Eight": {
+                "Gain": "GlobalGain"
+            },
+            "Gate": {
+                "Floor": "Gain",
+                "Attenuation": "Gain"
+            },
+            "Glue Compressor": {
+                "Clip": "PeakClipIn"
+            },
+            "Multiband Dynamics": {
+                "Amount": "GlobalAmount",
+                "Time": "GlobalTime",
+                "Output": "OutputGain"
+            },
+            "Pedal": {
+                "Type": "Type",
+                "Gain": "Gain",
+                "Bass": "Bass",
+                "Mid": "Mid",
+                "Treble": "Treble"
+            },
+            "Shifter": {
+                "Pitch": "PitchShift_ShiftSemitones",
+                "Fine": "PitchShift_Detune",
+                "Formant": "PitchShift_FormantShift",
+                "Window": "PitchShift_WindowSize",
+                "Delay": "Delay_Time"
+            },
+            "Saturator": {
+                "Drive": "Drive",
+                "Base": "Base",
+                "Freq": "Frequency",
+                "Width": "Width",
+                "Depth": "Depth",
+                "Output": "Output"
+            },
+            "Vocoder": {
+                "Formant": "FormantShift",
+                "Bands": "Bands",
+                "Range": "Range",
+                "Depth": "Depth",
+                "Release": "Release"
             }
         }
 
     def _load_database(self) -> Dict:
-        """Load device database from JSON"""
+        """Load device database from split JSON files (V52)"""
+        devices_map = {"devices": {"audio_effects": {}, "instruments": {}}}
+        
         try:
-            with open(self.db_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
+            # Priority: Split Files
+            if os.path.exists(self.devices_dir):
+                count = 0
+                for filename in os.listdir(self.devices_dir):
+                    if filename.endswith(".json"):
+                        path = os.path.join(self.devices_dir, filename)
+                        try:
+                            with open(path, 'r', encoding='utf-8') as f:
+                                device_data = json.load(f)
+                                # Use filename as key (sanitized)
+                                key_name = os.path.splitext(filename)[0]
+                                devices_map["devices"]["audio_effects"][key_name] = device_data
+                                count += 1
+                        except Exception as e:
+                            print(f"Failed to load {filename}: {e}")
+                
+                if count > 0:
+                    print(f"V52: Loaded {count} devices from split modules.")
+                    return devices_map
+                    
         except Exception as e:
-            print(f"Warning: Could not load devices.json: {e}")
-            return {"devices": {"audio_effects": {}, "instruments": {}}}
+            print(f"Warning: Could not load device database: {e}")
+            
+        return devices_map
 
     def _load_cloned_dna(self) -> Dict:
         """Load high-precision DNA from cloned_devices_dna.json"""

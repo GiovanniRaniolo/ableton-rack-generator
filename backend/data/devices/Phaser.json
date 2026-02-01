@@ -1,0 +1,200 @@
+{
+    "xml_tag": "PhaserNew",
+    "class_name": "Phaser",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_Amount",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_Waveform",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 9.0
+        },
+        {
+            "name": "Modulation_Frequency",
+            "default": 0.1999999732,
+            "min": 0.01000000071,
+            "max": 39.9999962
+        },
+        {
+            "name": "Modulation_Frequency2",
+            "default": 0.1999999732,
+            "min": 0.01000000071,
+            "max": 39.9999962
+        },
+        {
+            "name": "Modulation_Sync",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_Sync2",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_SyncedRate",
+            "default": 4.0,
+            "min": 0.0,
+            "max": 21.0
+        },
+        {
+            "name": "Modulation_SyncedRate2",
+            "default": 4.0,
+            "min": 0.0,
+            "max": 21.0
+        },
+        {
+            "name": "Modulation_PhaseOffset",
+            "default": 180.0,
+            "min": 0.0,
+            "max": 360.0
+        },
+        {
+            "name": "Modulation_SpinEnabled",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_Spin",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 0.5
+        },
+        {
+            "name": "Modulation_DutyCycle",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_LfoBlend",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_EnvelopeEnabled",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_EnvelopeAmount",
+            "default": 0.0,
+            "min": -1.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_EnvelopeAttack",
+            "default": 0.006000000052,
+            "min": 9.999999747e-05,
+            "max": 0.02999999933
+        },
+        {
+            "name": "Modulation_EnvelopeRelease",
+            "default": 0.200000003,
+            "min": 9.999999747e-05,
+            "max": 0.400000006
+        },
+        {
+            "name": "Mode",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "Notches",
+            "default": 4.0,
+            "min": 1.0,
+            "max": 42.0
+        },
+        {
+            "name": "FlangerDelayTime",
+            "default": 0.002500000177,
+            "min": 0.0001000000193,
+            "max": 0.02000000142
+        },
+        {
+            "name": "DoublerDelayTime",
+            "default": 0.07999999821,
+            "min": 0.02000000142,
+            "max": 0.1500000209
+        },
+        {
+            "name": "ModulationBlend",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "CenterFrequency",
+            "default": 999.999878,
+            "min": 70.0,
+            "max": 18500.0
+        },
+        {
+            "name": "Spread",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Feedback",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 0.9900000095
+        },
+        {
+            "name": "Warmth",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "SafeBassFrequency",
+            "default": 99.9999924,
+            "min": 4.99999952,
+            "max": 3000.00024
+        },
+        {
+            "name": "InvertWet",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "OutputGain",
+            "default": 0.9999999404,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "DryWet",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        }
+    ],
+    "macro_suggestions": [
+        {
+            "param_name": "Feedback",
+            "min": 0.1,
+            "max": 0.8
+        }
+    ]
+}

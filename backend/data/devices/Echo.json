@@ -1,0 +1,326 @@
+{
+    "xml_tag": "Echo",
+    "class_name": "Echo",
+    "type": "audio_effect",
+    "parameters": [
+        {
+            "name": "On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Delay_SyncL",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Delay_TimeL",
+            "default": 0.375,
+            "min": 0.001000000047,
+            "max": 2.5
+        },
+        {
+            "name": "Delay_SyncedDivisionL",
+            "default": -3.0,
+            "min": -6.0,
+            "max": 0.0
+        },
+        {
+            "name": "Delay_SyncedSixteenthL",
+            "default": 3.0,
+            "min": 1.0,
+            "max": 16.0
+        },
+        {
+            "name": "Delay_SyncModeL",
+            "default": 2.0,
+            "min": 0.0,
+            "max": 3.0
+        },
+        {
+            "name": "Delay_OffsetL",
+            "default": 0.0,
+            "min": -0.3300000131,
+            "max": 0.3300000131
+        },
+        {
+            "name": "Delay_TimeR",
+            "default": 0.375,
+            "min": 0.001000000047,
+            "max": 2.5
+        },
+        {
+            "name": "Delay_SyncR",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Delay_SyncedDivisionR",
+            "default": -3.0,
+            "min": -6.0,
+            "max": 0.0
+        },
+        {
+            "name": "Delay_SyncedSixteenthR",
+            "default": 3.0,
+            "min": 1.0,
+            "max": 16.0
+        },
+        {
+            "name": "Delay_SyncModeR",
+            "default": 2.0,
+            "min": 0.0,
+            "max": 3.0
+        },
+        {
+            "name": "Delay_OffsetR",
+            "default": 0.0,
+            "min": -0.3300000131,
+            "max": 0.3300000131
+        },
+        {
+            "name": "Delay_TimeLink",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Delay_Repitch",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Delay_RepitchSmoothingTime",
+            "default": 0.400000006,
+            "min": 0.009999999776,
+            "max": 1.0
+        },
+        {
+            "name": "Feedback",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.5
+        },
+        {
+            "name": "FeedbackInvert",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "ChannelMode",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "InputGain",
+            "default": 0.0,
+            "min": -40.0,
+            "max": 40.0
+        },
+        {
+            "name": "OutputGain",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 4.0
+        },
+        {
+            "name": "Clipper_Dry",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Gate_On",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Gate_Threshold",
+            "default": 0.0,
+            "min": -60.0,
+            "max": 0.0
+        },
+        {
+            "name": "Gate_Release",
+            "default": 0.05000000075,
+            "min": 0.0001000000193,
+            "max": 3.00000072
+        },
+        {
+            "name": "Ducking_On",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Ducking_Threshold",
+            "default": 0.0,
+            "min": -60.0,
+            "max": 0.0
+        },
+        {
+            "name": "Ducking_Release",
+            "default": 0.1000000015,
+            "min": 0.02000000142,
+            "max": 1.49999988
+        },
+        {
+            "name": "Filter_On",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Filter_HighPassFrequency",
+            "default": 49.9999962,
+            "min": 19.9999981,
+            "max": 19999.9961
+        },
+        {
+            "name": "Filter_HighPassResonance",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 0.3000000119
+        },
+        {
+            "name": "Filter_LowPassFrequency",
+            "default": 4999.99902,
+            "min": 19.9999981,
+            "max": 19999.9961
+        },
+        {
+            "name": "Filter_LowPassResonance",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 0.3000000119
+        },
+        {
+            "name": "Modulation_Waveform",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 5.0
+        },
+        {
+            "name": "Modulation_Frequency",
+            "default": 1.99999976,
+            "min": 0.01000000071,
+            "max": 39.9999962
+        },
+        {
+            "name": "Modulation_Sync",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_SyncedRate",
+            "default": 12.0,
+            "min": 0.0,
+            "max": 21.0
+        },
+        {
+            "name": "Modulation_PhaseOffset",
+            "default": 90.0,
+            "min": 0.0,
+            "max": 180.0
+        },
+        {
+            "name": "Modulation_EnvelopeMix",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_AmountDelay",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_AmountFilter",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Modulation_AmountDelayTimesFour",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Reverb_Level",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Reverb_Decay",
+            "default": 0.5,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Reverb_Location",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "Noise_On",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Noise_Amount",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Noise_Type",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Wobble_On",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Wobble_Amount",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "Wobble_Type",
+            "default": 0.0,
+            "min": 0.0,
+            "max": 1.0
+        },
+        {
+            "name": "StereoWidth",
+            "default": 1.0,
+            "min": 0.0,
+            "max": 2.0
+        },
+        {
+            "name": "DryWet",
+            "default": 0.6999999881,
+            "min": 0.0,
+            "max": 1.0
+        }
+    ],
+    "macro_suggestions": []
+}
