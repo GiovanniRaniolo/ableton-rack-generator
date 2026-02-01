@@ -90,12 +90,12 @@ function App() {
             <div className="max-w-3xl mx-auto relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-accent-primary to-accent-secondary rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
               <div className="relative glass-panel p-2">
-                <div className="bg-black/40 rounded-xl p-2 relative overflow-hidden">
+                <div className="bg-black/40 rounded-xl p-2 relative overflow-hidden border border-white/5 transition-all duration-300 focus-within:border-accent-primary/50 focus-within:bg-black/60 focus-within:shadow-[0_0_30px_rgba(255,124,37,0.15)]">
                    <textarea
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                     placeholder="Describe a sound... e.g. 'Crushed lo-fi drums with spatial echo'"
-                    className="w-full h-32 bg-transparent border-none focus:ring-0 text-2xl font-medium placeholder:text-white/20 text-white p-6 resize-none"
+                    className="w-full h-32 bg-transparent border-none focus:ring-0 outline-none text-2xl font-medium placeholder:text-white/20 text-white p-6 resize-none"
                   />
                   <div className="flex justify-between items-center px-4 pb-2">
                      <div className="flex gap-2">
