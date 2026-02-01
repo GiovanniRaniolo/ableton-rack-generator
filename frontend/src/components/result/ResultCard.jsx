@@ -1,4 +1,4 @@
-import { Download, RefreshCw, Sparkles, Layers, Settings2 } from 'lucide-react';
+import { Download, RefreshCw, Sparkles, Layers, Settings2, Cpu } from 'lucide-react';
 import { api } from '../../api/client';
 import { MacroGrid } from './MacroGrid';
 
@@ -63,10 +63,16 @@ export function ResultCard({ result, onReset }) {
                     <p className="text-xl md:text-2xl font-medium text-white leading-relaxed italic opacity-90">
                         "{result.sound_intent}"
                     </p>
-                    <div className="p-6 bg-white/5 rounded-2xl border border-white/5 backdrop-blur-sm">
-                        <p className="text-sm text-text-main font-mono leading-relaxed">
-                        {result.explanation}
-                        </p>
+                    <div className="space-y-4">
+                        <h3 className="text-xs font-black text-text-dim uppercase tracking-[0.5em] flex items-center gap-3">
+                           <Cpu className="w-4 h-4 text-accent-primary" />
+                           Design Strategy
+                        </h3>
+                        <div className="p-6 bg-white/5 rounded-2xl border border-white/5 backdrop-blur-sm">
+                            <p className="text-sm text-text-main font-mono leading-relaxed">
+                            {result.explanation}
+                            </p>
+                        </div>
                     </div>
                     </div>
 
