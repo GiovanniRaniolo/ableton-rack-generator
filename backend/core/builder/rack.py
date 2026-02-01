@@ -4,7 +4,7 @@ from typing import List, Dict, Optional
 from .chain import Chain
 from .models import MacroMapping
 from .serialization import prettify_xml, save_adg
-from .constants import PARAMETER_AUTHORITY, SEMANTIC_MAP
+from .authority import PARAMETER_AUTHORITY, SEMANTIC_MAP
 
 class AudioEffectRack:
     """Main class for building an Audio Effect Rack - Orchestrator (Modular)"""
@@ -133,29 +133,41 @@ class AudioEffectRack:
                                 found_match = True; break
 
                             macro_label = plan_item.get("name") or plan_item.get("label") or best_param
-                            min_v = plan_item.get("min", min_v)
-                            max_v = plan_item.get("max", max_v)
+                            
+                            # EXPANSION LOGIC (V36.2): If AI provides point value without range, expand to full context
+                            ai_min = plan_item.get("min")
+                            ai_max = plan_item.get("max")
+                            
+                            if ai_min is not None and ai_max is None:
+                                # AI gave target but no top. If it's a Sweep param, use Full Range
+                                if any(x in best_param for x in ["Freq", "Frequency", "Cutoff", "DryWet", "Amount", "Gain", "Feedback"]):
+                                     min_v, max_v = 0.0, 1.0 # Will be scaled below
+                                else:
+                                     min_v, max_v = ai_min, ai_min + 0.1
+                            elif ai_min is not None and ai_max is not None:
+                                min_v, max_v = ai_min, ai_max
+                            # else: keep suggestion values
                             
                             matched_p = next((p for p in device.device_info.get("parameters", []) if p["name"] == best_param), None)
                             if matched_p:
-                                p_max = matched_p.get("max", 1.0)
-                                p_min = matched_p.get("min", 0.0)
-                                auth_type = PARAMETER_AUTHORITY.get(best_param)
-                                
-                                if auth_type == "normalized_time_5s" or (any(x in best_param for x in ["TimeL", "TimeR", "Time", "DecayTime"]) and "Rate" not in best_param and p_max <= 60.0):
-                                    p_max_ms = p_max * 1000.0
-                                    def to_ms(v, pm):
-                                        if v is None: return 1.0
-                                        return v * 1000.0 if (v < pm and v != 1.0) else v
-                                    rm_min = to_ms(min_v, p_max); rm_max = to_ms(max_v, p_max)
-                                    min_v = max(0.0, (rm_min - 1.0) / p_max_ms); max_v = max(0.0, (rm_max - 1.0) / p_max_ms)
-                                elif auth_type == "physical_hz" or ("Freq" in best_param and p_max > 100):
-                                    if 0 < min_v < 200.0: min_v *= 1000.0; max_v *= 1000.0
-                                elif (0.0 <= min_v <= 1.0) and (0.0 <= max_v <= 1.0) and (p_max - p_min > 1.1):
-                                    min_v = p_min + (p_max - p_min) * min_v; max_v = p_min + (p_max - p_min) * max_v
+                                min_v, max_v = self._interpret_parameter_range(best_param, min_v, max_v, matched_p)
 
-                            if min_v == max_v and min_v is not None:
-                                 max_v = min_v + (0.0001 if (matched_p and matched_p.get("max", 1.0) <= 60.0) else 1.0)
+                            if (min_v == max_v or abs(max_v - min_v) < 0.0001) and min_v is not None:
+                                 # Final safety: If it's a sweepable param, force a range instead of a point
+                                 if any(x in best_param for x in ["Freq", "Frequency", "Cutoff"]):
+                                      min_v, max_v = 20.0, min_v 
+                                 elif any(x in best_param for x in ["Gain", "Threshold", "Volume", "OutputGain"]):
+                                      min_v, max_v = -100.0, min_v
+                                 elif any(x in best_param for x in ["DryWet", "Feedback", "Amount"]):
+                                      min_v, max_v = 0.0, 1.0
+                                 else:
+                                      max_v = min_v + (0.0001 if (matched_p and matched_p.get("max", 1.0) <= 60.0) else 1.0)
+
+                            # Clamp to physical range
+                            if matched_p:
+                                p_min, p_max = matched_p.get("min", 0.0), matched_p.get("max", 1.0)
+                                min_v = max(p_min, min(p_max, min_v))
+                                max_v = max(p_min, min(p_max, max_v))
 
                             mapping = MacroMapping(macro_index=t_macro_idx, device_id="0", param_path=best_path + [best_param], min_val=min_v, max_val=max_v, label=macro_label)
                             device.add_mapping(best_path + [best_param], mapping)
@@ -179,6 +191,56 @@ class AudioEffectRack:
                              p_path = ["Bands.0", "ParameterA"]; p_name = p_name.replace("1 ", "").replace(" A", "")
                         mapping = MacroMapping(macro_index=macro_idx, device_id="0", param_path=p_path + [p_name], min_val=suggestion['min'], max_val=suggestion['max'], label=p_name)
                         device.add_mapping(mapping.param_path, mapping); self.add_macro_mapping(mapping); macro_idx += 1
+
+    def _interpret_parameter_range(self, param_name: str, min_v: float, max_v: float, p_meta: dict) -> tuple:
+        """
+        UNIVERSAL PARAMETER INTERPRETER (V36.3)
+        Heuristically determines the correct scaling for any Ableton parameter.
+        """
+        p_max = p_meta.get("max", 1.0)
+        p_min = p_meta.get("min", 0.0)
+        auth_type = PARAMETER_AUTHORITY.get(param_name)
+        
+        # 1. AI 0.0-1.0 PROJECTOR (The Universal Scaler)
+        if (0.0 <= min_v <= 1.1) and (0.0 <= max_v <= 1.1) and (p_max - p_min > 0.0):
+             target_min = p_min + (p_max - p_min) * min_v
+             target_max = p_min + (p_max - p_min) * max_v
+             
+             # DISCRETE QUANTIZER: If it's a discrete param, round to nearest integer step
+             if auth_type == "discrete" or (p_max - p_min < 20.0 and p_max == int(p_max) and p_min == int(p_min)):
+                  target_min = round(target_min)
+                  target_max = round(target_max)
+             elif auth_type == "boolean":
+                  target_min = 1.0 if target_min >= 0.5 else 0.0
+                  target_max = 1.0 if target_max >= 0.5 else 0.0
+
+             return target_min, target_max
+
+        # 2. HEURISTIC TIME NORMALIZER (ms/s)
+        if auth_type == "normalized_time_5s" or (any(x in param_name for x in ["Time", "DecayTime"]) and "Rate" not in param_name and p_max <= 65.0):
+            p_max_ms = p_max * 1000.0
+            def to_ms(v, pm):
+                if v is None: return 1.0
+                return v * 1000.0 if (v < pm and v != 1.0) else v
+            rm_min = to_ms(min_v, p_max); rm_max = to_ms(max_v, p_max)
+            return max(0.0, (rm_min - 1.0) / p_max_ms), max(0.0, (rm_max - 1.0) / p_max_ms)
+
+        # 3. HEURISTIC HZ DETECTOR
+        if auth_type == "hz_physical" or ("Freq" in param_name and p_max > 200):
+            # If AI sent kHz (e.g. 15.2), convert to Hz. 
+            # V48 FIX: Lowered threshold to 18.0 to prevent 40Hz -> 40kHz conversion.
+            if 0 < min_v < 18.0: min_v *= 1000.0
+            if 0 < max_v < 18.0: max_v *= 1000.0
+            return min_v, max_v
+
+        # 4. HEURISTIC DB/PERCENTAGE DETECTOR
+        if auth_type in ["db_physical", "percentage"] or any(x in param_name for x in ["Gain", "Threshold", "Volume", "Amount", "DryWet", "Mix", "Feedback"]):
+             # If already projection-handled, we skip. Otherwise, ensure it's clamped.
+             return min_v, max_v
+
+        # 5. DEFAULT: METADATA SCALER
+        # Fallback for enums or non-linear params that don't need scaling beyond the projector.
+        return min_v, max_v
 
     def to_xml(self) -> ET.Element:
         template_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data", "template_rack.xml")

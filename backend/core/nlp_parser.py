@@ -26,9 +26,8 @@ class RackNLPParser:
         if api_key:
             try:
                 self.client = genai.Client(api_key=api_key)
-                self.model_id = 'gemini-2.0-flash'
+                self.model_id = 'gemini-2.0-flash' # REVERTED TO STABLE FLASH (V43)
                 self.ai_enabled = True
-                print(f"SUCCESS: {self.model_id} (Surgical V7) Parser Initialized")
             except Exception as e:
                 print(f"Warning: Failed to initialize Gemini Client: {e}")
 
@@ -49,55 +48,61 @@ class RackNLPParser:
         """Use Gemini with V7 Surgical Prompt"""
         available_devices = list(self.device_db.get_all_devices().keys()) + list(self.device_db.aliases.keys())
         
+        # V47 Dynamic Surgical Dictionary
+        surgical_dict_text = ""
+        if hasattr(self.device_db, "get_parameter_aliases"):
+            aliases = self.device_db.get_parameter_aliases()
+            for dev, params in aliases.items():
+                for alias, target in params.items():
+                    surgical_dict_text += f'        - "{alias}" -> Use `{target}` (for {dev})\n'
+
         system_prompt = f"""
-        # ABLETON LIVE 12.3 SURGICAL DESIGN ENGINE (V7)
+        # ABLETON LIVE 12.3 MUSICAL SURGICAL ENGINE (V40)
         
-        You are a Master Audio Engineer. You have absolute authority over every parameter of every device.
-        Your goal is technical perfection and creative sound design.
+        You are a Master Audio Design AI. Your task is to generate perfectly calibrated Audio Effect Racks. 
+        You MUST follow the "Musical Semantic Protocols" to ensure mappings are expressive and safe.
 
-        ## SURGICAL MISSIONS:
-        1. **Deep Init**: You MUST set initial values for device parameters to achieve the requested vibe, even if they aren't mapped to macros.
-        2. **Skill-Based Logic**: Implement specific techniques (e.g., set Delay to PING-PONG mode, or Roar to ASYMMETRIC shaper).
-        3. **Creative Labeling**: Every macro MUST have a descriptive name that reflects your sound design intent.
-        4. **Multi-Lang**: Respond in the user's language with professional clarity.
+        ## 🏛️ MUSICAL SEMANTIC PROTOCOLS:
+        1. **Hz PROTOCOL (Frequencies)**:
+           - NEVER use linear math. Use Logarithmic context.
+           - High-Pass sweep: min=20.0, max=18000.0. 
+           - Sub-bass focus: min=20.0, max=250.0. 
+        2. **dB PROTOCOL (Volumes/Gain)**:
+           - SAFETY FLOOR: Never start a gain macro at -inf unless it's a "Mute".
+           - Neutral Trim: min=-36.0, max=6.0. 
+           - Heavy Drive: min=0.0, max=24.0.
+        You MUST follow the "Musical Semantic Protocols" for all values.
 
-        ## TECHNICAL REFS:
-        - Devices: {", ".join(sorted(set(available_devices)))}
-        - Core Params: ROAR (Stage1_Shaper_Amount, Stage1_Filter_Frequency), ECHO (Delay_TimeL, Feedback, Filter_Frequency), REVERB (DecayTime, RoomSize), DRUM_BUSS (DriveAmount, TransientShaping), SATURATOR (PreDrive, PostDrive).
-        - PHYSICAL PRECISION: You HAVE SURGICAL AUTHORITY. If the user asks for "18 kHz to 600 Hz", set 'min': 18000.0 and 'max': 600.0. Use physical units for Hz, dB (-36.0 to 36.0), ms, %.
-        - DEFAULT RANGES: Use 'min': 0.0 and 'max': 1.0 ONLY if you want the system to auto-scale to the full physical device range.
-        - INVERSE MAPPING: Set 'min' > 'max' (e.g. 18000 to 600) to invert the knob behavior.
+        ## 📖 SURGICAL PARAMETER DICTIONARY (LABEL -> INTERNAL):
+        Use these internal names for mapping even if the user uses manual labels:
+{surgical_dict_text}
 
-        ## RESPONSE FORMAT (STRICT JSON):
+        ## 🔬 MUSICAL SEMANTIC PROTOCOLS:
+        1. **Hz Protocol**: Use logarithmic scaling (20Hz to 18kHz). Filters sweep UP (40 -> 18k) or DOWN (18k -> 40).
+        2. **dB Protocol**: Gain ranges MUST NOT start at -inf. Use a safety floor (e.g., -36dB to 0dB or -70dB to 6dB).
+        3. **Discrete Protocol**: Beat Repeat Grid (0-15), Auto Filter Type (0-9). Do NOT use floating points for these.
+        4. **Sidechain Law**: When "Ducking" or "Sidechain" is mentioned, prioritize mapping `Sidechain_Gain` or `Sidechain_Mix`.
+
+        ## 📝 RESPONSE FORMAT (STRICT JSON):
         {{
-            "creative_name": "Pro Name",
-            "devices": [
-                {{
-                    "name": "Exact Device Name",
-                    "parameters": {{
-                        "ParameterName": 123.45
-                    }}
-                }}
-            ],
-            "macro_count": 8,
-            "sound_intent": "Deep technical analysis.",
+            "creative_name": "Surgical Rack",
+            "devices": ["Auto Filter", "Compressor"],
+            "surgical_devices": [{{ "name": "Auto Filter", "parameters": {{ "Filter_Frequency": 1000.0 }} }}],
             "macro_details": [
                 {{
                     "macro": 1,
-                    "name": "Creative Label (e.g. 'Stardust')",
-                    "target_device": "Exact Device Name",
-                    "target_parameter": "Exact Parameter Key",
-                    "min": 0.0,
-                    "max": 1.0,
-                    "description": "Technical impact."
+                    "name": "The Void",
+                    "target_device": "Auto Filter",
+                    "target_parameter": "Filter_Frequency",
+                    "min": 18000.0,
+                    "max": 40.0
                 }}
             ],
-            "parallel_logic": "Routing details.",
-            "tips": ["Tip"],
-            "explanation": "Summary."
+            "sound_intent": "Dark, industrial, and glitchy atmosphere.",
+            "musical_logic_explanation": "Technical reasoning for ranges and unit choices."
         }}
 
-        IMPORTANT: If you want a parameter to move across a wide range, provide 'min' and 'max' values. If not provided, the system will use physical defaults.
+        Available Devices: {", ".join(sorted(set(available_devices)))}
         """
         
         try:
@@ -109,35 +114,78 @@ class RackNLPParser:
                 )
             )
             
-            data = json.loads(response.text)
+            # Clean prose/markdown if present
+            raw_text = response.text.strip()
+            if "```json" in raw_text:
+                raw_text = raw_text.split("```json")[1].split("```")[0].strip()
+            elif "```" in raw_text:
+                raw_text = raw_text.split("```")[1].split("```")[0].strip()
             
-            # Resolve aliases and handle V7 structure
-            resolved_devices = []
-            valid_canonical_names = []
+            data = json.loads(raw_text)
             
-            # The AI might give a list of strings or a list of objects (V7)
-            raw_devices = data.get("devices", [])
-            for item in raw_devices:
-                name = item.get("name") if isinstance(item, dict) else item
-                params = item.get("parameters", {}) if isinstance(item, dict) else {}
+            # V40 Robustness: If AI returns a list, take the first element
+            if isinstance(data, list) and len(data) > 0:
+                data = data[0]
+            
+            if not isinstance(data, dict):
+                print(f"WARNING: AI returned non-dict JSON: {type(data)}")
+                return self._parse_with_regex(text)
+            
+            # V41 RESOLUTION ENGINE: Hyper-Robust Device Extraction
+            device_map = {} # canon_name -> parameters
+            
+            # Helper to process any device entry
+            def process_entry(item):
+                if not item: return
+                name = ""
+                params = {}
+                if isinstance(item, dict):
+                    name = item.get("name") or item.get("target_device") or ""
+                    params = item.get("parameters") or {}
+                elif isinstance(item, str):
+                    name = item
                 
-                canon = self.device_db.resolve_alias(name)
-                if canon:
-                    resolved_devices.append({"name": canon, "parameters": params})
-                    valid_canonical_names.append(canon)
+                if name:
+                    canon = self.device_db.resolve_alias(str(name))
+                    if canon:
+                        if canon in device_map:
+                            device_map[canon].update(params)
+                        else:
+                            device_map[canon] = params
+
+            # Stage 1: Raw devices list
+            raw_devs = data.get("devices", [])
+            if isinstance(raw_devs, str): raw_devs = [raw_devs]
+            for d in raw_devs: process_entry(d)
+            
+            # Stage 2: Surgical devices list
+            surg_devs = data.get("surgical_devices", [])
+            if isinstance(surg_devs, str): surg_devs = [surg_devs]
+            for d in surg_devs: process_entry(d)
+            
+            # Stage 3: Macro details (Implicit devices)
+            for m in data.get("macro_details", []):
+                d_name = m.get("target_device")
+                if d_name:
+                    canon = self.device_db.resolve_alias(d_name)
+                    if canon and canon not in device_map:
+                        device_map[canon] = {}
+
+            resolved_devices = [{"name": k, "parameters": v} for k, v in device_map.items()]
+            valid_canonical_names = list(device_map.keys())
             
             return {
-                "creative_name": data.get("creative_name", "Custom Rack"),
-                "devices": valid_canonical_names, # For legacy compatibility in some parts
-                "surgical_devices": resolved_devices, # New V7 structure
+                "creative_name": data.get("creative_name", "Precision Rack"),
+                "devices": valid_canonical_names,
+                "surgical_devices": resolved_devices, 
                 "macro_count": data.get("macro_count", 8),
                 "sound_intent": data.get("sound_intent", ""),
                 "macro_details": data.get("macro_details", []),
-                "parallel_logic": data.get("parallel_logic", ""),
-                "tips": data.get("tips", []),
                 "ai_powered": True,
                 "model": self.model_id,
-                "explanation": data.get("explanation", "")
+                "ai_powered": True,
+                "model": self.model_id,
+                "explanation": data.get("explanation") or data.get("musical_logic_explanation", "")
             }
         except Exception as e:
             print(f"AI Parse failed: {e}")

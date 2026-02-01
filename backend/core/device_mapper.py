@@ -32,13 +32,8 @@ class DeviceDatabase:
         
         # Priority 1: Cloned DNA (Most accurate Physical Ranges)
         if self.cloned_dna:
-            print(f"DEVICE_DB_INFO: Merging {len(self.cloned_dna)} high-precision devices from cloned DNA...")
             for d_name, d_info in self.cloned_dna.items():
                 audio_effects[d_name] = d_info
-        
-        print(f"DEVICE_DB_INFO: Total {len(audio_effects)} audio effects online.")
-        print(f"DEVICE_DB_INFO: 'Delay' online? {'Delay' in audio_effects}")
-        print(f"DEVICE_DB_INFO: 'Auto Filter' online? {'Auto Filter' in audio_effects}")
         
         # Device name aliases for NLP
         self.aliases = {
@@ -76,8 +71,68 @@ class DeviceDatabase:
             "multiband dynamics": "Multiband Dynamics",
             "autofilter": "Auto Filter",
             "eq8": "EQ Eight",
+            "phaser-flanger": "PhaserNew",
+            "phaser new": "PhaserNew",
+            "audio effect rack": "Audio Effect Rack",
             "audio effect rack": "Audio Effect Rack",
             "rack": "Audio Effect Rack"
+        }
+
+        # V47 SURGICAL PARAMETER ALIASES (Manual -> Internal)
+        self.parameter_aliases = {
+            "Hybrid": {
+                "Decay": "Algorithm_Decay",
+                "Size": "Algorithm_Size",
+                "Shimmer": "Algorithm_Shimmer",
+                "Damping": "Algorithm_Damping",
+                "Pre Delay": "PreDelay_FeedbackTime",
+                "Stereo": "StereoWidth",
+                "Width": "StereoWidth",
+                "Dry/Wet": "DryWet",
+                "Blend": "ConvoAlgoBlend"
+            },
+            "AutoShift": {
+                "Shift": "PitchShift_ShiftSemitones",
+                "Glide": "MidiInput_Glide",
+                "Fine": "PitchShift_Detune",
+                "Formant": "PitchShift_FormantShift",
+                "Scale": "Quantizer_Active",
+                "Dry/Wet": "Global_DryWet"
+            },
+            "GrainDelay": {
+                "Time": "MsDelay",
+                "Spray": "Spray",
+                "Pitch": "Pitch",
+                "Frequency": "Freq",
+                "Random": "RandomPitch",
+                "Feedback": "Feedback",
+                "Dry/Wet": "NewDryWet"
+            },
+            "BeatRepeat": {
+                "Grid": "Grid",
+                "Density": "Grid",
+                "Interval": "Interval",
+                "Chance": "Chance",
+                "Gate": "Gate",
+                "Pitch": "Pitch",
+                "Variation": "Variation"
+            },
+            "Roar": {
+                "Drive": "Stage1_Shaper_Trim",
+                "Tone": "Input_ToneAmount",
+                "Color": "Input_ColorOn",
+                "Bias": "Stage1_Shaper_Bias",
+                "Filter Freq": "Stage1_Filter_Frequency",
+                "Resonance": "Stage1_Filter_Resonance",
+                "Amount": "Stage1_Shaper_Amount",
+                "Trim": "Stage1_Shaper_Trim"
+            },
+            "PhaserNew": {
+                "Doubler": "DoublerDelayTime",
+                "Color": "Warmth",
+                "Sync": "Modulation_Sync",
+                "Rate": "Modulation_Frequency"
+            }
         }
 
     def _load_database(self) -> Dict:
@@ -112,7 +167,6 @@ class DeviceDatabase:
     def get_device(self, name: str) -> Optional[Dict]:
         """Get device configuration by name, merging with extracted params"""
         audio_effects = self.devices.get("devices", {}).get("audio_effects", {})
-        print(f"DEBUG: Requesting device '{name}'. Available keys (total {len(audio_effects)}): {list(audio_effects.keys())[:5]}...")
         
         # Resolve canonical name using aliases first (case-insensitive)
         canon = name
@@ -164,20 +218,43 @@ class DeviceDatabase:
         # Merge in extracted parameters that aren't already defined
         # SMART MERGE: Re-enabled to support devices missing from devices.json (GrainDelay, Echo)
         # BUT with strict filtering to prevent 'Ghost Parameter' crashes.
+        # V44 SURGICAL INTELLIGENCE: Inject Virtual Parameters and Aliases
         xml_tag = device.get("xml_tag", canon)
+        
+        # 1. Virtual Parameter Injection (Sidechain / Advanced Controls)
+        VIRTUAL_P = {
+            "AutoFilter2": [
+                {"name": "Sidechain_Gain", "default": 1.0, "min": 0.0, "max": 10.0},
+                {"name": "Sidechain_Mix", "default": 1.0, "min": 0.0, "max": 1.0}
+            ],
+            "Compressor2": [
+                {"name": "Sidechain_Gain", "default": 1.0, "min": 0.0, "max": 10.0},
+                {"name": "Sidechain_Mix", "default": 1.0, "min": 0.0, "max": 1.0}
+            ],
+            "Gate": [
+                {"name": "Sidechain_Gain", "default": 1.0, "min": 0.0, "max": 10.0},
+                {"name": "Sidechain_Mix", "default": 1.0, "min": 0.0, "max": 1.0}
+            ],
+            "BeatRepeat": [
+                {"name": "Variation", "default": 0.0, "min": 0.0, "max": 10.0},
+                {"name": "Mix_Mode", "default": 0.0, "min": 0.0, "max": 2.0}
+            ]
+        }
+        
+        if xml_tag in VIRTUAL_P:
+            existing_names = {p["name"] for p in device.get("parameters", [])}
+            for p in VIRTUAL_P[xml_tag]:
+                if p["name"] not in existing_names:
+                    device["parameters"].append(p)
+
+        # 2. Smart Merge with Extracted Params
         if xml_tag in self.extracted_params:
+            # Re-read existing names after virtual injection
             existing_names = {p["name"] for p in device.get("parameters", [])}
             
-            # Dangerous parameters known to crash Live 12.3
-            BLACKLIST = {
-                "LegacyGain", "BranchSelectorRange", "WarpWait", "LaunchWait"
-            }
-            
+            BLACKLIST = {"LegacyGain", "BranchSelectorRange", "WarpWait", "LaunchWait"}
             for p_name in self.extracted_params[xml_tag]:
-                # Filter Logic
-                if p_name in existing_names: continue
-                if p_name in BLACKLIST: continue
-                # Skip array items like Bands.0, Bands.1 unless explicitly needed (usually internal)
+                if p_name in existing_names or p_name in BLACKLIST: continue
                 if "." in p_name and p_name.split(".")[-1].isdigit(): continue 
                 
                 device["parameters"].append({
@@ -234,3 +311,7 @@ class DeviceDatabase:
                 return k
                 
         return name
+
+    def get_parameter_aliases(self) -> Dict[str, Dict[str, str]]:
+        """Get all parameter aliases for NLP prompt injection"""
+        return self.parameter_aliases

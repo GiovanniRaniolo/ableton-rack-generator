@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 from typing import List, Dict, Any, Optional
-from .constants import PARAMETER_AUTHORITY, ENUM_AUTHORITY
+from .authority import PARAMETER_AUTHORITY, ENUM_AUTHORITY
 from .models import MacroMapping
 
 class AbletonDevice:
@@ -13,9 +13,18 @@ class AbletonDevice:
         # Get device config from database
         self.device_info = device_db.get_device(name)
         
+        # FUZZY DB LOOKUP (V36.1)
+        if not self.device_info:
+            target_norm = name.lower().replace(" ", "").replace("_", "").replace("-", "").replace("2", "").replace("new", "")
+            for db_key in device_db.devices.keys():
+                db_norm = db_key.lower().replace(" ", "").replace("_", "").replace("-", "").replace("2", "").replace("new", "")
+                if target_norm == db_norm or target_norm in db_norm or db_norm in target_norm:
+                    self.device_info = device_db.get_device(db_key)
+                    self.name = db_key # Standardize to DB name
+                    break
+        
         # SAFE FALLBACK LOGIC
         if not self.device_info:
-            print(f"[WARNING] Device '{name}' not found in DB. Applying Fallback strategy.")
             
             fallback_map = {
                 "Echo": "Delay",
@@ -29,8 +38,6 @@ class AbletonDevice:
             
             original_name = name
             fallback_name = fallback_map.get(name, "Utility")
-            
-            print(f" -> Mapping '{original_name}' to '{fallback_name}'")
             self.device_info = device_db.get_device(fallback_name)
             self.name = fallback_name
             

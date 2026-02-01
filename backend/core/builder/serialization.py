@@ -43,4 +43,5 @@ def save_adg(xml_string: str, filepath: str):
         with gzip.GzipFile(filename=fname, mode='wb', fileobj=f, compresslevel=9, mtime=0) as gz:
             gz.write(xml_string.encode('utf-8'))
     
-    print(f"SUCCESS: Saved V35 'Golden DNA' Rack (Modular): {filepath}")
+    # Silent in V38 Industrial context
+    # print(f"SUCCESS: Saved V35 'Golden DNA' Rack (Modular): {filepath}")
