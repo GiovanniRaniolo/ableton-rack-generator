@@ -83,11 +83,32 @@ class RackNLPParser:
         3. **Discrete Protocol**: Beat Repeat Grid (0-15), Auto Filter Type (0-9). Do NOT use floating points for these.
         4. **Sidechain Law**: When "Ducking" or "Sidechain" is mentioned, prioritize mapping `Sidechain_Gain` or `Sidechain_Mix`.
 
+        ## 🎨 STATIC SOUND SCULPTING (PRESET DESIGN):
+        You are also a PRESET DESIGNER. You must initialize device parameters to define the "texture" even if they are NOT mapped to Macros.
+        - If user wants "Dark", set Filter Freq to 400Hz (Static) even if no Macro controls it.
+        - If user wants "Wide", set StereoWidth/Spread to max.
+        - **CRITICAL**: Do not leave unmapped parameters at default (vanilla) values. SCULPT THE SOUND.
+
         ## 📝 RESPONSE FORMAT (STRICT JSON):
         {{
             "creative_name": "Surgical Rack",
-            "devices": ["Auto Filter", "Compressor"],
-            "surgical_devices": [{{ "name": "Auto Filter", "parameters": {{ "Filter_Frequency": 1000.0 }} }}],
+            "devices": ["Auto Filter", "Compressor", "Reverb"],
+            "surgical_devices": [
+                {{ 
+                    "name": "Auto Filter", 
+                    "parameters": {{ 
+                        "Filter_Frequency": 400.0,       // Static Setting (Dark Tone)
+                        "Filter_Type": 1.0               // Static Setting (OSR)
+                    }} 
+                }},
+                {{
+                    "name": "Reverb",
+                    "parameters": {{
+                        "DecayTime": 4.5,                // Static Setting (Massive Space)
+                        "DryWet": 0.35
+                    }}
+                }}
+            ],
             "macro_details": [
                 {{
                     "macro": 1,
@@ -99,7 +120,7 @@ class RackNLPParser:
                 }}
             ],
             "sound_intent": "Dark, industrial, and glitchy atmosphere.",
-            "musical_logic_explanation": "Technical reasoning for ranges and unit choices."
+            "musical_logic_explanation": "Technical reasoning. E.g. Set Reverb Decay to 4.5s statically to create the 'Cathedral' space."
         }}
 
         Available Devices: {", ".join(sorted(set(available_devices)))}
