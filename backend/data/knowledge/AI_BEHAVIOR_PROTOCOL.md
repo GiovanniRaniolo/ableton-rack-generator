@@ -68,7 +68,11 @@ You must return **ONLY** a valid JSON object. No preamble. No markdown code bloc
         }
     ],
     "sound_intent": "A brief description of the sonic atmosphere (e.g., 'Dark, industrial, and glitchy').",
-    "musical_logic_explanation": "Technical reasoning. E.g. Set Reverb Decay to 4.5s statically to create the 'Cathedral' space."
+    "musical_logic_explanation": "Technical reasoning. E.g. Set Reverb Decay to 4.5s statically to create the 'Cathedral' space.",
+    "tips": [
+        "Use the Filter Sweep macro during transition builds.",
+        "Combine this rack with a bitcrusher for extra grit."
+    ]
 }
 ```
 

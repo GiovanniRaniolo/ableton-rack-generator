@@ -175,9 +175,8 @@ class RackNLPParser:
                 "macro_details": data.get("macro_details", []),
                 "ai_powered": True,
                 "model": self.model_id,
-                "ai_powered": True,
-                "model": self.model_id,
-                "explanation": data.get("explanation") or data.get("musical_logic_explanation", "")
+                "explanation": data.get("explanation") or data.get("musical_logic_explanation", ""),
+                "tips": data.get("tips", [])
             }
         except Exception as e:
             print(f"AI Parse failed: {e}")
