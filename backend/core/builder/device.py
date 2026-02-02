@@ -138,7 +138,23 @@ class AbletonDevice:
                 ET.SubElement(midi_range, "Max").set("Value", str(max_val))
                 
                 mod_target = ET.SubElement(elem, "ModulationTarget")
-                mod_target.set("Id", "0")
+                # MAPPING LOGIC RESTORED (V64)
+                # Check if this parameter path has a mapping
+                mapping_id = "0"
+                # We need to construct the path as the code would see it.
+                # param_path arg is passed in for complex devices like Eq8
+                current_path = param_path if param_path else [name]
+                
+                # Check mappings
+                for m_path, mapping in self.mappings.items():
+                    # converting tuple to list for comparison if needed, or exact match
+                    if list(m_path) == current_path or m_path == tuple(current_path):
+                         # Map ID is index + 1 (1-based for LOM usually, but let's try 1-based integers)
+                         # Note: In Ableton XML, modulation sources correspond to their index if SourceCount > 0
+                         mapping_id = str(mapping.macro_index + 1)
+                         break
+                         
+                mod_target.set("Id", mapping_id)
                 ET.SubElement(mod_target, "LockEnvelope").set("Value", "0")
         
         return elem

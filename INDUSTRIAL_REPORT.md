@@ -69,3 +69,27 @@
 - SUCCESS: 60
 - FAILURES: 0
 - PASS RATE: 100.0%
+
+# 🔬 Phase 16: Parallel Chain Research Conclusions (V63)
+
+## The "Forbidden Icon" Mystery Solved
+For weeks, generated racks with parallel chains caused Ableton 12.3 to display a "Forbidden Icon" and refuse loading. 
+
+### The Hypothesis (V58-V60)
+We believed the issue was **ID Scoping**. We thought we needed complex, sequential ID generation for `AudioEffectBranch` (View) nodes to match `AudioEffectBranchPreset` (Data) nodes. This led to over-engineered solutions ("Giga-Sync", "Precision ID") that failed.
+
+### The Forensic Breakthrough (V63)
+Analysis of a native `REFERENCE.adg` revealed a startling fact:
+**Native Parallel Racks do NOT contain `AudioEffectBranch` (View) nodes.**
+
+They only contain `AudioEffectBranchPreset` (Data) nodes. 
+In Ableton 12.3, explicitly defining the View nodes for parallel chains is seemingly **forbidden** or requires an undocumented schema we could not replicate.
+
+### The Solution: "Less is More"
+The stable **V62 Generator** (which was rolled back to) works perfectly for parallel chains because it **leaves the `<Branches>` list empty**.
+By defining ONLY the `BranchPresets`, Ableton 12.3 automatically instantiates the necessary view structures without error.
+
+**Status:**
+- Single Chain Racks: ✅ STABLE (V62)
+- Parallel Chain Racks: ✅ STABLE (V62/V63)
+- ID Protocol: **Simple Sequential** (No complex sync required if View nodes are omitted).

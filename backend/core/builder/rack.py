@@ -248,6 +248,11 @@ class AudioEffectRack:
         root = tree.getroot()
         gp = root.find("GroupDevicePreset")
         rack = gp.find("Device/AudioEffectGroupDevice")
+        
+        # MAPPING RESTORATION (V64): Enable 16 Modulation Sources (Macros)
+        mod_count = rack.find("ModulationSourceCount")
+        if mod_count is not None: mod_count.set("Value", "16")
+        
         num_macros = rack.find("NumVisibleMacroControls")
         if num_macros is not None: num_macros.set("Value", str(self.macro_count))
         branches_elem = rack.find("Branches")
