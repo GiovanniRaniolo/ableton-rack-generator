@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+@theme {
+  /* Ableton-inspired Core Palette */
+  --color-bg-deep: #0a0a0b;
+  --color-bg-primary: #121214;
+  --color-bg-secondary: #1a1a1d;
+  --color-bg-tertiary: #242429;
+  
+  --color-accent-primary: #ff7c25;    /* Ableton Orange */
+  --color-accent-secondary: #00d2ff;  /* Techno Cyan */
+  --color-accent-success: #3ef08b;    /* Level Meter Green */
+  
+  --color-text-bright: #f0f0f2;
+  --color-text-main: #b1b1b7;
+  --color-text-dim: #6e6e77;
+  
+  --color-border-subtle: #2d2d33;
+  --color-border-light: #3f3f48;
+
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-bg-deep text-text-main font-sans antialiased selection:bg-accent-primary/30 selection:text-white;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(255, 124, 37, 0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(0, 210, 255, 0.08) 0px, transparent 50%);
+    min-height: 100vh;
+    font-size: 18px; /* High legibility base */
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4 {
+    @apply text-text-bright font-extrabold tracking-tight;
+  }
+
+  /* Ableton Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-bg-deep;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border-light rounded-full hover:bg-text-dim transition-colors;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-black/40 backdrop-blur-3xl border border-white/5 rounded-[2rem] shadow-[0_0_100px_-20px_rgba(255,124,37,0.1)];
+    box-shadow: 
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+      0 20px 50px -10px rgba(0, 0, 0, 0.5);
+  }
+  
+  .glass-input {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl focus:border-accent-primary/50 transition-all outline-none text-lg p-6;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+  }
+
+  .premium-blur {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse-slow 6s ease-in-out infinite;
+  }
+  
+  .animate-float-slow {
+    animation: float-slow 8s ease-in-out infinite;
+  }
+
+  .premium-blur::before {
+    content: '';
+    position: absolute;
+    inset: -100%;
+    background: linear-gradient(to top right, rgba(255, 124, 37, 0.2), transparent, rgba(0, 210, 255, 0.2));
+    filter: blur(100px);
+    opacity: 0.3;
+    animation: pulse-slow 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .noise-bg {
+    position: relative;
+    z-index: 0;
+  }
+  .noise-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+  }
+  
+  .text-glow {
+    text-shadow: 0 0 20px rgba(255, 124, 37, 0.5);
+  }
+  
+  .border-gradient {
+    position: relative;
+    background: linear-gradient(#0a0a0b, #0a0a0b) padding-box,
+                linear-gradient(45deg, var(--color-accent-primary), var(--color-accent-secondary)) border-box;
+    border: 1px solid transparent;
+  }
+  
+  .animate-scanline {
+    position: relative;
+    overflow: hidden;
+  }
+  .animate-scanline::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.05), transparent);
+    animation: scanline 4s linear infinite;
+    pointer-events: none;
+  }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}

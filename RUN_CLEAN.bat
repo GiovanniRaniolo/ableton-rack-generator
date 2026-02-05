@@ -20,13 +20,13 @@ timeout /t 5 /nobreak >nul
 
 echo.
 echo ==================================================
-echo   3. AVVIO FRONTEND (VITE)
+echo   3. AVVIO FRONTEND (NEXT.JS)
 echo ==================================================
 start "ABLETON FRONTEND" cmd /c "cd frontend && npm run dev & pause"
 
 echo.
 echo ==================================================
 echo   TUTTO AVVIATO!
-echo   Vai su: http://localhost:5173
+echo   Vai su: http://localhost:3000
 echo ==================================================
 pause
