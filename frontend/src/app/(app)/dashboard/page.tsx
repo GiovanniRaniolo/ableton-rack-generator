@@ -6,7 +6,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { InputSection } from '@/components/hero/InputSection';
 import { ResultCard } from '@/components/result/ResultCard';
 import { UserButton, useUser } from "@clerk/nextjs";
-import { syncUserProfile } from '@/app/actions';
+import { syncUserProfile, generateRackAction } from '@/app/actions';
 
 export default function DashboardPage() {
   const { user } = useUser();
@@ -37,8 +37,18 @@ export default function DashboardPage() {
     setResult(null);
 
     try {
-      const data = await api.generateRack(prompt);
-      setResult(data);
+      // Use Server Action instead of direct API call
+      const res = await generateRackAction(prompt);
+      
+      if (!res.success) {
+        throw new Error(res.error);
+      }
+      
+      setResult(res.data);
+      if (res.remainingCredits !== undefined) {
+        setCredits(res.remainingCredits);
+      }
+      
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message || 'Failed to generate rack. Our AI engine is currently busy or the prompt was invalid.');
