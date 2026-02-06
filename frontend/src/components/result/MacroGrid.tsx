@@ -1,8 +1,15 @@
-export function MacroGrid({ macroDetails }) {
+import { MacroDetail } from "@/lib/api";
+import { cn } from "@/lib/utils";
+
+interface MacroGridProps {
+    macroDetails: MacroDetail[];
+}
+
+export function MacroGrid({ macroDetails }: MacroGridProps) {
     // Default 8 macros if empty
     const macros = (macroDetails && macroDetails.length > 0) 
         ? macroDetails 
-        : Array.from({length: 8}, (_,i) => ({macro: i+1, name: `Macro ${i+1}`, description: 'Parameter'}));
+        : Array.from({length: 8}, (_,i) => ({macro: i+1, name: `Macro ${i+1}`, description: 'Parameter'} as MacroDetail));
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -23,7 +30,7 @@ export function MacroGrid({ macroDetails }) {
                 {/* Technical Mapping Truth - HIGH VISIBILITY */}
                 <div className="bg-black/40 rounded-lg p-3 relative z-10">
                     <div className="flex items-center gap-2 mb-2">
-                    <div className={`w-1.5 h-1.5 rounded-full ${m.target_device ? 'bg-accent-success shadow-[0_0_8px_rgba(74,222,128,0.5)]' : 'bg-yellow-500'}`}></div>
+                    <div className={cn("w-1.5 h-1.5 rounded-full", m.target_device ? 'bg-accent-success shadow-[0_0_8px_rgba(74,222,128,0.5)]' : 'bg-yellow-500')}></div>
                     <span className="text-[10px] font-black uppercase tracking-widest text-text-dim">
                         {m.target_device ? 'AI Connection' : 'Auto-Mapping'}
                     </span>

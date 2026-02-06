@@ -1,8 +1,16 @@
-import { Download, RefreshCw, Sparkles, Layers, Settings2, Cpu } from 'lucide-react';
-import { api } from '../../api/client';
-import { MacroGrid } from './MacroGrid';
+"use client";
 
-export function ResultCard({ result, onReset }) {
+import { Download, RefreshCw, Sparkles, Layers, Settings2, Cpu } from 'lucide-react';
+import { api, GenerateResponse } from '@/lib/api';
+import { MacroGrid } from './MacroGrid';
+import { cn } from '@/lib/utils';
+
+interface ResultCardProps {
+    result: GenerateResponse;
+    onReset: () => void;
+}
+
+export function ResultCard({ result, onReset }: ResultCardProps) {
   if (!result) return null;
 
   return (
@@ -34,15 +42,21 @@ export function ResultCard({ result, onReset }) {
 
                 <div className="flex flex-col gap-3 relative z-10">
                 <button 
-                    onClick={() => api.downloadRack(result.filename)}
-                    className="px-8 py-4 bg-accent-primary hover:bg-[#ff904d] text-black font-black uppercase tracking-[0.2em] text-xs rounded-full shadow-[0_0_30px_-5px_rgba(255,124,37,0.4)] hover:shadow-[0_0_50px_-10px_rgba(255,124,37,0.6)] hover:scale-105 transition-all active:scale-95 flex items-center gap-3"
+                    onClick={() => {
+                        if (result.file_url) {
+                            window.open(result.file_url, '_blank');
+                        } else {
+                            api.downloadRack(result.filename);
+                        }
+                    }}
+                    className="px-8 py-4 bg-accent-primary hover:bg-[#ff904d] text-black font-black uppercase tracking-[0.2em] text-xs rounded-full shadow-[0_0_30px_-5px_rgba(255,124,37,0.4)] hover:shadow-[0_0_50px_-10px_rgba(255,124,37,0.6)] hover:scale-105 transition-all active:scale-95 flex items-center gap-3 cursor-pointer"
                 >
                     <Download className="w-4 h-4" />
                     Download .adg
                 </button>
                 <button 
                     onClick={onReset}
-                    className="px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-white font-bold uppercase tracking-[0.2em] text-xs rounded-full transition-all flex items-center justify-center gap-3 backdrop-blur-md"
+                    className="px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-white font-bold uppercase tracking-[0.2em] text-xs rounded-full transition-all flex items-center justify-center gap-3 backdrop-blur-md cursor-pointer"
                 >
                     <RefreshCw className="w-4 h-4" />
                     New Rack

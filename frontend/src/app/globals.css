@@ -68,7 +68,6 @@
     overflow: hidden;
   }
   
-  /* Broken apply usage fixed by converting to standard CSS utility */
   .animate-pulse-slow {
     animation: pulse-slow 6s ease-in-out infinite;
   }
@@ -113,25 +112,7 @@
                 linear-gradient(45deg, var(--color-accent-primary), var(--color-accent-secondary)) border-box;
     border: 1px solid transparent;
   }
-}
-
-/* Animations defined at root or base to be accessible */
-@keyframes float-slow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes pulse-slow {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.6; }
-}
-
-@keyframes scanline {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100%); }
-}
-
-@layer utilities {
+  
   .animate-scanline {
     position: relative;
     overflow: hidden;
@@ -147,4 +128,19 @@
     animation: scanline 4s linear infinite;
     pointer-events: none;
   }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
 }
