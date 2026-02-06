@@ -9,6 +9,7 @@ export interface GenerateResponse {
   devices: string[];
   macro_details: MacroDetail[];
   tips: string[];
+  file_url?: string; // New Cloud URL
 }
 
 export interface MacroDetail {

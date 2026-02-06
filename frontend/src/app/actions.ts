@@ -61,9 +61,9 @@ export async function generateRackAction(prompt: string) {
     return { success: false, error: "Insufficient credits. Please top up." };
   }
 
-  // 2. Call Python Backend (Server-to-Server)
-  try {
-    const backendUrl = "http://127.0.0.1:8000"; // Local Python
+    // 2. Call Python Backend (Server-to-Server)
+    try {
+      const backendUrl = "http://127.0.0.1:8000"; // Local Python
     const res = await fetch(`${backendUrl}/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -76,21 +76,84 @@ export async function generateRackAction(prompt: string) {
     }
 
     const rackData = await res.json();
+    const filename = rackData.filename;
 
-    // 3. Deduct Credit (Only on Success)
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update({ credits: profile.credits - 1 })
-      .eq('id', user.id);
+    // 3. Fetch the actual file content from Python
+    const fileRes = await fetch(`${backendUrl}/download/${filename}`);
+    if (!fileRes.ok) throw new Error("Failed to retrieve generated file");
+    const fileBuffer = await fileRes.arrayBuffer();
 
-    if (updateError) {
-      console.error("Failed to deduct credit:", updateError);
-      // Optional: rollback or log critical error
-    }
+    // 4. Upload to Supabase Storage
+    const { error: uploadError } = await supabase.storage
+      .from('racks')
+      .upload(filename, fileBuffer, {
+        contentType: 'application/octet-stream',
+        upsert: false
+      });
 
-    return { success: true, data: rackData, remainingCredits: profile.credits - 1 };
+    if (uploadError) throw new Error(`Storage Error: ${uploadError.message}`);
+
+    // 5. Get Public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from('racks')
+      .getPublicUrl(filename);
+
+    // 6. Save Metadata to DB & Deduct Credit
+    // We strive for atomicity but Supabase doesn't support easy multi-table transactions via JS client yet without RPC.
+    // We'll update credits first (already checked > 0).
+    
+    const { error: dbError } = await supabase
+      .from('generations')
+      .insert({
+        user_id: user.id,
+        prompt: prompt,
+        creative_name: rackData.creative_name,
+        filename: filename,
+        file_url: publicUrl,
+        rack_data: rackData
+      });
+
+    if (dbError) throw new Error(`History Error: ${dbError.message}`);
+
+    const { error: creditError } = await supabase
+        .from('profiles')
+        .update({ credits: profile.credits - 1 })
+        .eq('id', user.id);
+        
+    if (creditError) console.error("Credit Deduction failed but file generated", creditError);
+
+    // Return extended data including the cloud URL
+    return { 
+        success: true, 
+        data: { ...rackData, file_url: publicUrl }, 
+        remainingCredits: profile.credits - 1 
+    };
 
   } catch (err: any) {
+    console.error("Action Error:", err);
     return { success: false, error: err.message || "Backend Error" };
   }
+}
+
+export async function getUserLibrary() {
+  const user = await currentUser();
+  if (!user) return [];
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { data, error } = await supabase
+    .from('generations')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error("Library Fetch Error:", error);
+    return [];
+  }
+
+  return data;
 }
