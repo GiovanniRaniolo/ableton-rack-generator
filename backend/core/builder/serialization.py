@@ -17,9 +17,9 @@ def prettify_xml(elem):
     start_pos = raw_xml.find('<GroupDevicePreset')
     final_body = raw_xml[start_pos:]
     
-    # 2. Reconstruct the root tag with character-perfect attribute order
-    # Analyzing golden sample: <Ableton MajorVersion="5" MinorVersion="12.0_12300" SchemaChangeCount="1" Creator="Ableton Live 12.3" Revision="49ca8995cfdbe384bd4648a2e0d5a14dba7b993d">
-    root_tag = '<Ableton MajorVersion="5" MinorVersion="12.0_12300" SchemaChangeCount="1" Creator="Ableton Live 12.3" Revision="49ca8995cfdbe384bd4648a2e0d5a14dba7b993d">'
+    # 2. Hardcoded root tag to ensure exact match with verified working template
+    # Targeting Ableton 12.2.5 (Build 12203)
+    root_tag = '<Ableton MajorVersion="5" MinorVersion="12.0_12203" SchemaChangeCount="3" Creator="Ableton Live 12.2.5" Revision="174fd107af43e88065794fb882063fd27e80439a">'
     
     # 3. Concatenate without ANY newline after header
     # V35/36: NO NEWLINE between header and root
