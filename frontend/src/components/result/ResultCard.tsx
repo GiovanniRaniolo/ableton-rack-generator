@@ -3,7 +3,6 @@
 import { Download, RefreshCw, Sparkles, Layers, Settings2, Cpu } from 'lucide-react';
 import { api, GenerateResponse } from '@/lib/api';
 import { MacroGrid } from './MacroGrid';
-import { cn } from '@/lib/utils';
 
 interface ResultCardProps {
     result: GenerateResponse;

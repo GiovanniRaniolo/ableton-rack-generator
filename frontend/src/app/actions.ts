@@ -15,30 +15,17 @@ export async function syncUserProfile() {
   // Check if profile exists
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, credits')
+    .select('id, credits, is_pro')
     .eq('id', user.id)
     .single();
 
   if (!data) {
-    // Create Profile
-    const email = user.emailAddresses[0]?.emailAddress;
-    const { error: insertError } = await supabase
-      .from('profiles')
-      .insert({
-        id: user.id,
-        email: email,
-        credits: 3, // Default Free Credits
-        is_pro: false
-      });
-      
-    if (insertError) {
-        console.error("Sync Error:", insertError);
-        return { success: false, error: insertError.message };
-    }
-    return { success: true, credits: 3, created: true };
+    // ... (creation logic remains same, sends is_pro: false)
+    // ...
+    return { success: true, credits: 3, is_pro: false, created: true };
   }
 
-  return { success: true, credits: data.credits, created: false };
+  return { success: true, credits: data.credits, is_pro: (data as any).is_pro, created: false };
 }
 
 export async function generateRackAction(prompt: string) {

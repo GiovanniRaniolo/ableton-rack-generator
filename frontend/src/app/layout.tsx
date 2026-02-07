@@ -21,7 +21,7 @@ export default function RootLayout({
       appearance={{
         baseTheme: dark,
         variables: {
-          colorPrimary: "#00FFC2", // Your brand Cyan
+          colorPrimary: "#FF7E00", // Dark Studio Orange
           colorBackground: "#121212",
         },
       }}
