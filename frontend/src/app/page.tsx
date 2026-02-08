@@ -2,7 +2,7 @@ import { Navbar } from "@/components/landing/Navbar";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { ProblemSection } from "@/components/landing/ProblemSection";
 import { SocialProof } from "@/components/landing/SocialProof";
-import { Simulation } from "@/components/landing/Simulation";
+import { TechSpecs } from "@/components/landing/TechSpecs";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { Footer } from "@/components/landing/Footer";
 
@@ -14,7 +14,7 @@ export default function LandingPage() {
         <HeroSection />
         <SocialProof />
         <ProblemSection />
-        <Simulation />
+        <TechSpecs />
         <PricingSection />
       </main>
       <Footer />

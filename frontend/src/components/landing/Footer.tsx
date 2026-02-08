@@ -17,8 +17,12 @@ export function Footer() {
                     The first NPL-to-Rack engine. 
                     We parse your intent and map native Ableton devices for you.
                 </p>
-                <div className="text-[10px] text-white/20 uppercase tracking-widest">
-                    &copy; 2026 Dark Studio AI.
+                <div className="text-[10px] text-white/60 uppercase tracking-widest">
+                    &copy; 2026 ADG Builder.
+                </div>
+                <div className="text-[10px] text-white/40 leading-tight">
+                    Ableton Live is a trademark of Ableton AG.<br/>
+                    ADG Builder is not affiliated with Ableton.
                 </div>
             </div>
 
