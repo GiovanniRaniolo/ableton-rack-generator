@@ -19,6 +19,7 @@ build/
 # Ableton Generated
 backend/generated/
 *.adg
+!frontend/public/showcase/*.adg
 *.als
 
 # Logs

@@ -1,9 +1,9 @@
 import { Navbar } from "@/components/landing/Navbar";
 import { HeroSection } from "@/components/landing/HeroSection";
+import { Showcase } from "@/components/landing/Showcase";
 import { ProblemSection } from "@/components/landing/ProblemSection";
-import { SocialProof } from "@/components/landing/SocialProof";
 import { TechSpecs } from "@/components/landing/TechSpecs";
-import { PricingSection } from "@/components/landing/PricingSection";
+import { FinalCTA } from "@/components/landing/FinalCTA";
 import { Footer } from "@/components/landing/Footer";
 
 export default function LandingPage() {
@@ -12,10 +12,10 @@ export default function LandingPage() {
       <Navbar />
       <main>
         <HeroSection />
-        <SocialProof />
         <ProblemSection />
         <TechSpecs />
-        <PricingSection />
+        <Showcase />
+        <FinalCTA />
       </main>
       <Footer />
     </div>
