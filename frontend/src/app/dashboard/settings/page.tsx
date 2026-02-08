@@ -1,34 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, Sparkles, Zap, Shield, HelpCircle, ExternalLink, ArrowLeft, CreditCard, Box } from "lucide-react";
+import { Check, Sparkles, Zap, Shield, HelpCircle, ExternalLink, ArrowLeft, CreditCard, Box, Home, Crown } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { syncUserProfile } from "@/app/actions";
-
-const PLANS = [
-  {
-    id: "free",
-    name: "Free Tier",
-    price: "€0",
-    period: "/mo",
-    credits: 5,
-    reset: "Resets every 30 days",
-    idealFor: "Curiosity",
-    features: ["Standard Generation", "Community Support"],
-  },
-  {
-    id: "pro",
-    name: "Pro Sub",
-    price: "€5.90",
-    period: "/mo",
-    credits: 80,
-    reset: "Resets every 30 days",
-    idealFor: "Active Production",
-    features: ["Priority Generation", "Commercial License", "Priority Support"],
-  }
-];
+import { STRIPE_PRICES } from "@/config/stripe";
+import { useSearchParams } from "next/navigation";
 
 const PACKS = [
   {
@@ -38,7 +17,6 @@ const PACKS = [
     credits: 20,
     reset: "Never Expires",
     idealFor: "Emergency Top-up",
-    cta: "Buy Pack",
   },
   {
     id: "power",
@@ -47,22 +25,53 @@ const PACKS = [
     credits: 40,
     reset: "Never Expires",
     idealFor: "Casual Use",
-    cta: "Buy Pack",
   }
 ];
 
-export default function PlansPage() {
+export default function SettingsPage() {
   const [isPro, setIsPro] = useState<boolean | null>(null);
+  const [credits, setCredits] = useState<number>(0);
+  const [loading, setLoading] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const paymentStatus = searchParams.get('payment');
 
   useEffect(() => {
     syncUserProfile().then(res => {
-        if (res.success && res.is_pro !== undefined) {
-             setIsPro(res.is_pro);
+        if (res.success) {
+             setIsPro(res.is_pro || false);
+             setCredits(res.credits || 0);
         } else {
-             setIsPro(false); // Default to free if unknown
+             setIsPro(false);
+             setCredits(0);
         }
     });
   }, []);
+
+  async function handleCheckout(priceId: string, packId: string) {
+    setLoading(packId);
+    
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceId }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        alert(`Error: ${data.error || 'Failed to start checkout'}`);
+        return;
+      }
+
+      window.location.href = data.url;
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert('Failed to start checkout. Please try again.');
+    } finally {
+      setLoading(null);
+    }
+  }
 
   if (isPro === null) {
       return (
@@ -73,191 +82,230 @@ export default function PlansPage() {
   }
 
   return (
-    <div className="min-h-screen p-6 md:p-12 max-w-6xl mx-auto space-y-16 pb-6">
+    <div className="min-h-screen p-6 md:p-12 max-w-6xl mx-auto space-y-12 pb-6">
       
-      {/* Header */}
-      <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
-        <h1 className="text-4xl font-black text-white tracking-tight">Plans & Credits</h1>
-        <p className="text-text-dim text-lg max-w-2xl">
-          Choose the best plan for your production needs or top up your credits.
-        </p>
+      {/* Header with Navigation */}
+      <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-700">
+        <Link 
+          href="/" 
+          className="inline-flex items-center gap-2 text-text-dim hover:text-white transition-colors group"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          <span className="text-sm font-medium">Back to Home</span>
+        </Link>
+        
+        <div>
+          <h1 className="text-4xl font-black text-white tracking-tight">Account Settings</h1>
+          <p className="text-text-dim text-lg max-w-2xl mt-2">
+            Manage your subscription, credits, and billing preferences.
+          </p>
+        </div>
       </div>
 
-      {/* Subscription Section */}
+      {/* Payment Status Notification */}
+      {paymentStatus === 'success' && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-accent-success/10 border border-accent-success/30 rounded-xl p-4 flex items-center gap-3"
+        >
+          <Check className="w-5 h-5 text-accent-success" />
+          <div>
+            <p className="font-bold text-white">Payment Successful!</p>
+            <p className="text-sm text-text-dim">Your credits will be added shortly.</p>
+          </div>
+        </motion.div>
+      )}
+
+      {paymentStatus === 'cancelled' && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-center gap-3"
+        >
+          <ExternalLink className="w-5 h-5 text-red-400" />
+          <div>
+            <p className="font-bold text-white">Payment Cancelled</p>
+            <p className="text-sm text-text-dim">You can try again anytime.</p>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Current Plan Status */}
       <section className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
         <div className="flex items-center gap-2 text-accent-primary">
             <Zap className="w-5 h-5" />
-            <h2 className="text-xl font-bold uppercase tracking-wider text-white">Monthly Subscriptions</h2>
+            <h2 className="text-xl font-bold uppercase tracking-wider text-white">Your Current Plan</h2>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {PLANS.map((plan) => {
-                const isCurrentPlan = plan.id === 'pro' ? isPro : !isPro;
-                const isUpgrade = plan.id === 'pro' && !isPro;
-                
-                // Logic for visual state
-                let cta = "Current Plan";
-                let disabled = true;
-                let highlight = false;
+          {/* Plan Card */}
+          <motion.div 
+            whileHover={{ y: -5 }}
+            className={cn(
+              "relative p-8 rounded-3xl border flex flex-col gap-6 overflow-hidden",
+              isPro
+                ? "bg-[#0f0f10] border-accent-primary/50 shadow-[0_0_40px_-10px_rgba(255,124,37,0.15)]" 
+                : "bg-[#0a0a0b] border-white/10"
+            )}
+          >
+            <div className="absolute top-0 right-0 bg-accent-success/20 text-accent-success text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-bl-xl flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent-success animate-pulse"/>
+              Active
+            </div>
 
-                if (isCurrentPlan) {
-                    cta = "Current Plan";
-                    disabled = true;
-                    highlight = false; 
-                    // Special case: If Pro is current, we might want to highlight it as "Active"
-                    if (plan.id === 'pro') highlight = true;
-                } else if (isUpgrade) {
-                    cta = "Upgrade to Pro";
-                    disabled = false;
-                    highlight = true;
-                } else {
-                    // Downgrade case (Free tier when Pro)
-                    cta = "Downgrade";
-                    disabled = false; // Allow click to manage stripe/cancel
-                    highlight = false;
-                }
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                {isPro && <Crown className="w-5 h-5 text-accent-primary" />}
+                <h3 className="text-2xl font-bold text-white">
+                  {isPro ? "Pro Plan" : "Free Tier"}
+                </h3>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-4xl font-black text-white">
+                  {isPro ? "€5.90" : "€0"}
+                </span>
+                <span className="text-text-dim">/mo</span>
+              </div>
+              <p className="text-sm text-text-dim">
+                {isPro ? "Active Production" : "Curiosity"}
+              </p>
+            </div>
 
-                return (
-                    <motion.div 
-                        key={plan.id}
-                        whileHover={!disabled ? { y: -5 } : {}}
-                        className={cn(
-                            "relative p-8 rounded-3xl border flex flex-col gap-6 overflow-hidden group transition-all",
-                            highlight
-                                ? "bg-[#0f0f10] border-accent-primary/50 shadow-[0_0_40px_-10px_rgba(255,124,37,0.15)]" 
-                                : "bg-[#0a0a0b] border-white/5",
-                             isCurrentPlan && "border-accent-success/30"
-                        )}
-                    >
-                        {highlight && isUpgrade && (
-                            <div className="absolute top-0 right-0 bg-accent-primary text-black text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-bl-xl">
-                                Best Value
-                            </div>
-                        )}
+            <div className="py-6 border-t border-white/5">
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2 text-sm text-text-dim">
+                  <Check className="w-4 h-4 text-accent-success" />
+                  {isPro ? "Priority Generation" : "Standard Generation"}
+                </li>
+                <li className="flex items-center gap-2 text-sm text-text-dim">
+                  <Check className="w-4 h-4 text-accent-success" />
+                  {isPro ? "Priority Support" : "Community Support"}
+                </li>
+                {isPro && (
+                  <li className="flex items-center gap-2 text-sm text-text-dim">
+                    <Check className="w-4 h-4 text-accent-success" />
+                    Commercial License
+                  </li>
+                )}
+              </ul>
+            </div>
 
-                        {isCurrentPlan && (
-                             <div className="absolute top-0 right-0 bg-accent-success/20 text-accent-success text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-bl-xl flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-accent-success animate-pulse"/>
-                                Active
-                            </div>
-                        )}
+            {!isPro ? (
+              <Link href="/pricing" className="w-full">
+                <button className="w-full py-4 rounded-xl bg-white text-black font-black uppercase tracking-widest text-xs hover:scale-[1.02] shadow-lg transition-all flex items-center justify-center gap-2">
+                  Upgrade to Pro
+                  <Sparkles className="w-4 h-4" />
+                </button>
+              </Link>
+            ) : (
+              <button className="w-full py-4 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2">
+                Manage Billing
+                <CreditCard className="w-4 h-4" />
+              </button>
+            )}
+          </motion.div>
 
-                        <div className="space-y-2">
-                            <div className="text-sm font-mono text-text-dim uppercase tracking-wider">{plan.idealFor}</div>
-                            <h3 className="text-2xl font-bold text-white">{plan.name}</h3>
-                            <div className="flex items-baseline gap-1">
-                                <span className="text-4xl font-black text-white">{plan.price}</span>
-                                <span className="text-text-dim">{plan.period}</span>
-                            </div>
-                        </div>
+          {/* Credits Card */}
+          <motion.div 
+            whileHover={{ y: -5 }}
+            className="relative p-8 rounded-3xl border border-white/10 bg-[#0a0a0b] flex flex-col gap-6"
+          >
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-accent-primary" />
+                <h3 className="text-2xl font-bold text-white">Credits</h3>
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-5xl font-black text-white">{credits}</span>
+                <span className="text-text-dim text-lg">available</span>
+              </div>
+              <p className="text-xs text-text-dim bg-white/5 px-2 py-1 rounded-md inline-block">
+                Resets every 30 days
+              </p>
+            </div>
 
-                        <div className="py-6 border-t border-b border-white/5 space-y-4">
-                            <div className="flex justify-between items-center">
-                                <span className="text-lg font-bold text-white flex items-center gap-2">
-                                    <Sparkles className="w-4 h-4 text-accent-primary" />
-                                    {plan.credits} Credits
-                                </span>
-                                <span className="text-xs text-text-dim bg-white/5 px-2 py-1 rounded-md">{plan.reset}</span>
-                            </div>
-                            <ul className="space-y-2">
-                                {plan.features.map(f => (
-                                    <li key={f} className="flex items-center gap-2 text-sm text-text-dim">
-                                        <Check className="w-4 h-4 text-accent-success" />
-                                        {f}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+            <div className="py-6 border-t border-white/5 flex-1">
+              <p className="text-sm text-text-dim">
+                {isPro 
+                  ? "Your credits reset monthly with your Pro subscription." 
+                  : "Need more credits? Upgrade to Pro for 80 credits/month or buy a one-time pack below."}
+              </p>
+            </div>
 
-                        <button 
-                            disabled={disabled}
-                            className={cn(
-                                "w-full py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2",
-                                isUpgrade
-                                    ? "bg-white text-black hover:scale-[1.02] shadow-lg"
-                                    : disabled 
-                                        ? "bg-white/5 text-white/50 cursor-default"
-                                        : "bg-white/5 hover:bg-white/10 text-white"
-                            )}
-                        >
-                            {cta}
-                            {isUpgrade && <ArrowLeft className="w-4 h-4 rotate-180" />}
-                            {disabled && <Check className="w-4 h-4" />}
-                        </button>
-                    </motion.div>
-                );
-            })}
+            <Link href="/pricing" className="w-full">
+              <button className="w-full py-4 rounded-xl bg-accent-primary/10 hover:bg-accent-primary/20 border-2 border-accent-primary/30 text-white font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2">
+                Buy More Credits
+                <Box className="w-4 h-4" />
+              </button>
+            </Link>
+          </motion.div>
         </div>
       </section>
 
-      {/* Credit Packs Section */}
+      {/* Credit Packs Section - Simplified */}
       <section className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
-        <div className="flex items-center gap-2 text-accent-secondary">
-            <Box className="w-5 h-5" />
-            <h2 className="text-xl font-bold uppercase tracking-wider text-white">One-Time Packs</h2>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-accent-secondary">
+              <Box className="w-5 h-5" />
+              <h2 className="text-xl font-bold uppercase tracking-wider text-white">Need More Credits?</h2>
+          </div>
+          <Link href="/pricing" className="text-sm text-accent-primary hover:text-white transition-colors flex items-center gap-1">
+            View all plans
+            <ExternalLink className="w-3 h-3" />
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {PACKS.map((pack) => (
                 <motion.div 
                     key={pack.id}
-                    whileHover={{ scale: 1.01 }}
-                    className="p-6 rounded-2xl bg-[#0a0a0b] border border-white/5 flex items-center justify-between hover:border-white/10 transition-all group"
+                    whileHover={{ y: -5 }}
+                    className="relative p-6 rounded-2xl border border-white/10 bg-[#0a0a0b] flex flex-col gap-4"
                 >
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                             <h3 className="text-lg font-bold text-white">{pack.name}</h3>
-                             <span className="text-[10px] bg-accent-secondary/10 text-accent-secondary px-2 py-0.5 rounded-full font-bold uppercase">{pack.idealFor}</span>
-                        </div>
-                        <div className="text-sm text-text-dim">{pack.credits} Credits • <span className="text-accent-success">{pack.reset}</span></div>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="text-lg font-bold text-white">{pack.name}</h3>
+                        <p className="text-xs text-text-dim">{pack.idealFor}</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-black text-white">{pack.price}</div>
+                        <div className="text-xs text-text-dim">{pack.credits} credits</div>
+                      </div>
                     </div>
-                    
-                    <div className="flex items-center gap-4">
-                        <span className="text-xl font-bold text-white">{pack.price}</span>
-                        <button className="px-5 py-2 rounded-lg bg-white/5 hover:bg-white text-white hover:text-black font-bold uppercase text-[10px] tracking-widest transition-all">
-                            {pack.cta}
-                        </button>
+
+                    <div className="text-xs text-accent-success bg-accent-success/10 px-2 py-1 rounded-md inline-block self-start">
+                      {pack.reset}
                     </div>
+
+                    <button 
+                        onClick={() => handleCheckout(
+                          pack.id === 'starter' ? STRIPE_PRICES.STARTER : STRIPE_PRICES.POWER,
+                          pack.id
+                        )}
+                        disabled={loading === pack.id}
+                        className="w-full py-3 rounded-xl bg-white text-black font-bold uppercase tracking-widest text-xs hover:scale-[1.02] shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {loading === pack.id ? 'Loading...' : 'Buy Pack'}
+                    </button>
                 </motion.div>
             ))}
         </div>
-      </section>
 
-      {/* Meta Links & Footer */}
-      <section className="pt-12 border-t border-white/5 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="space-y-4">
-                <h4 className="text-sm font-bold uppercase tracking-widest text-text-dim">Resources</h4>
-                <ul className="space-y-2">
-                    <li><Link href="#" className="flex items-center gap-2 text-sm text-white hover:text-accent-primary transition-colors"><HelpCircle className="w-4 h-4" /> Documentation</Link></li>
-                    <li><Link href="#" className="flex items-center gap-2 text-sm text-white hover:text-accent-primary transition-colors"><ExternalLink className="w-4 h-4" /> Tutorials</Link></li>
-                </ul>
-            </div>
-            
-            <div className="space-y-4">
-                <h4 className="text-sm font-bold uppercase tracking-widest text-text-dim">Legal</h4>
-                <ul className="space-y-2">
-                    <li><Link href="#" className="flex items-center gap-2 text-sm text-white hover:text-accent-primary transition-colors"><Shield className="w-4 h-4" /> Privacy Policy</Link></li>
-                    <li><Link href="#" className="flex items-center gap-2 text-sm text-white hover:text-accent-primary transition-colors"><Shield className="w-4 h-4" /> Terms of Service</Link></li>
-                </ul>
-            </div>
-
-            <div className="flex items-end justify-end">
-                 <Link href="/">
-                    <button className="px-6 py-3 rounded-xl border border-white/10 hover:border-white/30 text-text-dim hover:text-white transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                        Back to Website <ExternalLink className="w-3 h-3" />
-                    </button>
-                 </Link>
-            </div>
-         </div>
-         
-         <div className="mt-4 text-center">
-            <p className="text-[10px] text-white/40 font-bold uppercase tracking-[0.2em]">
-                ADG Builder v5.4 • Engine Online
+        {!isPro && (
+          <div className="text-center p-6 bg-white/5 rounded-xl border border-white/10">
+            <p className="text-text-dim mb-3">
+              Or upgrade to <span className="text-accent-primary font-bold">Pro</span> for 80 credits every month
             </p>
-         </div>
+            <Link href="/pricing">
+              <button className="px-6 py-3 rounded-xl bg-accent-primary text-black font-bold uppercase tracking-widest text-xs hover:scale-[1.02] shadow-lg transition-all inline-flex items-center gap-2">
+                View Pro Plan
+                <ArrowLeft className="w-4 h-4 rotate-180" />
+              </button>
+            </Link>
+          </div>
+        )}
       </section>
-
     </div>
   );
 }
