@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
-import { Home, History, Settings, Zap } from "lucide-react";
+import { History, Zap, CreditCard } from "lucide-react";
 import Image from "next/image";
 
 const navItems = [
   { icon: Zap, label: "Generator", href: "/dashboard" },
   { icon: History, label: "Archive", href: "/dashboard/history" },
-  { icon: Settings, label: "Settings", href: "/dashboard/settings" },
+  { icon: CreditCard, label: "Plans", href: "/dashboard/settings" },
 ];
 
 import { useEffect, useState } from "react";
