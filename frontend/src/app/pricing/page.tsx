@@ -8,6 +8,7 @@ import { Check, Zap, Sparkles, Clock, Box, Gift } from "lucide-react";
 import { SignInButton, SignedOut, SignedIn } from "@clerk/nextjs";
 import Link from "next/link";
 import { isBonusActive, formatTimeRemaining, LAUNCH_BONUS_CONFIG } from "@/config/launch-bonus";
+import { STRIPE_PRICES } from "@/config/stripe";
 
 const PLANS = [
   {
@@ -55,6 +56,7 @@ const PACKS = [
 export default function PricingPage() {
   const [timeRemaining, setTimeRemaining] = useState<string>('');
   const [bonusActive, setBonusActive] = useState(false);
+  const [loading, setLoading] = useState<string | null>(null);
 
   useEffect(() => {
     setBonusActive(isBonusActive());
@@ -73,6 +75,33 @@ export default function PricingPage() {
     
     return () => clearInterval(timer);
   }, []);
+
+  async function handleCheckout(priceId: string, planId: string) {
+    setLoading(planId);
+    
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceId }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        alert(`Error: ${data.error || 'Failed to start checkout'}`);
+        return;
+      }
+
+      // Redirect to Stripe Checkout
+      window.location.href = data.url;
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert('Failed to start checkout. Please try again.');
+    } finally {
+      setLoading(null);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-white selection:bg-accent-primary/30 font-sans flex flex-col">
@@ -204,15 +233,20 @@ export default function PricingPage() {
                                 </SignedOut>
                                 
                                 <SignedIn>
-                                    <Link href="/dashboard/settings">
-                                        <button className={`w-full py-4 rounded-xl font-black uppercase tracking-widest text-xs transition-all ${
+                                    <button 
+                                        onClick={() => handleCheckout(
+                                            isProPlan ? STRIPE_PRICES.PRO : '',
+                                            plan.id
+                                        )}
+                                        disabled={loading === plan.id || !isProPlan}
+                                        className={`w-full py-4 rounded-xl font-black uppercase tracking-widest text-xs transition-all ${
                                             isProPlan
-                                                ? "bg-accent-primary text-black hover:scale-[1.02] shadow-[0_0_30px_rgba(255,124,37,0.3)]"
+                                                ? "bg-accent-primary text-black hover:scale-[1.02] shadow-[0_0_30px_rgba(255,124,37,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
                                                 : "bg-white/10 hover:bg-white/20 text-white border-2 border-white/20"
-                                        }`}>
-                                            {isProPlan ? 'Manage Subscription' : 'View Dashboard'}
-                                        </button>
-                                    </Link>
+                                        }`}
+                                    >
+                                        {loading === plan.id ? 'Loading...' : (isProPlan ? 'Upgrade to Pro' : 'Current Plan')}
+                                    </button>
                                 </SignedIn>
                             </motion.div>
                         );
@@ -281,11 +315,18 @@ export default function PricingPage() {
                             </SignedOut>
                             
                             <SignedIn>
-                                <Link href="/dashboard/settings">
-                                    <button className="w-full py-4 rounded-xl bg-white text-black font-black uppercase tracking-widest hover:scale-[1.02] shadow-[0_0_30px_rgba(255,255,255,0.15)] transition-all">
-                                        Go to Dashboard
-                                    </button>
-                                </Link>
+                                <button 
+                                    onClick={() => handleCheckout(
+                                        pack.id === 'starter' 
+                                            ? STRIPE_PRICES.STARTER 
+                                            : STRIPE_PRICES.POWER,
+                                        pack.id
+                                    )}
+                                    disabled={loading === pack.id}
+                                    className="w-full py-4 rounded-xl bg-white text-black font-black uppercase tracking-widest hover:scale-[1.02] shadow-[0_0_30px_rgba(255,255,255,0.15)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {loading === pack.id ? 'Loading...' : 'Buy Pack'}
+                                </button>
                             </SignedIn>
                         </motion.div>
                     ))}
