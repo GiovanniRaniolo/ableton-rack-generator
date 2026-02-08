@@ -147,12 +147,13 @@ export function HeroSection() {
                  </Link>
                </SignedIn>
                <div className="flex items-center gap-[-10px] pl-4">
-                  <div className="flex -space-x-2">
+                  {/* TODO: Re-enable when we have real user numbers */}
+                  {/* <div className="flex -space-x-2">
                       {[1,2,3].map(i => (
                           <div key={i} className="w-8 h-8 rounded-full bg-white/10 border-2 border-[#0A0A0B]" />
                       ))}
                   </div>
-                  <span className="text-xs text-text-dim ml-4 font-medium">+2k Producers</span>
+                  <span className="text-xs text-text-dim ml-4 font-medium">+2k Producers</span> */}
                </div>
              </motion.div>
            </div>

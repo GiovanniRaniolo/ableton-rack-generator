@@ -2,6 +2,8 @@
 
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { createClient } from "@supabase/supabase-js";
+import { createHash } from 'crypto'; // Node.js built-in
+import { LAUNCH_BONUS_CONFIG, isBonusActive } from '@/config/launch-bonus';
 
 export async function syncUserProfile() {
   const user = await currentUser();
@@ -12,20 +14,136 @@ export async function syncUserProfile() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  // Check if profile exists
+  // Get primary email (Clerk normalizes this across providers)
+  const primaryEmail = user.emailAddresses.find(e => e.id === user.primaryEmailAddressId)?.emailAddress;
+  if (!primaryEmail) return { success: false, error: "No email found" };
+
+  const emailHash = createHash('sha256').update(primaryEmail.toLowerCase()).digest('hex');
+
+  // Check if profile exists by Clerk ID (including soft-deleted ones)
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, credits, is_pro')
+    .select('id, credits, is_pro, bonus_credits_awarded, deleted_at, created_at')
     .eq('id', user.id)
     .single();
 
   if (!data) {
-    // ... (creation logic remains same, sends is_pro: false)
-    // ...
-    return { success: true, credits: 3, is_pro: false, created: true };
+    // NEW USER CREATION LOGIC
+    
+    // 🔒 SECURITY LAYER 2: Multi-Provider Check
+    // Has this email already claimed credits under a DIFFERENT Clerk ID?
+    const { data: existingEmailClaim } = await supabase
+      .from('bonus_claims')
+      .select('user_id, claimed_at')
+      .eq('email_hash', emailHash)
+      .single();
+
+    if (existingEmailClaim && existingEmailClaim.user_id !== user.id) {
+      // FRAUD DETECTED: Same email, different Clerk ID
+      console.error(`⚠️ MULTI-PROVIDER FRAUD: User ${user.id} tried to claim credits with email already used by ${existingEmailClaim.user_id}`);
+      
+      return { 
+        success: false, 
+        error: "This email has already been used to claim credits. If you believe this is an error, please contact support.",
+        fraudDetected: true
+      };
+    }
+    
+    // 1. Determine credits to award
+    let creditsToAward = LAUNCH_BONUS_CONFIG.STANDARD_CREDITS; // Default: 5
+    let bonusAwarded = 0;
+    
+    // 2. Check if bonus is active
+    if (isBonusActive()) {
+      // 3. 🔒 SECURITY LAYER 1: Email Hash Check (re-registration prevention)
+      // Has this email already claimed the bonus?
+      if (!existingEmailClaim) {
+        // Email has NOT claimed bonus before → Award it!
+        creditsToAward = LAUNCH_BONUS_CONFIG.BONUS_CREDITS; // 10
+        bonusAwarded = LAUNCH_BONUS_CONFIG.BONUS_EXTRA; // 5
+        
+        // 4. Record the claim (prevents future abuse)
+        await supabase.from('bonus_claims').insert({
+          email_hash: emailHash,
+          user_id: user.id,
+          bonus_type: LAUNCH_BONUS_CONFIG.BONUS_TYPE,
+        });
+      } else {
+        console.warn(`User ${user.id} attempted to re-claim bonus with email hash ${emailHash.substring(0, 8)}...`);
+      }
+    }
+    
+    // 5. Create profile with calculated credits
+    const { error: createError } = await supabase
+      .from('profiles')
+      .insert({
+        id: user.id,
+        credits: creditsToAward,
+        is_pro: false,
+        bonus_credits_awarded: bonusAwarded,
+        deleted_at: null // Explicitly active
+      });
+    
+    if (createError) {
+      console.error('Profile creation error:', createError);
+      return { success: false, error: 'Failed to create profile' };
+    }
+    
+    return { 
+      success: true, 
+      credits: creditsToAward, 
+      is_pro: false, 
+      created: true,
+      bonusAwarded: bonusAwarded > 0 // For frontend notification
+    };
+  }
+  
+  // Profile exists - check if it was soft-deleted
+  if (data.deleted_at) {
+    // 🔒 SECURITY LAYER 3: Re-activation Rules
+    // USER RE-REGISTERING AFTER DELETION
+    
+    const deletedDate = new Date(data.deleted_at);
+    const now = new Date();
+    const daysSinceDeletion = (now.getTime() - deletedDate.getTime()) / (1000 * 60 * 60 * 24);
+    
+    // RULE: Must wait 30 days before re-activating account
+    if (daysSinceDeletion < 30) {
+      return { 
+        success: false, 
+        error: `Your account was deleted ${Math.floor(daysSinceDeletion)} days ago. You can re-activate it after 30 days from deletion.`,
+        daysRemaining: Math.ceil(30 - daysSinceDeletion),
+        canReactivateAt: new Date(deletedDate.getTime() + (30 * 24 * 60 * 60 * 1000)).toISOString()
+      };
+    }
+    
+    // Re-activate account with SAME credits (no new credits!)
+    await supabase
+      .from('profiles')
+      .update({ 
+        deleted_at: null, // Re-activate
+        deletion_reason: null 
+      })
+      .eq('id', user.id);
+    
+    return { 
+      success: true, 
+      credits: data.credits, // SAME credits as before deletion
+      is_pro: data.is_pro,
+      created: false,
+      reactivated: true,
+      message: "Welcome back! Your account has been re-activated with your previous credits."
+    };
   }
 
-  return { success: true, credits: data.credits, is_pro: (data as any).is_pro, created: false };
+  // Normal active user
+  return { 
+    success: true, 
+    credits: data.credits, 
+    is_pro: data.is_pro, 
+    created: false,
+    bonusAwarded: false
+  };
 }
 
 export async function generateRackAction(prompt: string) {

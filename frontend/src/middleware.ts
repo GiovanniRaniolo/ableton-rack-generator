@@ -3,6 +3,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 // Define routes that do NOT require authentication
 const isPublicRoute = createRouteMatcher([
   '/', 
+  '/pricing',
   '/sign-in(.*)', 
   '/sign-up(.*)',
   '/api/webhooks(.*)' // Important for Supabase sync later

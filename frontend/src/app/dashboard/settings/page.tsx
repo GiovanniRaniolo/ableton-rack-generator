@@ -13,7 +13,7 @@ const PLANS = [
     name: "Free Tier",
     price: "€0",
     period: "/mo",
-    credits: 10,
+    credits: 5,
     reset: "Resets every 30 days",
     idealFor: "Curiosity",
     features: ["Standard Generation", "Community Support"],
