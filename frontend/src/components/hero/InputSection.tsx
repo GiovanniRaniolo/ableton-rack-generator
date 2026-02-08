@@ -9,14 +9,14 @@ import { Logo } from '../ui/Logo';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const ALL_TEMPLATES = [
-  { id: 'vocal', icon: <Music className="w-4 h-4" />, name: 'Vocal Prime', prompt: 'Elite vocal chain with compressor, de-esser, EQ Eight and hybrid reverb' },
-  { id: 'drums', icon: <Zap className="w-4 h-4" />, name: 'Punchy Drums', prompt: 'Aggressive drum buss with roar, saturator and glue compressor' },
-  { id: 'master', icon: <Sparkles className="w-4 h-4" />, name: 'Master AI', prompt: 'Clean mastering chain with mid-side EQ, limiter and saturator' },
-  { id: 'space', icon: <Box className="w-4 h-4" />, name: 'Deep Space', prompt: 'Atmospheric rack with spectral time, echo and phaser-flanger' },
-  { id: 'lofi', icon: <Radio className="w-4 h-4" />, name: 'Lo-Fi Tape', prompt: 'Vintage tape emulation with erosion, vinyl distortion and filter' },
-  { id: 'dub', icon: <Waves className="w-4 h-4" />, name: 'Dub Echoes', prompt: 'Dub techno chords with delay, reverb and chorus' },
-  { id: 'glitch', icon: <Activity className="w-4 h-4" />, name: 'Glitch FX', prompt: 'Experimental glitch rack with beat repeat, redundance and redux' },
-  { id: 'texture', icon: <Wind className="w-4 h-4" />, name: 'Texture Pad', prompt: 'Evolving pad texture with grain delay and resonator' },
+  { id: 'lofi', icon: <Radio className="w-4 h-4" />, name: 'Lo-Fi Cassette', prompt: 'Vintage tape saturation with wow/flutter, erosion and heavy compression' },
+  { id: 'space', icon: <Box className="w-4 h-4" />, name: 'Deep Space', prompt: 'Atmospheric reverb with shimmer, grain delay and spectral time' },
+  { id: 'vocal', icon: <Music className="w-4 h-4" />, name: 'Vocal Air', prompt: 'Clean vocal chain with OTT, de-esser, EQ Eight high-shelf and plate reverb' },
+  { id: 'dub', icon: <Waves className="w-4 h-4" />, name: 'Dub Echoes', prompt: 'Rhythmic tape delay with filter modulation and spring reverb tail' },
+  { id: 'glitch', icon: <Activity className="w-4 h-4" />, name: 'Glitch Stutter', prompt: 'Beat repeat chaos with redux, frequency shifter and gate' },
+  { id: 'crunch', icon: <Zap className="w-4 h-4" />, name: 'Drum Crunch', prompt: 'Aggressive parallel compression with drum buss, roar and limiter' },
+  { id: 'texture', icon: <Wind className="w-4 h-4" />, name: 'Texture Pad', prompt: 'Evolving granular texture with resonator, chorus and auto-pan' },
+  { id: 'master', icon: <Sparkles className="w-4 h-4" />, name: 'Mix Polish', prompt: 'Subtle mastering chain with glue compressor, mid-side EQ and saturator' },
 ];
 
 interface InputSectionProps {
@@ -40,11 +40,18 @@ export function InputSection({ prompt, setPrompt, handleGenerate, isGenerating, 
     else setGreeting("Good evening");
   }, []);
 
-  // Rotate items every 5 seconds
+  // Smoother rotation: rotate ONE card at a time every 4 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setVisibleIndices(prev => prev.map(i => (i + 1) % ALL_TEMPLATES.length));
-    }, 5000);
+      setVisibleIndices(prev => {
+        const next = [...prev];
+        // Rotate the first item to the end of the list relative to the current set
+        // Actually, let's just shift the window by 1
+        const lastIndex = prev[prev.length - 1];
+        const newIndex = (lastIndex + 1) % ALL_TEMPLATES.length;
+        return [prev[1], prev[2], newIndex];
+      });
+    }, 4000); // Slower interval
     return () => clearInterval(interval);
   }, []);
 
@@ -88,18 +95,18 @@ export function InputSection({ prompt, setPrompt, handleGenerate, isGenerating, 
         </div>
 
         {/* Animated Suggested Prompts Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 w-full">
              <AnimatePresence mode='popLayout'>
-                {visibleIndices.map((idx, i) => {
+                {visibleIndices.map((idx) => {
                     const t = ALL_TEMPLATES[idx];
                     return (
                         <motion.button 
                             key={t.id} 
-                            layoutId={t.id}
-                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.9, y: -20 }}
-                            transition={{ duration: 0.5, delay: i * 0.1 }}
+                            layout
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 0.4 }}
                             onClick={() => setPrompt(t.prompt)}
                             className="text-left group relative p-4 rounded-xl bg-white/5 border border-white/5 hover:border-white/20 transition-all duration-300 hover:bg-white/10 overflow-hidden h-28 flex flex-col justify-between"
                         >
