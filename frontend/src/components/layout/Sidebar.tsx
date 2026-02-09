@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 import { History, Zap, CreditCard } from "lucide-react";
-import Image from "next/image";
+import { Logo } from "../ui/Logo";
 
 const navItems = [
   { icon: Zap, label: "Generator", href: "/dashboard" },
@@ -38,23 +38,8 @@ export function Sidebar() {
   return (
     <aside className="w-64 h-screen fixed left-0 top-0 border-r border-white/5 bg-bg-surface/30 backdrop-blur-xl flex flex-col z-50">
       {/* Logo Section */}
-      <Link href="/dashboard?new=true" className="flex flex-col items-center justify-center py-6 gap-0 border-b border-white/5 cursor-pointer hover:bg-white/5 transition-colors group">
-        <div className="relative w-20 h-10 group-hover:scale-105 transition-transform">
-            <Image 
-                src="/adg.png" 
-                alt="ADG Logo" 
-                fill 
-                className="object-contain"
-            />
-        </div>
-        <div className="relative h-7 w-18 opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300">
-            <Image 
-                src="/builder.png" 
-                alt="Builder Text" 
-                fill 
-                className="object-contain"
-            />
-        </div>
+      <Link href="/dashboard?new=true" className="flex items-center justify-center py-6 border-b border-white/5 cursor-pointer hover:bg-white/5 transition-colors group">
+        <Logo className="w-12 h-12" showText={true} />
       </Link>
 
       {/* Navigation */}

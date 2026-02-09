@@ -2,39 +2,144 @@ export function Logo({ className = "w-8 h-8", showText = true }: { className?: s
   return (
     <div className="flex items-center gap-3">
       <svg 
-        viewBox="0 0 100 100" 
         className={className} 
+        viewBox="0 0 90 90" 
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* Input Lines (Cyan) */}
-        <path d="M10 35 H30" stroke="#00FFC2" strokeWidth="6" strokeLinecap="round" />
-        <path d="M10 65 H30" stroke="#00FFC2" strokeWidth="6" strokeLinecap="round" />
+        <defs>
+          <linearGradient id="textGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#00FFC2" />
+            <stop offset="100%" stopColor="#4A9EFF" />
+          </linearGradient>
+          
+          <style>
+            {`
+              #logo-icon {
+                filter: drop-shadow(0 0 5px rgba(0, 255, 194, 0.4));
+                transition: all 0.3s ease;
+              }
+              
+              #logo-icon:hover {
+                filter: drop-shadow(0 0 12px rgba(0, 255, 194, 0.8));
+                transform: scale(1.05);
+              }
+              
+              .pixel-block {
+                animation: float 3s ease-in-out infinite;
+              }
+              
+              .pixel-block:nth-child(1) { animation-delay: 0s; }
+              .pixel-block:nth-child(2) { animation-delay: 0.2s; }
+              .pixel-block:nth-child(3) { animation-delay: 0.4s; }
+              .pixel-block:nth-child(4) { animation-delay: 0.6s; }
+              .pixel-block:nth-child(5) { animation-delay: 0.8s; }
+              .pixel-block:nth-child(6) { animation-delay: 1s; }
+              .pixel-block:nth-child(7) { animation-delay: 1.2s; }
+              .pixel-block:nth-child(8) { animation-delay: 1.4s; }
+              
+              @keyframes float {
+                0%, 100% { transform: translateY(0px) translateX(0px); opacity: 1; }
+                50% { transform: translateY(-4px) translateX(3px); opacity: 0.6; }
+              }
+              
+              #knob-indicator {
+                transform-origin: 45px 45px;
+                animation: dial-turn 1.5s cubic-bezier(0.65, 0, 0.35, 1);
+              }
+              
+              @keyframes dial-turn {
+                from { transform: rotate(-120deg); }
+                to { transform: rotate(0deg); }
+              }
+            `}
+          </style>
+        </defs>
         
-        {/* The Processor Box (Dark with Cyan Glow) */}
-        <rect x="30" y="20" width="40" height="60" rx="8" fill="#121212" stroke="#00FFC2" strokeWidth="3" />
-        
-        {/* Internal Parallel Logic (Subtle) */}
-        <path d="M40 35 H60" stroke="#00FFC2" strokeWidth="2" strokeOpacity="0.5" />
-        <path d="M40 50 H60" stroke="#00FFC2" strokeWidth="2" strokeOpacity="0.5" />
-        <path d="M40 65 H60" stroke="#00FFC2" strokeWidth="2" strokeOpacity="0.5" />
-
-        {/* 8 Output Macro Lines (The Core Value) */}
-        <path d="M70 24 H90" stroke="#00FFC2" strokeWidth="3" strokeLinecap="round" />
-        <path d="M70 32 H90" stroke="#00FFC2" strokeWidth="3" strokeLinecap="round" />
-        <path d="M70 40 H90" stroke="#00FFC2" strokeWidth="3" strokeLinecap="round" />
-        <path d="M70 48 H90" stroke="#00FFC2" strokeWidth="3" strokeLinecap="round" />
-        <path d="M70 56 H90" stroke="#00FFC2" strokeWidth="3" strokeLinecap="round" />
-        <path d="M70 64 H90" stroke="#00FFC2" strokeWidth="3" strokeLinecap="round" />
-        <path d="M70 72 H90" stroke="#00FFC2" strokeWidth="3" strokeLinecap="round" />
-        <path d="M70 80 H90" stroke="#00FFC2" strokeWidth="3" strokeLinecap="round" />
+        <g id="logo-icon">
+          {/* Knob Ring */}
+          <path 
+            id="knob-ring" 
+            d="M45 15C33.5 15 23.5 21.5 18.5 31C13.5 40.5 13.5 52 18.5 61.5C23.5 71 33.5 77.5 45 77.5C56.5 77.5 66.5 71 71.5 61.5" 
+            stroke="url(#textGradient)" 
+            strokeWidth="6" 
+            strokeLinecap="round"
+          />
+          
+          {/* Knob Indicator */}
+          <line 
+            id="knob-indicator" 
+            x1="45" 
+            y1="45" 
+            x2="58" 
+            y2="28" 
+            stroke="url(#textGradient)" 
+            strokeWidth="5" 
+            strokeLinecap="round"
+          />
+          
+          {/* More Pixel Blocks - Exploding Pattern */}
+          <g id="builder-blocks">
+            {/* Top row */}
+            <rect className="pixel-block" x="62" y="8" width="8" height="8" rx="1" fill="#00FFC2" fillOpacity="0.9">
+              <animate attributeName="opacity" values="1;0.4;1" dur="2s" repeatCount="indefinite" />
+            </rect>
+            <rect className="pixel-block" x="72" y="10" width="7" height="7" rx="1" fill="#00FFC2" fillOpacity="0.8">
+              <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2.3s" repeatCount="indefinite" />
+            </rect>
+            <rect className="pixel-block" x="80" y="14" width="6" height="6" rx="1" fill="#4A9EFF" fillOpacity="0.7">
+              <animate attributeName="opacity" values="0.7;0.3;0.7" dur="1.8s" repeatCount="indefinite" />
+            </rect>
+            
+            {/* Middle row */}
+            <rect className="pixel-block" x="68" y="20" width="9" height="9" rx="1" fill="#00FFC2" fillOpacity="0.85">
+              <animate attributeName="opacity" values="0.85;0.4;0.85" dur="2.5s" repeatCount="indefinite" />
+            </rect>
+            <rect className="pixel-block" x="79" y="22" width="7" height="7" rx="1" fill="#4A9EFF" fillOpacity="0.75">
+              <animate attributeName="opacity" values="0.75;0.3;0.75" dur="2.1s" repeatCount="indefinite" />
+            </rect>
+            
+            {/* Lower middle */}
+            <rect className="pixel-block" x="70" y="32" width="8" height="8" rx="1" fill="#00FFC2" fillOpacity="0.7">
+              <animate attributeName="opacity" values="0.7;0.3;0.7" dur="1.9s" repeatCount="indefinite" />
+            </rect>
+            <rect className="pixel-block" x="80" y="34" width="6" height="6" rx="1" fill="#4A9EFF" fillOpacity="0.6">
+              <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2.2s" repeatCount="indefinite" />
+            </rect>
+            
+            {/* Bottom */}
+            <rect className="pixel-block" x="74" y="42" width="7" height="7" rx="1" fill="#00FFC2" fillOpacity="0.5">
+              <animate attributeName="opacity" values="0.5;0.2;0.5" dur="2.4s" repeatCount="indefinite" />
+            </rect>
+          </g>
+        </g>
       </svg>
       
       {showText && (
-        <span className="font-extrabold tracking-tight text-white flex flex-col leading-none">
-          <span className="text-[1.1em] tracking-[0.05em]">ADG</span>
-          <span className="text-[0.6em] text-[#00FFC2] tracking-[0.2em] font-mono uppercase">Builder</span>
-        </span>
+        <div className="flex flex-col leading-none">
+          <span 
+            className="font-black text-lg tracking-tight"
+            style={{
+              background: 'linear-gradient(180deg, #00FFC2 0%, #4A9EFF 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}
+          >
+            ADG
+          </span>
+          <span 
+            className="font-light text-xs tracking-[0.1em]"
+            style={{
+              background: 'linear-gradient(180deg, #00FFC2 0%, #4A9EFF 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}
+          >
+            BUILDER
+          </span>
+        </div>
       )}
     </div>
   );
