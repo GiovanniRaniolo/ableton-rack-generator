@@ -28,7 +28,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link href="/" className="flex items-center gap-2 group">
              <Logo className="w-8 h-8 group-hover:rotate-90 transition-transform duration-700" showText={false} />
-             <span className="font-bold tracking-tight text-white hidden md:block">ADG<span className="text-accent-primary">BUILDER</span></span>
+             <span className="font-bold tracking-tight text-white hidden md:block">ADG<span className="text-brand-primary">BUILDER</span></span>
         </Link>
         
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-text-dim">
@@ -45,7 +45,7 @@ export function Navbar() {
                     </button>
                 </SignInButton>
                 <SignInButton mode="modal">
-                     <button className="group relative px-5 py-2 rounded-full bg-accent-primary text-black text-xs font-black uppercase tracking-widest overflow-hidden transition-all hover:scale-105">
+                     <button className="group relative px-5 py-2 rounded-full bg-brand-primary text-black text-xs font-black uppercase tracking-widest overflow-hidden transition-all hover:scale-105">
                         <div className="absolute inset-0 bg-white/40 group-hover:translate-x-full transition-transform duration-500 skew-x-12 -translate-x-full" />
                         Get Started
                      </button>

@@ -79,8 +79,8 @@ export function PricingSection() {
         <div className="max-w-7xl mx-auto">
             
             <div className="text-center mb-16 space-y-4">
-                <h2 className="text-3xl md:text-5xl font-black text-white tracking-tighter">
-                    Simple, Transparent <span className="text-accent-secondary">Pricing.</span>
+                <h2 className="text-3xl md:text-5xl font-black tracking-tighter">
+                    Simple, Transparent <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-brand-secondary">Pricing.</span>
                 </h2>
                 <p className="text-text-dim max-w-xl mx-auto">
                     Start for free. Upgrade for power. No hidden fees.
@@ -89,7 +89,7 @@ export function PricingSection() {
 
             {/* Monthly Subscriptions */}
             <div className="mb-12">
-                <div className="flex items-center gap-2 text-accent-primary mb-6">
+                <div className="flex items-center gap-2 text-brand-primary mb-6">
                     <Zap className="w-5 h-5" />
                     <h3 className="text-xl font-bold uppercase tracking-wider text-white">Monthly Subscriptions</h3>
                 </div>
@@ -105,18 +105,18 @@ export function PricingSection() {
                                 whileHover={{ y: -5 }}
                                 className={`relative p-8 rounded-3xl border flex flex-col gap-6 overflow-hidden group transition-all ${
                                     isProPlan
-                                        ? "bg-[#0f0f10] border-accent-primary/50 shadow-[0_0_40px_-10px_rgba(255,124,37,0.15)]" 
+                                        ? "bg-[#0f0f10] border-brand-primary/50 shadow-[0_0_40px_-10px_rgba(0,255,194,0.15)]" 
                                         : "bg-[#0a0a0b] border-white/5"
                                 }`}
                             >
                                 {isProPlan && (
-                                    <div className="absolute top-0 right-0 bg-accent-primary text-black text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-bl-xl">
+                                    <div className="absolute top-0 right-0 bg-brand-primary text-black text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-bl-xl">
                                         Best Value
                                     </div>
                                 )}
 
                                 {showBonus && (
-                                    <div className="absolute top-0 right-0 bg-accent-primary/20 text-accent-primary text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-bl-xl flex items-center gap-1 animate-pulse">
+                                    <div className="absolute top-0 right-0 bg-brand-primary/20 text-brand-primary text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-bl-xl flex items-center gap-1 animate-pulse">
                                         🎁 Launch Bonus
                                     </div>
                                 )}
@@ -135,7 +135,7 @@ export function PricingSection() {
                                         {showBonus ? (
                                             <>
                                                 <span className="text-2xl font-black text-white line-through decoration-2 opacity-40">{plan.credits}</span>
-                                                <span className="text-3xl font-black text-accent-primary">{plan.bonusCredits}</span>
+                                                <span className="text-3xl font-black text-brand-primary">{plan.bonusCredits}</span>
                                                 <span className="text-sm text-text-dim">credits</span>
                                             </>
                                         ) : (
@@ -148,9 +148,9 @@ export function PricingSection() {
                                     <div className="text-xs text-text-dim">{plan.reset}</div>
                                     
                                     {showBonus && timeRemaining && (
-                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/40 border border-accent-primary/30 text-xs text-white">
-                                            <Clock className="w-3 h-3 text-accent-primary" />
-                                            <span className="font-mono">Ends in: <strong className="text-accent-primary">{timeRemaining}</strong></span>
+                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/40 border border-brand-primary/30 text-xs text-white">
+                                            <Clock className="w-3 h-3 text-brand-primary" />
+                                            <span className="font-mono">Ends in: <strong className="text-brand-primary">{timeRemaining}</strong></span>
                                         </div>
                                     )}
                                 </div>
@@ -158,7 +158,7 @@ export function PricingSection() {
                                 <ul className="space-y-3 flex-1">
                                     {plan.features.map((feature, idx) => (
                                         <li key={idx} className={`flex items-center gap-3 text-sm ${isProPlan ? 'text-white font-medium' : 'text-text-main'}`}>
-                                            <Check className={`w-4 h-4 ${isProPlan ? 'text-accent-primary' : 'text-white/50'}`} />
+                                            <Check className={`w-4 h-4 ${isProPlan ? 'text-brand-primary' : 'text-white/50'}`} />
                                             {feature}
                                         </li>
                                     ))}
@@ -168,7 +168,7 @@ export function PricingSection() {
                                     <SignInButton mode="modal">
                                         <button className={`w-full py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${
                                             isProPlan
-                                                ? "bg-accent-primary text-black hover:brightness-110 shadow-[0_0_20px_rgba(255,124,37,0.2)]"
+                                                ? "bg-brand-primary text-black hover:brightness-110 shadow-[0_0_20px_rgba(0,255,194,0.2)]"
                                                 : "border border-white/10 hover:bg-white/5"
                                         }`}>
                                             {showBonus ? `Claim ${plan.bonusCredits} Free Credits` : isProPlan ? 'Start Pro Trial' : 'Get Started Free'}

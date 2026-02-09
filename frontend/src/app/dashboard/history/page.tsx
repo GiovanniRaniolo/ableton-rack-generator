@@ -53,7 +53,7 @@ export default function ArchivePage() {
 
         {loading ? (
             <div className="flex justify-center py-32">
-                <Loader2 className="w-10 h-10 animate-spin text-accent-primary" />
+                <Loader2 className="w-10 h-10 animate-spin text-brand-primary" />
             </div>
         ) : generations.length === 0 ? (
             <div className="text-center py-32 border border-white/5 rounded-3xl bg-white/[0.02] flex flex-col items-center">

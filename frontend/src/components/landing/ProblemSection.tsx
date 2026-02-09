@@ -37,7 +37,7 @@ export function ProblemSection() {
         
         <div className="text-center mb-16 space-y-4">
             <h2 className="text-3xl md:text-5xl font-black text-white tracking-tighter">
-                Stop building <span className="text-accent-primary">infrastructure.</span> Start mixing.
+                Stop building <span className="text-brand-primary">infrastructure.</span> Start mixing.
             </h2>
             <p className="text-text-dim max-w-2xl mx-auto">
                 We handle the routing, mapping, and device selection. You just turn the knobs.

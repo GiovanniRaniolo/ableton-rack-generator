@@ -17,7 +17,7 @@ export function Navbar({ deviceCount, credits }: NavbarProps) {
             </Link>
             
             <div className="flex gap-4 px-2">
-               <Link href="/dashboard" className="text-[10px] font-bold uppercase tracking-widest text-text-bright hover:text-accent-primary transition-colors">Generator</Link>
+               <Link href="/dashboard" className="text-[10px] font-bold uppercase tracking-widest text-text-bright hover:text-brand-primary transition-colors">Generator</Link>
                <Link href="/library" className="text-[10px] font-bold uppercase tracking-widest text-text-dim hover:text-white transition-colors">Library</Link>
             </div>
 
@@ -34,8 +34,8 @@ export function Navbar({ deviceCount, credits }: NavbarProps) {
                 <>
                   <div className="w-px h-3 bg-white/10"></div>
                   <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-text-bright">
-                    <Coins className="w-3 h-3 text-accent-primary" />
-                    <span className="text-accent-primary">{credits} Credits</span>
+                    <Coins className="w-3 h-3 text-brand-primary" />
+                    <span className="text-brand-primary">{credits} Credits</span>
                   </div>
                 </>
               )}

@@ -52,7 +52,7 @@ export function TechSpecs() {
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-accent-primary mb-6"
+                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-brand-primary mb-6"
             >
                 <Zap className="w-3 h-3" />
                 <span>ENGINE ARCHITECTURE</span>
@@ -101,7 +101,7 @@ export function TechSpecs() {
                         </div>
                         
                         <div>
-                            <h3 className="text-2xl font-bold text-white mb-1 group-hover:text-accent-primary transition-colors">
+                            <h3 className="text-2xl font-bold text-white mb-1 group-hover:text-brand-primary transition-colors">
                                 {item.title}
                             </h3>
                             <div className={`text-xs font-mono font-bold uppercase tracking-widest ${item.color} opacity-80`}>

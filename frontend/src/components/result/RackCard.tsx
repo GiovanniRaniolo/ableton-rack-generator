@@ -60,7 +60,7 @@ export function RackCard({ id, name, type, date, tags, file_url, rack_data, prom
 
         <motion.h3 
             layoutId={`title-${id}`}
-            className="font-display font-bold text-xl text-white leading-tight mb-2 line-clamp-2 group-hover:text-accent-primary transition-colors"
+            className="font-display font-bold text-xl text-white leading-tight mb-2 line-clamp-2 group-hover:text-brand-primary transition-colors"
         >
             {name}
         </motion.h3>
@@ -163,7 +163,7 @@ export function RackCard({ id, name, type, date, tags, file_url, rack_data, prom
                                     href={file_url} 
                                     target="_blank" 
                                     rel="noopener noreferrer" 
-                                    className="px-6 py-3 bg-accent-primary text-black font-black uppercase tracking-widest text-xs rounded-xl hover:scale-105 transition-transform flex items-center gap-2 shadow-[0_0_20px_rgba(255,124,37,0.3)]"
+                                    className="px-6 py-3 bg-brand-primary text-black font-black uppercase tracking-widest text-xs rounded-xl hover:scale-105 transition-transform flex items-center gap-2 shadow-[0_0_20px_rgba(0,255,194,0.3)]"
                                 >
                                     <Download className="w-4 h-4" />
                                     Download
@@ -183,7 +183,7 @@ export function RackCard({ id, name, type, date, tags, file_url, rack_data, prom
                                 {prompt && (
                                     <div className="space-y-4">
                                         <h3 className="text-xs font-black text-text-dim uppercase tracking-[0.2em] flex items-center gap-2">
-                                            <Info className="w-4 h-4 text-accent-primary" />
+                                            <Info className="w-4 h-4 text-brand-primary" />
                                             User Prompt
                                         </h3>
                                         <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-sm text-text-bright italic leading-relaxed">
@@ -207,7 +207,7 @@ export function RackCard({ id, name, type, date, tags, file_url, rack_data, prom
                                  {rack_data?.explanation && (
                                      <div className="space-y-4">
                                         <h3 className="text-xs font-black text-text-dim uppercase tracking-[0.2em] flex items-center gap-2">
-                                            <Info className="w-4 h-4 text-accent-primary" />
+                                            <Info className="w-4 h-4 text-brand-primary" />
                                             Design Strategy
                                         </h3>
                                         <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-sm text-text-main leading-relaxed">
@@ -220,10 +220,10 @@ export function RackCard({ id, name, type, date, tags, file_url, rack_data, prom
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between">
                                         <h3 className="text-xs font-black text-text-dim uppercase tracking-[0.2em] flex items-center gap-2">
-                                            <Layers className="w-4 h-4 text-accent-primary" />
+                                            <Layers className="w-4 h-4 text-brand-primary" />
                                             Signal Chain
                                         </h3>
-                                        {rack_data?.parallel_logic && <span className="text-[10px] font-mono text-accent-primary bg-accent-primary/10 px-2 py-1 rounded">PARALLEL</span>}
+                                        {rack_data?.parallel_logic && <span className="text-[10px] font-mono text-brand-primary bg-brand-primary/10 px-2 py-1 rounded">PARALLEL</span>}
                                     </div>
                                     <div className="space-y-2">
                                         {(rack_data?.devices || []).map((dev: string, i: number) => (

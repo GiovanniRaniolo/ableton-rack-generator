@@ -104,14 +104,14 @@ export default function PricingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B] text-white selection:bg-accent-primary/30 font-sans flex flex-col">
+    <div className="min-h-screen bg-[#0A0A0B] text-white selection:bg-brand-primary/30 font-sans flex flex-col">
       <Navbar />
       
       <main className="flex-1 flex flex-col justify-center py-20">
         <div className="max-w-6xl mx-auto px-6 w-full">
             
             <div className="text-center mb-16 space-y-4">
-                <h2 className="text-xs font-black text-accent-primary uppercase tracking-[0.3em] mb-4">
+                <h2 className="text-xs font-black text-brand-primary uppercase tracking-[0.3em] mb-4">
                     Invest in your sound
                 </h2>
                 <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter">
@@ -124,7 +124,7 @@ export default function PricingPage() {
 
             {/* Monthly Subscriptions */}
             <div className="mb-16">
-                <div className="flex items-center gap-2 text-accent-primary mb-8 justify-center">
+                <div className="flex items-center gap-2 text-brand-primary mb-8 justify-center">
                     <Zap className="w-5 h-5" />
                     <h3 className="text-xl font-bold uppercase tracking-wider text-white">Monthly Subscriptions</h3>
                 </div>
@@ -140,18 +140,18 @@ export default function PricingPage() {
                                 whileHover={{ y: -5 }}
                                 className={`relative p-10 rounded-3xl border-2 flex flex-col gap-6 overflow-hidden transition-all ${
                                     isProPlan
-                                        ? "bg-[#0f0f10] border-accent-primary/60 shadow-[0_0_50px_-10px_rgba(255,124,37,0.2)]" 
+                                        ? "bg-[#0f0f10] border-brand-primary/60 shadow-[0_0_50px_-10px_rgba(0,255,194,0.2)]" 
                                         : "bg-[#0a0a0b] border-white/20"
                                 }`}
                             >
                                 {isProPlan && (
-                                    <div className="absolute top-0 right-0 bg-accent-primary text-black text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-bl-xl">
+                                    <div className="absolute top-0 right-0 bg-brand-primary text-black text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-bl-xl">
                                         Best Value
                                     </div>
                                 )}
 
                                 {showBonus && (
-                                    <div className="absolute top-0 right-0 bg-gradient-to-r from-red-500 to-accent-primary text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-bl-xl animate-pulse">
+                                    <div className="absolute top-0 right-0 bg-gradient-to-r from-red-500 to-brand-primary text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-bl-xl animate-pulse">
                                         Launch Bonus
                                     </div>
                                 )}
@@ -169,7 +169,7 @@ export default function PricingPage() {
                                 <div className="py-6 border-t border-b border-white/10 space-y-4">
                                     <div className="flex justify-between items-center">
                                         <div className="flex items-center gap-3">
-                                            <Sparkles className="w-5 h-5 text-accent-primary" />
+                                            <Sparkles className="w-5 h-5 text-brand-primary" />
                                             {showBonus ? (
                                                 <div className="flex items-center gap-3">
                                                     {/* Strikethrough 5 with RED diagonal line */}
@@ -179,24 +179,24 @@ export default function PricingPage() {
                                                             <div className="w-full h-[3px] bg-red-500 rotate-[-15deg] shadow-lg" />
                                                         </div>
                                                     </div>
-                                                    <span className="text-4xl font-black text-accent-primary">10</span>
+                                                    <span className="text-4xl font-black text-brand-primary">10</span>
                                                     <span className="text-lg text-white">Credits</span>
                                                 </div>
                                             ) : (
                                                 <span className="text-2xl font-black text-white">{plan.credits} Credits</span>
                                             )}
                                         </div>
-                                        <span className="text-xs font-bold text-accent-primary bg-accent-primary/10 border border-accent-primary/30 px-3 py-1.5 rounded-md whitespace-nowrap">
+                                        <span className="text-xs font-bold text-brand-primary bg-brand-primary/10 border border-brand-primary/30 px-3 py-1.5 rounded-md whitespace-nowrap">
                                             {plan.reset}
                                         </span>
                                     </div>
                                     
                                     {/* Enhanced Countdown */}
                                     {showBonus && timeRemaining && (
-                                        <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-red-500/10 to-accent-primary/10 border border-accent-primary/40">
-                                            <Clock className="w-4 h-4 text-accent-primary animate-pulse" />
+                                        <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-red-500/10 to-brand-primary/10 border border-brand-primary/40">
+                                            <Clock className="w-4 h-4 text-brand-primary animate-pulse" />
                                             <span className="font-mono text-sm font-bold text-white">
-                                                Bonus ends in: <strong className="text-accent-primary text-base">{timeRemaining}</strong>
+                                                Bonus ends in: <strong className="text-brand-primary text-base">{timeRemaining}</strong>
                                             </span>
                                         </div>
                                     )}
@@ -207,7 +207,7 @@ export default function PricingPage() {
                                     <ul className="space-y-3 flex-1">
                                         {plan.features.map((feature, idx) => (
                                             <li key={idx} className="flex items-center gap-3 text-sm text-white font-medium">
-                                                <Check className="w-4 h-4 text-accent-primary" />
+                                                <Check className="w-4 h-4 text-brand-primary" />
                                                 {feature}
                                             </li>
                                         ))}
@@ -222,7 +222,7 @@ export default function PricingPage() {
                                     <SignInButton mode="modal">
                                         <button className={`w-full py-4 rounded-xl font-black uppercase tracking-widest text-xs transition-all ${
                                             isProPlan
-                                                ? "bg-accent-primary text-black hover:scale-[1.02] shadow-[0_0_30px_rgba(255,124,37,0.3)]"
+                                                ? "bg-brand-primary text-black hover:scale-[1.02] shadow-[0_0_30px_rgba(0,255,194,0.3)]"
                                                 : showBonus
                                                     ? "bg-white text-black hover:scale-[1.02] shadow-[0_0_30px_rgba(255,255,255,0.15)]"
                                                     : "bg-white/10 hover:bg-white/20 text-white border-2 border-white/20"
@@ -241,7 +241,7 @@ export default function PricingPage() {
                                         disabled={loading === plan.id || !isProPlan}
                                         className={`w-full py-4 rounded-xl font-black uppercase tracking-widest text-xs transition-all ${
                                             isProPlan
-                                                ? "bg-accent-primary text-black hover:scale-[1.02] shadow-[0_0_30px_rgba(255,124,37,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
+                                                ? "bg-brand-primary text-black hover:scale-[1.02] shadow-[0_0_30px_rgba(0,255,194,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
                                                 : "bg-white/10 hover:bg-white/20 text-white border-2 border-white/20"
                                         }`}
                                     >

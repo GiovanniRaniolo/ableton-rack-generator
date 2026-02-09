@@ -76,7 +76,7 @@ export default function SettingsPage() {
   if (isPro === null) {
       return (
         <div className="min-h-screen flex items-center justify-center">
-            <div className="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-brand-primary border-t-transparent rounded-full animate-spin" />
         </div>
       );
   }
@@ -133,7 +133,7 @@ export default function SettingsPage() {
 
       {/* Current Plan Status */}
       <section className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
-        <div className="flex items-center gap-2 text-accent-primary">
+        <div className="flex items-center gap-2 text-brand-primary">
             <Zap className="w-5 h-5" />
             <h2 className="text-xl font-bold uppercase tracking-wider text-white">Your Current Plan</h2>
         </div>
@@ -145,7 +145,7 @@ export default function SettingsPage() {
             className={cn(
               "relative p-8 rounded-3xl border flex flex-col gap-6 overflow-hidden",
               isPro
-                ? "bg-[#0f0f10] border-accent-primary/50 shadow-[0_0_40px_-10px_rgba(255,124,37,0.15)]" 
+                ? "bg-[#0f0f10] border-brand-primary/50 shadow-[0_0_40px_-10px_rgba(0,255,194,0.15)]" 
                 : "bg-[#0a0a0b] border-white/10"
             )}
           >
@@ -156,7 +156,7 @@ export default function SettingsPage() {
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                {isPro && <Crown className="w-5 h-5 text-accent-primary" />}
+                {isPro && <Crown className="w-5 h-5 text-brand-primary" />}
                 <h3 className="text-2xl font-bold text-white">
                   {isPro ? "Pro Plan" : "Free Tier"}
                 </h3>
@@ -213,7 +213,7 @@ export default function SettingsPage() {
           >
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-accent-primary" />
+                <Sparkles className="w-5 h-5 text-brand-primary" />
                 <h3 className="text-2xl font-bold text-white">Credits</h3>
               </div>
               <div className="flex items-baseline gap-2">
@@ -234,7 +234,7 @@ export default function SettingsPage() {
             </div>
 
             <Link href="/pricing" className="w-full">
-              <button className="w-full py-4 rounded-xl bg-accent-primary/10 hover:bg-accent-primary/20 border-2 border-accent-primary/30 text-white font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2">
+              <button className="w-full py-4 rounded-xl bg-brand-primary/10 hover:bg-brand-primary/20 border-2 border-brand-primary/30 text-white font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2">
                 Buy More Credits
                 <Box className="w-4 h-4" />
               </button>
@@ -250,7 +250,7 @@ export default function SettingsPage() {
               <Box className="w-5 h-5" />
               <h2 className="text-xl font-bold uppercase tracking-wider text-white">Need More Credits?</h2>
           </div>
-          <Link href="/pricing" className="text-sm text-accent-primary hover:text-white transition-colors flex items-center gap-1">
+          <Link href="/pricing" className="text-sm text-brand-primary hover:text-white transition-colors flex items-center gap-1">
             View all plans
             <ExternalLink className="w-3 h-3" />
           </Link>
@@ -295,10 +295,10 @@ export default function SettingsPage() {
         {!isPro && (
           <div className="text-center p-6 bg-white/5 rounded-xl border border-white/10">
             <p className="text-text-dim mb-3">
-              Or upgrade to <span className="text-accent-primary font-bold">Pro</span> for 80 credits every month
+              Or upgrade to <span className="text-brand-primary font-bold">Pro</span> for 80 credits every month
             </p>
             <Link href="/pricing">
-              <button className="px-6 py-3 rounded-xl bg-accent-primary text-black font-bold uppercase tracking-widest text-xs hover:scale-[1.02] shadow-lg transition-all inline-flex items-center gap-2">
+              <button className="px-6 py-3 rounded-xl bg-brand-primary text-black font-bold uppercase tracking-widest text-xs hover:scale-[1.02] shadow-lg transition-all inline-flex items-center gap-2">
                 View Pro Plan
                 <ArrowLeft className="w-4 h-4 rotate-180" />
               </button>

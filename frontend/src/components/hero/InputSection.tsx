@@ -61,14 +61,14 @@ export function InputSection({ prompt, setPrompt, handleGenerate, isGenerating, 
         {/* AI Greeting Header */}
         <div className="text-center space-y-2">
             <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">
-                {greeting}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-primary to-accent-secondary">{userName}</span>
+                {greeting}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-accent-secondary">{userName}</span>
             </h2>
             <p className="text-text-dim text-lg">What sound are we designing today?</p>
         </div>
 
         {/* Main Input Area */}
         <div className="relative group w-full">
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-accent-primary via-accent-secondary to-accent-primary rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 animate-pulse-slow"></div>
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-brand-primary via-accent-secondary to-brand-primary rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 animate-pulse-slow"></div>
           <div className="relative bg-[#0a0a0b] p-1.5 rounded-2xl border border-white/10 shadow-2xl">
             <div className="bg-[#121214] rounded-xl p-1 relative overflow-hidden transition-all duration-300 focus-within:bg-[#18181b]">
                <textarea
@@ -113,10 +113,10 @@ export function InputSection({ prompt, setPrompt, handleGenerate, isGenerating, 
                             <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/50 opacity-0 group-hover:opacity-100 transition-opacity" />
                             
                             <div className="relative z-10 flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-accent-primary group-hover:text-white group-hover:bg-accent-primary transition-all duration-300 shadow-inner">
+                                <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-brand-primary group-hover:text-white group-hover:bg-brand-primary transition-all duration-300 shadow-inner">
                                     {t.icon}
                                 </div>
-                                <h3 className="text-base font-bold text-white group-hover:text-accent-primary transition-colors">{t.name}</h3>
+                                <h3 className="text-base font-bold text-white group-hover:text-brand-primary transition-colors">{t.name}</h3>
                             </div>
                             
                             <p className="relative z-10 text-xs text-white/80 line-clamp-2 leading-relaxed group-hover:text-white pl-1">{t.prompt}</p>

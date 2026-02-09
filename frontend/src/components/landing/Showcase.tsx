@@ -89,14 +89,14 @@ export function Showcase() {
         <section className="py-32 relative overflow-hidden bg-[#0A0A0B]">
             {/* Background Ambience */}
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent"></div>
-            <div className="absolute top-1/4 -left-[10%] w-[800px] h-[800px] bg-accent-primary/5 blur-[150px] rounded-full pointer-events-none" />
+            <div className="absolute top-1/4 -left-[10%] w-[800px] h-[800px] bg-brand-primary/5 blur-[150px] rounded-full pointer-events-none" />
             
             <div className="max-w-7xl mx-auto px-6 relative z-10 space-y-24">
                 
                 {/* Section Header */}
                 <div className="text-center space-y-6 max-w-4xl mx-auto">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
-                        <Zap className="w-4 h-4 text-accent-primary animate-pulse" />
+                        <Zap className="w-4 h-4 text-brand-primary animate-pulse" />
                         <span className="text-xs font-black uppercase tracking-[0.2em] text-white">Live Evidence</span>
                     </div>
                     <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-[0.9]">
@@ -170,7 +170,7 @@ function ShowcaseCard({ data, onClick }: { data: any, onClick: () => void }) {
                         <div>
                              <motion.h3 
                                 layoutId={`title-${data.id}`}
-                                className="text-2xl font-black text-white tracking-tighter leading-tight group-hover:text-accent-primary transition-colors duration-300"
+                                className="text-2xl font-black text-white tracking-tighter leading-tight group-hover:text-brand-primary transition-colors duration-300"
                             >
                                 {data.title}
                             </motion.h3>
@@ -251,7 +251,7 @@ function ShowcaseModal({ data, onClose }: { data: any, onClose: () => void }) {
                             <a 
                             href={`/showcase/${data.filename}`} 
                             download
-                            className={`px-6 py-3 bg-accent-primary text-black font-black uppercase tracking-widest text-xs rounded-xl hover:scale-105 transition-transform flex items-center gap-2 shadow-[0_0_20px_rgba(255,124,37,0.3)]`}
+                            className={`px-6 py-3 bg-brand-primary text-black font-black uppercase tracking-widest text-xs rounded-xl hover:scale-105 transition-transform flex items-center gap-2 shadow-[0_0_20px_rgba(0,255,194,0.3)]`}
                             onClick={(e) => e.stopPropagation()}
                         >
                             <Download className="w-4 h-4" />
@@ -307,7 +307,7 @@ function ShowcaseModal({ data, onClose }: { data: any, onClose: () => void }) {
                                         <div key={i} className="flex items-center gap-2 group/dev">
                                             <div className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-lg hover:border-white/30 transition-colors">
                                                 <span className="text-[10px] font-black text-text-dim/50">{i + 1}</span>
-                                                <span className="text-xs font-bold text-white uppercase tracking-wide group-hover/dev:text-accent-primary transition-colors">
+                                                <span className="text-xs font-bold text-white uppercase tracking-wide group-hover/dev:text-brand-primary transition-colors">
                                                     {dev}
                                                 </span>
                                             </div>

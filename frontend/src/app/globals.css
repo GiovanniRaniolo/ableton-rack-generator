@@ -6,10 +6,18 @@
   --color-bg-surface: #121214;   /* Surface/Cards */
   --color-bg-elevated: #1a1a1d;  /* Modals/Dropdowns */
   
-  --color-accent-primary: #ff7c25;    /* Ableton Orange - Primary Action */
-  --color-accent-secondary: #00d2ff;  /* Techno Cyan - Secondary/Info */
-  --color-accent-success: #3ef08b;    /* Level Meter Green */
-  --color-accent-danger: #ff4040;     /* Recording Red */
+  /* NEW: Cyan-First Brand Colors */
+  --color-brand-primary: #00FFC2;      /* Cyan - Main Brand Color */
+  --color-brand-secondary: #4A9EFF;    /* Blue - Secondary Brand */
+  
+  /* Accent Colors - Semantic Use Only */
+  --color-accent-warm: #ff7c25;        /* Orange - Energy/Hot Content ONLY */
+  --color-accent-success: #3ef08b;     /* Green - Success States */
+  --color-accent-danger: #ff4040;      /* Red - Errors */
+  
+  /* Legacy Support (will be replaced gradually) */
+  --color-accent-primary: #00FFC2;     /* Maps to brand-primary */
+  --color-accent-secondary: #4A9EFF;   /* Maps to brand-secondary */
   
   --color-text-bright: #ffffff;
   --color-text-main: #d1d1d6;    /* Readable Gray */
@@ -28,10 +36,10 @@
 
 @layer base {
   body {
-    @apply bg-bg-deep text-text-main font-sans antialiased selection:bg-accent-primary/30 selection:text-white;
+    @apply bg-bg-deep text-text-main font-sans antialiased selection:bg-brand-primary/30 selection:text-white;
     background-image: 
-      radial-gradient(circle at 50% 0%, rgba(255, 124, 37, 0.03) 0%, transparent 50%),
-      radial-gradient(circle at 100% 100%, rgba(0, 210, 255, 0.03) 0%, transparent 50%);
+      radial-gradient(circle at 50% 0%, rgba(0, 255, 194, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 100% 100%, rgba(74, 158, 255, 0.05) 0%, transparent 50%);
     min-height: 100vh;
   }
 
@@ -51,16 +59,37 @@
   }
   
   .glass-input {
-    @apply bg-black/20 backdrop-blur-md border border-white/10 focus:border-accent-primary/50 transition-all outline-none;
+    @apply bg-black/20 backdrop-blur-md border border-white/10 focus:border-brand-primary/50 transition-all outline-none;
+  }
+
+  /* Brand Gradients */
+  .gradient-brand {
+    background: linear-gradient(135deg, #00FFC2 0%, #4A9EFF 100%);
+  }
+  
+  .gradient-brand-vertical {
+    background: linear-gradient(180deg, #00FFC2 0%, #4A9EFF 100%);
+  }
+  
+  .gradient-warm {
+    background: linear-gradient(135deg, #ff7c25 0%, #ff904d 100%);
   }
 
   /* Text Effects */
   .text-glow {
-    text-shadow: 0 0 20px rgba(255, 124, 37, 0.3);
+    text-shadow: 0 0 20px rgba(0, 255, 194, 0.4);
+  }
+  
+  .text-glow-cyan {
+    text-shadow: 0 0 20px rgba(0, 255, 194, 0.4);
   }
   
   .text-glow-blue {
-    text-shadow: 0 0 20px rgba(0, 210, 255, 0.3);
+    text-shadow: 0 0 20px rgba(74, 158, 255, 0.4);
+  }
+  
+  .text-glow-warm {
+    text-shadow: 0 0 20px rgba(255, 124, 37, 0.3);
   }
 
   /* Animations */

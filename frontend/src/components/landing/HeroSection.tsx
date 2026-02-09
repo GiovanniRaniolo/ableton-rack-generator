@@ -69,7 +69,7 @@ export function HeroSection() {
       
       {/* Background Ambience */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-accent-primary/5 blur-[120px] rounded-full animate-pulse-glow" />
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-brand-primary/5 blur-[120px] rounded-full animate-pulse-glow" />
         <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-accent-secondary/5 blur-[120px] rounded-full animate-pulse-glow delay-1000" />
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
       </div>
@@ -82,11 +82,11 @@ export function HeroSection() {
                initial={{ opacity: 0, y: 20 }}
                animate={{ opacity: 1, y: 0 }}
                transition={{ duration: 0.6 }}
-               className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-accent-primary"
+               className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-brand-primary"
              >
                <span className="relative flex h-2 w-2">
-                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-primary opacity-75"></span>
-                 <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-primary"></span>
+                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-primary opacity-75"></span>
+                 <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-primary"></span>
                </span>
                v5.3 Now Available
              </motion.div>
@@ -100,7 +100,7 @@ export function HeroSection() {
                <span className="text-4xl md:text-5xl lg:text-6xl block mb-2">
                    Native <span className="text-white">Ableton Audio FX</span> Racks.
                </span>
-               <span className="text-6xl md:text-7xl lg:text-8xl text-transparent bg-clip-text bg-gradient-to-r from-accent-primary to-accent-secondary">Generated from Text.</span>
+               <span className="text-6xl md:text-7xl lg:text-8xl text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-accent-secondary">Generated from Text.</span>
              </motion.h1>
 
              <motion.p 
@@ -110,17 +110,17 @@ export function HeroSection() {
                className="text-xl text-text-dim max-w-xl mx-auto lg:mx-0 leading-relaxed"
              >
                Type "Lo-Fi Tape Saturation Chain" or "Techno Rumble" and get a fully mapped <strong>.adg file</strong> for <span className="text-white">Ableton Live</span> instantly.
-               <span className="block mt-6 text-white/80 text-sm border-l-2 border-accent-primary pl-4 space-y-2">
+               <span className="block mt-6 text-white/80 text-sm border-l-2 border-brand-primary pl-4 space-y-2">
                   <span className="flex items-center gap-2">
-                    <Cpu className="w-4 h-4 text-accent-primary" />
+                    <Cpu className="w-4 h-4 text-brand-primary" />
                     100% Stock Ableton Devices
                   </span>
                   <span className="flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-accent-primary" />
+                    <Activity className="w-4 h-4 text-brand-primary" />
                     8 Performance-Ready Macros
                   </span>
                   <span className="flex items-center gap-2">
-                    <Terminal className="w-4 h-4 text-accent-primary" />
+                    <Terminal className="w-4 h-4 text-brand-primary" />
                     Fully Editable Signal Chain
                   </span>
                </span>
@@ -134,14 +134,14 @@ export function HeroSection() {
              >
                <SignedOut>
                  <SignInButton mode="modal">
-                   <button className="px-8 py-4 bg-accent-primary text-black font-bold text-lg rounded-full hover:scale-105 hover:shadow-[0_0_40px_rgba(255,124,37,0.3)] transition-all flex items-center justify-center gap-2">
+                   <button className="px-8 py-4 bg-brand-primary text-black font-bold text-lg rounded-full hover:scale-105 hover:shadow-[0_0_40px_rgba(0,255,194,0.3)] transition-all flex items-center justify-center gap-2">
                      Start Building Free <ArrowRight className="w-5 h-5" />
                    </button>
                  </SignInButton>
                </SignedOut>
                <SignedIn>
                  <Link href="/dashboard">
-                   <button className="px-8 py-4 bg-accent-primary text-black font-bold text-lg rounded-full hover:scale-105 hover:shadow-[0_0_40px_rgba(255,124,37,0.3)] transition-all flex items-center justify-center gap-2">
+                   <button className="px-8 py-4 bg-brand-primary text-black font-bold text-lg rounded-full hover:scale-105 hover:shadow-[0_0_40px_rgba(0,255,194,0.3)] transition-all flex items-center justify-center gap-2">
                      Go to Dashboard <ArrowRight className="w-5 h-5" />
                    </button>
                  </Link>
@@ -235,7 +235,7 @@ export function HeroSection() {
                                             <div className="text-[10px] text-white/40 uppercase tracking-widest">Ready for Ableton</div>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-white/10 rounded-md text-xs font-bold text-white group-hover:bg-accent-primary group-hover:text-black transition-colors">
+                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-white/10 rounded-md text-xs font-bold text-white group-hover:bg-brand-primary group-hover:text-black transition-colors">
                                         <Download className="w-3 h-3" />
                                         Download .adg
                                     </div>
@@ -248,7 +248,7 @@ export function HeroSection() {
                 </AnimatePresence>
 
                 {/* Glow behind */}
-                <div className="absolute -inset-4 bg-accent-primary/10 blur-3xl -z-10 rounded-full opacity-30" />
+                <div className="absolute -inset-4 bg-brand-primary/10 blur-3xl -z-10 rounded-full opacity-30" />
            </div>
 
       </div>

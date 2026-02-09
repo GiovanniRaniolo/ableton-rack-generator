@@ -45,7 +45,7 @@ export function Simulation() {
     <section id="simulation" className="py-24 px-6 bg-[#0A0A0B] relative overflow-hidden">
         
         {/* Background Glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-accent-primary/5 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-primary/5 blur-[120px] rounded-full pointer-events-none" />
 
         <div className="max-w-4xl mx-auto relative z-10">
             
@@ -55,7 +55,7 @@ export function Simulation() {
                     Interactive Demo
                 </div>
                 <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter mb-4">
-                    Test the <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-primary to-accent-secondary">Builder.</span>
+                    Test the <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-accent-secondary">Builder.</span>
                 </h2>
                 <p className="text-text-dim">
                     Type a desired FX Chain. Watch the engine construct it.
@@ -71,13 +71,13 @@ export function Simulation() {
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         placeholder="e.g. Parallel Saturation with filtered delays..."
-                        className="w-full bg-white/5 border border-white/5 rounded-xl px-6 py-4 text-white placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-accent-primary/50 font-mono text-sm"
+                        className="w-full bg-white/5 border border-white/5 rounded-xl px-6 py-4 text-white placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-brand-primary/50 font-mono text-sm"
                         onKeyDown={(e) => e.key === "Enter" && handleSimulate()}
                     />
                     <button 
                         onClick={handleSimulate}
                         disabled={isSimulating || !prompt}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 px-6 py-2 bg-accent-primary text-black font-bold uppercase tracking-widest text-xs rounded-lg hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 px-6 py-2 bg-brand-primary text-black font-bold uppercase tracking-widest text-xs rounded-lg hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
                     >
                         {isSimulating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
                         Build .adg
@@ -118,8 +118,8 @@ export function Simulation() {
                             exit={{ opacity: 0, y: 20 }}
                             className="absolute inset-0 z-20 bg-[#0F0F10]/95 backdrop-blur-xl flex flex-col items-center justify-center text-center p-8 rounded-2xl"
                         >
-                            <div className="w-16 h-16 bg-accent-primary/10 rounded-2xl flex items-center justify-center mb-6 animate-pulse-glow">
-                                <Lock className="w-8 h-8 text-accent-primary" />
+                            <div className="w-16 h-16 bg-brand-primary/10 rounded-2xl flex items-center justify-center mb-6 animate-pulse-glow">
+                                <Lock className="w-8 h-8 text-brand-primary" />
                             </div>
                             <h3 className="text-2xl font-bold text-white mb-2">Rack Compiled Successfully</h3>
                             <p className="text-text-dim max-w-sm mb-8">
@@ -137,7 +137,7 @@ export function Simulation() {
                                 </SignedOut>
                                 <SignedIn>
                                     <Link href="/dashboard">
-                                        <button className="px-8 py-3 bg-accent-primary text-black font-bold uppercase tracking-widest text-xs rounded-xl hover:scale-105 transition-transform flex items-center gap-2">
+                                        <button className="px-8 py-3 bg-brand-primary text-black font-bold uppercase tracking-widest text-xs rounded-xl hover:scale-105 transition-transform flex items-center gap-2">
                                             Go to Dashboard
                                             <ArrowRight className="w-4 h-4" />
                                         </button>
