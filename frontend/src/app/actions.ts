@@ -23,7 +23,7 @@ export async function syncUserProfile() {
   // Check if profile exists by Clerk ID (including soft-deleted ones)
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, credits, is_pro, bonus_credits_awarded, deleted_at, created_at')
+    .select('id, credits, is_pro, bonus_credits_awarded, deleted_at, created_at, stripe_subscription_id')
     .eq('id', user.id)
     .single();
 
@@ -50,7 +50,7 @@ export async function syncUserProfile() {
     }
     
     // 1. Determine credits to award
-    let creditsToAward = LAUNCH_BONUS_CONFIG.STANDARD_CREDITS; // Default: 5
+    let creditsToAward: number = LAUNCH_BONUS_CONFIG.STANDARD_CREDITS; // Default: 5
     let bonusAwarded = 0;
     
     // 2. Check if bonus is active
@@ -94,7 +94,8 @@ export async function syncUserProfile() {
       credits: creditsToAward, 
       is_pro: false, 
       created: true,
-      bonusAwarded: bonusAwarded > 0 // For frontend notification
+      bonusAwarded: bonusAwarded > 0, // For frontend notification
+      stripe_subscription_id: null
     };
   }
   
@@ -132,7 +133,8 @@ export async function syncUserProfile() {
       is_pro: data.is_pro,
       created: false,
       reactivated: true,
-      message: "Welcome back! Your account has been re-activated with your previous credits."
+      message: "Welcome back! Your account has been re-activated with your previous credits.",
+      stripe_subscription_id: data.stripe_subscription_id || null
     };
   }
 
@@ -142,7 +144,8 @@ export async function syncUserProfile() {
     credits: data.credits, 
     is_pro: data.is_pro, 
     created: false,
-    bonusAwarded: false
+    bonusAwarded: false,
+    stripe_subscription_id: data.stripe_subscription_id || null
   };
 }
 
