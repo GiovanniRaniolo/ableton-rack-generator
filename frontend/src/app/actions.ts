@@ -78,6 +78,7 @@ export async function syncUserProfile() {
       .from('profiles')
       .insert({
         id: user.id,
+        email: primaryEmail,
         credits: creditsToAward,
         is_pro: false,
         bonus_credits_awarded: bonusAwarded,
