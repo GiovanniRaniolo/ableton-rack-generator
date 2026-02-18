@@ -53,6 +53,8 @@ class AudioEffectRack:
 
         macro_idx = 0
         used_macros = set()
+        global_mapped_paths = set()  # Track (macro_idx, full_path) - same param on same macro
+        global_param_paths = set()   # Track full_path only - same param on ANY macro (cross-macro dedup)
         if ai_mapping_plan:
             for plan_item in ai_mapping_plan:
                 if macro_idx >= 16: break
@@ -121,16 +123,30 @@ class AudioEffectRack:
                             if not best_param: continue
 
                             t_macro_idx = plan_item.get("macro")
-                            t_macro_idx = int(t_macro_idx) - 1 if t_macro_idx is not None else macro_idx
-                            while t_macro_idx < 16 and t_macro_idx in used_macros and "macro" not in plan_item:
-                                t_macro_idx += 1
+                            if t_macro_idx is not None:
+                                # AI explicitly specified macro number - RESPECT IT (multi-param mapping)
+                                t_macro_idx = int(t_macro_idx) - 1
+                            else:
+                                # Auto-assign: find next unused macro slot
+                                while macro_idx < 16 and macro_idx in used_macros:
+                                    macro_idx += 1
+                                t_macro_idx = macro_idx
                             
                             if t_macro_idx >= 16: break
                             used_macros.add(t_macro_idx)
 
                             full_path = tuple(best_path + [best_param])
-                            if full_path in device.mappings:
-                                found_match = True; break
+                            global_key = (t_macro_idx, full_path)
+                            if full_path in device.mappings or global_key in global_mapped_paths:
+                                # Already mapped this exact param on this macro - skip silently
+                                print(f"[DEDUP-RACK] Skipped same-macro duplicate: macro={t_macro_idx+1} path={full_path}")
+                                local_found = True; break
+                            if full_path in global_param_paths:
+                                # Same param already mapped on a DIFFERENT macro - skip (cross-macro dedup)
+                                print(f"[DEDUP-CROSS-RACK] Skipped cross-macro duplicate: macro={t_macro_idx+1} path={full_path}")
+                                local_found = True; break
+                            global_mapped_paths.add(global_key)
+                            global_param_paths.add(full_path)
 
                             macro_label = plan_item.get("name") or plan_item.get("label") or best_param
                             

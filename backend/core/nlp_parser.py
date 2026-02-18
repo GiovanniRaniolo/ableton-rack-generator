@@ -26,7 +26,7 @@ class RackNLPParser:
         if api_key:
             try:
                 self.client = genai.Client(api_key=api_key)
-                self.model_id = 'gemini-2.0-flash' # REVERTED TO STABLE FLASH (V43)
+                self.model_id = 'gemini-2.5-flash'  # Upgraded from 2.0 - same price, better reasoning!
                 self.ai_enabled = True
             except Exception as e:
                 print(f"Warning: Failed to initialize Gemini Client: {e}")
@@ -102,7 +102,10 @@ class RackNLPParser:
                 model=self.model_id,
                 contents=f"{system_prompt}\n\nUSER PROMPT: {text}",
                 config=types.GenerateContentConfig(
-                    response_mime_type="application/json"
+                    response_mime_type="application/json",
+                    thinking_config=types.ThinkingConfig(
+                        thinking_budget=12000  # Enable reasoning mode for complex sound design
+                    )
                 )
             )
             
@@ -166,13 +169,39 @@ class RackNLPParser:
             resolved_devices = [{"name": k, "parameters": v} for k, v in device_map.items()]
             valid_canonical_names = list(device_map.keys())
             
+            # Deduplicate macro_details:
+            # Pass 1: Remove identical (macro, device, param) combos (same macro, same param)
+            # Pass 2: Remove same (device, param) appearing on DIFFERENT macros (cross-macro dup)
+            raw_macro_details = data.get("macro_details", [])
+            seen_same_macro = set()   # (macro, device, param) - exact duplicates
+            seen_cross_macro = set()  # (device, param) - cross-macro duplicates
+            deduped_macro_details = []
+            for m in raw_macro_details:
+                macro_num = m.get("macro")
+                dev_key = str(m.get("target_device", "")).lower().strip()
+                param_key = str(m.get("target_parameter", "")).lower().strip()
+                
+                same_key = (macro_num, dev_key, param_key)
+                cross_key = (dev_key, param_key)
+                
+                if same_key in seen_same_macro:
+                    print(f"[DEDUP-SAME] Removed exact duplicate: macro={macro_num} device={dev_key} param={param_key}")
+                    continue
+                if cross_key in seen_cross_macro:
+                    print(f"[DEDUP-CROSS] Removed cross-macro duplicate: macro={macro_num} device={dev_key} param={param_key} (already on another macro)")
+                    continue
+                
+                seen_same_macro.add(same_key)
+                seen_cross_macro.add(cross_key)
+                deduped_macro_details.append(m)
+            
             return {
                 "creative_name": data.get("creative_name", "Precision Rack"),
                 "devices": valid_canonical_names,
                 "surgical_devices": resolved_devices, 
                 "macro_count": data.get("macro_count", 8),
                 "sound_intent": data.get("sound_intent", ""),
-                "macro_details": data.get("macro_details", []),
+                "macro_details": deduped_macro_details,
                 "ai_powered": True,
                 "model": self.model_id,
                 "explanation": data.get("explanation") or data.get("musical_logic_explanation", ""),

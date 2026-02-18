@@ -213,6 +213,9 @@ async def generate_rack(request: GenerateRequest):
                 "max": mapping.max_val
             })
         
+        # Sort by macro index for correct UI display order
+        actual_macro_details.sort(key=lambda x: x["macro"])
+        
         # Return info to frontend
         return RackInfo(
             filename=filename,
