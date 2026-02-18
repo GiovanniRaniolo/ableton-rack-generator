@@ -155,35 +155,119 @@ class AudioEffectRack:
                             ai_max = plan_item.get("max")
                             
                             if ai_min is not None and ai_max is None:
-                                # AI gave target but no top. If it's a Sweep param, use Full Range
-                                if any(x in best_param for x in ["Freq", "Frequency", "Cutoff", "DryWet", "Amount", "Gain", "Feedback"]):
-                                     min_v, max_v = 0.0, 1.0 # Will be scaled below
-                                else:
-                                     min_v, max_v = ai_min, ai_min + 0.1
+                                 # AI gave target but no top. If it's a Sweep param, use Full Range
+                                 if any(x in best_param for x in ["Freq", "Frequency", "Cutoff", "DryWet", "Amount", "Gain", "Feedback", "Width", "Stereo", "Spread"]):
+                                      min_v, max_v = 0.0, 1.0 # Will be scaled below
+                                 else:
+                                      min_v, max_v = ai_min, ai_min + 0.1
                             elif ai_min is not None and ai_max is not None:
                                 min_v, max_v = ai_min, ai_max
                             # else: keep suggestion values
                             
-                            matched_p = next((p for p in device.device_info.get("parameters", []) if p["name"] == best_param), None)
+                            # --- MACRO RANGE POLISH & SAFETY (V36.9 - THE DEFINITIVE FIX) ---
+                            
+                            # 1. ULTRA-FUZZY PARAMETER MATCHER
+                            best_param_clean = str(best_param).lower().replace(" ", "").replace("_", "").replace("-", "")
+                            matched_p = None
+                            for p in device.device_info.get("parameters", []):
+                                p_name_raw = str(p["name"])
+                                p_clean = p_name_raw.lower().replace(" ", "").replace("_", "").replace("-", "")
+                                if p_clean == best_param_clean or p_clean in best_param_clean or best_param_clean in p_clean:
+                                    matched_p = p; break
+
+                            # Audibility flags (MUST be set before nudge logic)
+                            is_gain = any(x in best_param for x in ["Gain", "Threshold", "Volume", "OutputGain"])
+                            is_freq = any(x in best_param for x in ["Freq", "Frequency", "Cutoff"])
+                            is_width = any(x in best_param for x in ["Width", "Stereo", "Spread"])
+                            is_feedback = "Feedback" in best_param
+                            is_drywet = any(x in best_param for x in ["DryWet", "Mix", "Amount"])
+
+                            # 2. INTERPRET RANGE (MetaData or Fallback Authority)
                             if matched_p:
                                 min_v, max_v = self._interpret_parameter_range(best_param, min_v, max_v, matched_p)
-
+                            else:
+                                # FALLBACK AUTHORITY (If device metadata is missing)
+                                print(f"[FALLBACK] Using heuristic ranges for {best_param}")
+                                if is_gain: min_v, max_v = -30.0, 0.0
+                                elif is_freq: min_v, max_v = 400.0, 8000.0
+                                elif is_drywet: min_v, max_v = 0.0, 100.0
+                                elif is_feedback: min_v, max_v = 0.0, 70.0
+                            
+                            # 3. STATIC RANGE NUDGE (Force Movement)
                             if (min_v == max_v or abs(max_v - min_v) < 0.0001) and min_v is not None:
-                                 # Final safety: If it's a sweepable param, force a range instead of a point
-                                 if any(x in best_param for x in ["Freq", "Frequency", "Cutoff"]):
-                                      min_v, max_v = 20.0, min_v 
-                                 elif any(x in best_param for x in ["Gain", "Threshold", "Volume", "OutputGain"]):
-                                      min_v, max_v = -100.0, min_v
-                                 elif any(x in best_param for x in ["DryWet", "Feedback", "Amount"]):
-                                      min_v, max_v = 0.0, 1.0
-                                 else:
-                                      max_v = min_v + (0.0001 if (matched_p and matched_p.get("max", 1.0) <= 60.0) else 1.0)
+                                p_min, p_max = (matched_p.get("min", 0.0), matched_p.get("max", 1.0)) if matched_p else (min_v, min_v + 10.0)
+                                if p_min < -1000.0: p_min = -70.0 # Safe range for math
+                                
+                                p_range = p_max - p_min
+                                nudge = p_range * 0.20 if p_range > 0 else 1.0 # 20% escursivity
+                                
+                                # Escapology from Silence (-inf)
+                                if is_gain and min_v < -70.0:
+                                    max_v = -18.0 # Jump to highly audible level
+                                    min_v = -1e9 # Restore -inf / silence
+                                elif is_width and min_v >= (p_max * 0.9): 
+                                    # Force escursione for things stuck at 400% or 100%
+                                    min_v = p_max * 0.75; max_v = p_max
+                                elif abs(min_v - p_min) < p_range * 0.1:
+                                    max_v = min_v + nudge
+                                elif abs(min_v - p_max) < p_range * 0.1:
+                                    min_v = max_v - nudge
+                                else:
+                                    min_v = min_v - (nudge/2); max_v = max_v + (nudge/2)
 
-                            # Clamp to physical range
+                            # 4. FINAL QUALITY POLISH (Audibility & Safety)
+                            if is_gain and abs(max_v - min_v) < 6.0:
+                                # Increase gain escursivity to at least 15dB
+                                if max_v >= min_v: max_v = min_v + 15.0
+                                else: min_v = max_v + 15.0
+                            
+                            if is_feedback:
+                                min_v = min(min_v, 95.0); max_v = min(max_v, 95.0)
+
+                            # --- MACRO MOVEMENT INSURANCE (V37.5 - THE FINAL STAND) ---
+                            # This runs AFTER all scaling and interpretation to guarantee movement.
+                            
+                            # Final hardware clamp (Pre-insurance)
                             if matched_p:
                                 p_min, p_max = matched_p.get("min", 0.0), matched_p.get("max", 1.0)
                                 min_v = max(p_min, min(p_max, min_v))
                                 max_v = max(p_min, min(p_max, max_v))
+                            
+                            # ABSOLUTE MOVEMENT INSURANCE: If still static or functionally static
+                            if (min_v == max_v or abs(max_v - min_v) < 0.0001) and min_v is not None:
+                                print(f"[INSURANCE] Param {best_param} is static at {min_v}. Forcing range.")
+                                if matched_p:
+                                    p_min, p_max = matched_p.get("min", 0.0), matched_p.get("max", 1.0)
+                                    p_range = p_max - p_min
+                                    if p_range > 0:
+                                        nudge = p_range * 0.20 # Force 20% escursivity
+                                        
+                                        # If at bottom, move UP. If at top, move DOWN. Else move UP.
+                                        if abs(min_v - p_min) < p_range * 0.1:
+                                            max_v = min_v + nudge
+                                        elif abs(min_v - p_max) < p_range * 0.1:
+                                            min_v = max_v - nudge
+                                        else:
+                                            # Center: split the nudge
+                                            min_v = min_v - (nudge/2); max_v = max_v + (nudge/2)
+                                        
+                                        # Re-clamp after nudge
+                                        min_v = max(p_min, min(p_max, min_v))
+                                        max_v = max(p_min, min(p_max, max_v))
+                                        
+                                        # Final check for Discrete params (like Transpose): Ensure nudges are integers
+                                        if "Transpose" in best_param or p_range < 25.0:
+                                            if abs(max_v - min_v) < 1.0:
+                                                if max_v < p_max: max_v += 1.0
+                                                elif min_v > p_min: min_v -= 1.0
+                                else:
+                                    max_v = min_v + 1.0 # Blind fallback
+
+                            # 5. SPECIAL CASE: "On" parameter logic (The Toggle Trap)
+                            # If it's a binary "On" parameter, ensure it's expressive (usually 64 -> 127)
+                            if any(x in best_param for x in ["On", "Enable", "Active"]) and "Frequency" not in best_param:
+                                if min_v == max_v:
+                                    min_v, max_v = 64.0, 127.0
 
                             mapping = MacroMapping(macro_index=t_macro_idx, device_id="0", param_path=best_path + [best_param], min_val=min_v, max_val=max_v, label=macro_label)
                             device.add_mapping(best_path + [best_param], mapping)
@@ -228,9 +312,18 @@ class AudioEffectRack:
         
         # 1. AI 0.0-1.0 PROJECTOR (The Universal Scaler)
         if (0.0 <= min_v <= 1.1) and (0.0 <= max_v <= 1.1) and (p_max - p_min > 0.0):
-             target_min = p_min + (p_max - p_min) * min_v
-             target_max = p_min + (p_max - p_min) * max_v
+             # V58 FIX: Handle -inf (effectively) to prevent NaN math
+             safe_p_min = p_min
+             if p_min < -1000.0: safe_p_min = -70.0 # Clamp -inf to -70dB for scaling math
              
+             safe_p_range = p_max - safe_p_min
+             target_min = safe_p_min + (safe_p_range * min_v)
+             target_max = safe_p_min + (safe_p_range * max_v)
+             
+             # Restore -inf if min_v was 0.0 and p_min was very low
+             if min_v == 0.0 and p_min < -1000.0: target_min = p_min
+             if max_v == 0.0 and p_min < -1000.0: target_max = p_min
+
              # DISCRETE QUANTIZER: If it's a discrete param, round to nearest integer step
              if auth_type == "discrete" or (p_max - p_min < 20.0 and p_max == int(p_max) and p_min == int(p_min)):
                   target_min = round(target_min)

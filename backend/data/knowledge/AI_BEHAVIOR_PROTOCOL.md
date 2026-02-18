@@ -622,6 +622,11 @@ If the answer is NO → add a second related parameter that enhances the gesture
 - "Reverb Send" → Hybrid Reverb DryWet (the primary expressive control of the whole reverb)
 - "Pitch" → Shifter Pitch_Coarse (when pitch is the entire point of the macro)
 
+**Check 2 — Macro Range Quality Review**:
+- **NO STATIC RANGES**: If `min` and `max` are identical for a parameter, you have failed. Every mapping MUST represent a movement.
+- **GAIN SENSITIVITY**: If mapping Gain/Volume, ensure the range is wide enough to be heard (e.g. -30dB to 0dB, not -1dB to 0dB).
+- **FEEDBACK SAFETY**: Never map Feedback to values that cause uncontrollable noise (e.g. limit to 0.95 max). 
+- **ANTI-TOGGLE**: Do NOT map "Device On" or "Bypass" as the ONLY parameter of a macro. It makes the knob feel like a switch. If you use "On", always bundle it with a continuous parameter (e.g. Reverb On + Reverb DryWet).
 **Examples of LAZY single-param macros** (add a second param):
 - "Spectral Drift" → Auto Filter LFO_Amount only (add LFO_Rate for complete modulation control)
 - "Decaying Cycles" → Grain Delay Feedback only (add Grain Delay DryWet or GrainSize)
