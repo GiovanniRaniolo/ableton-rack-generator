@@ -189,6 +189,30 @@ async def generate_rack(request: GenerateRequest):
         rack.save(filepath)
         print(f"✅ FILE GENERATED: {filename}")
         
+        # Convert rack.macro_mappings to frontend format
+        actual_macro_details = []
+        for mapping in rack.macro_mappings:
+            # Find the device name from the rack
+            device_name = ""
+            for chain in rack.chains:
+                for device in chain.devices:
+                    # Check if this mapping belongs to this device
+                    if tuple(mapping.param_path) in device.mappings:
+                        device_name = device.name
+                        break
+                if device_name:
+                    break
+            
+            actual_macro_details.append({
+                "macro": mapping.macro_index + 1,  # 1-indexed for display
+                "name": mapping.label or mapping.param_path[-1],
+                "description": f"Controls the {mapping.param_path[-1]} parameter.",
+                "target_device": device_name,
+                "target_parameter": mapping.param_path[-1],
+                "min": mapping.min_val,
+                "max": mapping.max_val
+            })
+        
         # Return info to frontend
         return RackInfo(
             filename=filename,
@@ -197,7 +221,7 @@ async def generate_rack(request: GenerateRequest):
             macro_count=rack.macro_count,
             chains=len(rack.chains),
             sound_intent=spec.get("sound_intent", ""),
-            macro_details=spec.get("macro_details", []),
+            macro_details=actual_macro_details,  # Use actual mapped macros, not AI spec
             parallel_logic=spec.get("parallel_logic", ""),
             tips=spec.get("tips", []),
             explanation=spec.get("explanation", "")

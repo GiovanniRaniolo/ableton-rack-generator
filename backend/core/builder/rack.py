@@ -176,8 +176,6 @@ class AudioEffectRack:
                             local_found = True; break 
                     if local_found: break
 
-        if ai_mapping_plan and len(ai_mapping_plan) > 0: return
-
         if macro_idx < 16:
             for chain in self.chains:
                 for device in chain.devices:
@@ -186,7 +184,18 @@ class AudioEffectRack:
                         while macro_idx < 16 and macro_idx in used_macros: macro_idx += 1
                         if macro_idx >= 8: break
                         p_name = suggestion['param_name']; p_path = []
+                        
+                        # Check if already mapped in this device
                         if tuple(p_path + [p_name]) in device.mappings: continue
+                        
+                        # GLOBAL DUPLICATE CHECK: Prevent same parameter name across devices
+                        already_mapped = False
+                        for existing_mapping in self.macro_mappings:
+                            if existing_mapping.param_path[-1] == p_name:
+                                already_mapped = True
+                                break
+                        if already_mapped: continue
+                        
                         if device.xml_tag == "Eq8" and any(x in p_name for x in ["Freq", "Gain", "Q"]):
                              p_path = ["Bands.0", "ParameterA"]; p_name = p_name.replace("1 ", "").replace(" A", "")
                         mapping = MacroMapping(macro_index=macro_idx, device_id="0", param_path=p_path + [p_name], min_val=suggestion['min'], max_val=suggestion['max'], label=p_name)
