@@ -53,8 +53,6 @@ class Chain:
         devices_list = ET.SubElement(device_chain, "Devices")
         if self.devices:
             for dev in self.devices:
-                if hasattr(device_db, "get_next_device_id"):
-                    dev.device_id = device_db.get_next_device_id()
                 devices_list.append(dev.to_node_xml())
 
         ET.SubElement(device_chain, "SignalModulations")

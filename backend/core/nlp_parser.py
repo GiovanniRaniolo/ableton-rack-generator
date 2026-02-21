@@ -127,11 +127,14 @@ class RackNLPParser:
                 return self._parse_with_regex(text)
             
             # V41 RESOLUTION ENGINE: Hyper-Robust Device Extraction
-            device_map = {} # canon_name -> parameters
             
-            # Helper to process any device entry
-            def process_entry(item):
-                if not item: return
+            # V42 INSTANCE-BASED RESOLUTION: Support multiple devices of same type
+            resolved_devices = []
+            valid_canonical_names = []
+            
+            # Helper to process any device entry and return its resolved state
+            def resolve_item(item):
+                if not item: return None
                 name = ""
                 params = {}
                 if isinstance(item, dict):
@@ -143,38 +146,50 @@ class RackNLPParser:
                 if name:
                     canon = self.device_db.resolve_alias(str(name))
                     if canon:
-                        if canon in device_map:
-                            device_map[canon].update(params)
-                        else:
-                            device_map[canon] = params
+                        return {"name": canon, "parameters": params}
+                return None
 
-            # Stage 1: Raw devices list
+            # Stage 1: Preserve order and multiplicity from AI "devices" list
             raw_devs = data.get("devices", [])
             if isinstance(raw_devs, str): raw_devs = [raw_devs]
-            for d in raw_devs: process_entry(d)
             
-            # Stage 2: Surgical devices list
+            for d in raw_devs:
+                resolved = resolve_item(d)
+                if resolved:
+                    resolved_devices.append(resolved)
+                    valid_canonical_names.append(resolved["name"])
+            
+            # Stage 2: Sync with surgical_devices (if AI provided specific initial states)
             surg_devs = data.get("surgical_devices", [])
-            if isinstance(surg_devs, str): surg_devs = [surg_devs]
-            for d in surg_devs: process_entry(d)
-            
-            # Stage 3: Macro details (Implicit devices)
+            for s in surg_devs:
+                res_s = resolve_item(s)
+                if not res_s: continue
+                # Match by name and update existing resolved devices (first match that has empty params or same name)
+                # This is a heuristic: if AI listed devices then surgical_devices, we pair them up.
+                for r in resolved_devices:
+                    if r["name"] == res_s["name"] and not r["parameters"]:
+                        r["parameters"].update(res_s["parameters"])
+                        break
+                else:
+                    # If not found in primary list, add it as a new instance
+                    resolved_devices.append(res_s)
+                    valid_canonical_names.append(res_s["name"])
+
+            # Stage 3: Merge implicit devices from macro_details
             for m in data.get("macro_details", []):
                 d_name = m.get("target_device")
                 if d_name:
                     canon = self.device_db.resolve_alias(d_name)
-                    if canon and canon not in device_map:
-                        device_map[canon] = {}
+                    if canon and canon not in valid_canonical_names:
+                        resolved_devices.append({"name": canon, "parameters": {}})
+                        valid_canonical_names.append(canon)
 
-            resolved_devices = [{"name": k, "parameters": v} for k, v in device_map.items()]
-            valid_canonical_names = list(device_map.keys())
-            
             # Deduplicate macro_details:
-            # Pass 1: Remove identical (macro, device, param) combos (same macro, same param)
-            # Pass 2: Remove same (device, param) appearing on DIFFERENT macros (cross-macro dup)
+            # Pass 1: Remove identical (macro, device, param) combos
+            # Pass 2: Remove cross-macro duplicates
             raw_macro_details = data.get("macro_details", [])
-            seen_same_macro = set()   # (macro, device, param) - exact duplicates
-            seen_cross_macro = set()  # (device, param) - cross-macro duplicates
+            seen_same_macro = set()
+            seen_cross_macro = set()
             deduped_macro_details = []
             for m in raw_macro_details:
                 macro_num = m.get("macro")
@@ -184,12 +199,8 @@ class RackNLPParser:
                 same_key = (macro_num, dev_key, param_key)
                 cross_key = (dev_key, param_key)
                 
-                if same_key in seen_same_macro:
-                    print(f"[DEDUP-SAME] Removed exact duplicate: macro={macro_num} device={dev_key} param={param_key}")
-                    continue
-                if cross_key in seen_cross_macro:
-                    print(f"[DEDUP-CROSS] Removed cross-macro duplicate: macro={macro_num} device={dev_key} param={param_key} (already on another macro)")
-                    continue
+                if same_key in seen_same_macro: continue
+                if cross_key in seen_cross_macro: continue
                 
                 seen_same_macro.add(same_key)
                 seen_cross_macro.add(cross_key)

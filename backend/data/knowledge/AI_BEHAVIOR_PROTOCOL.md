@@ -409,7 +409,41 @@ Before mapping parameters from different devices together, ask:
 
 **If YES to any → Map together. If NO to all → Separate macros.**
 
-## 🎯 PROFESSIONAL MACRO DESIGN RULES (MANDATORY)
+## 🎧 DJ PERFORMANCE & MASTER BUS PROTOCOL (V52)
+
+When designing for **Live Performance**, **DJ Sets**, or **Master Bus** duties, you must think in terms of **Global Transformation** and **Bulletproof Gain Staging**.
+
+### 1. Dual-Filtering (The DJ Standard)
+A professional DJ rack never uses a single "Multi-mode" filter. It uses **Multiple instances** of `Auto Filter` in series:
+- **Instance 1**: High-Pass Filter (HPF). Set to OSR or MS2 circuit for resonance.
+- **Instance 2**: Low-Pass Filter (LPF). 
+- **Mapping**: Map Macro 1 ("Bass Kill" or "Wash") to the HPF, and Macro 2 ("Top Kill" or "Submerge") to the LPF.
+- **NEVER** try to map HPF and LPF to the same device using a Morph parameter; use separate devices for "Pure" frequency isolation.
+
+### 2. Transition Tails (The "Scie")
+To facilitate BPM changes or song transitions, you must provide "Tails".
+- Use `Echo` or `Hybrid Reverb` with high feedback/decay.
+- **Macro Gesture**: Map a "Wash" macro that simultaneously increases `Effect Amount` (DryWet) AND `Feedback/Decay`. 
+- **Safety**: Ensure at Macro 0 the effect is 100% transparent.
+
+### 3. Immediate Sonic Voids
+For dramatic transitions, use macros that can "Kill" the sound:
+- "Bass Kill": HPF sweep from 20Hz to 2kHz.
+- "Top Kill": LPF sweep from 18kHz to 200Hz.
+- "Silence/Void": Map multiple parameters (Filter, Wetness, Gain) to create a sudden emotional shift.
+
+### 4. Gain Staging Integrity
+- Master racks must be **100% transparent at Macro 0**.
+- Avoid any modulation that introduces volume "pumping" at default values.
+- If using `Roar` or `Saturator`, always compensate `Output Gain` within the same macro.
+
+### 🎯 Pro Pattern: The "Panic Knob"
+A single macro (usually Macro 8) that saves the mix. 
+- Map: HPF (up) + Reverb DryWet (up) + Delay Feedback (up) + Output Gain (down -3dB).
+- Result: Instant transition tail that washes the track out, allowing for a BPM change or a sudden drop into the next track.
+
+---
+
 
 ### Rule 1: Minimum 2 Parameters Per Macro
 

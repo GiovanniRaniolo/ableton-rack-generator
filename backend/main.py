@@ -163,7 +163,7 @@ async def generate_rack(request: GenerateRequest):
 
                 for device_name in devices_for_this_chain:
                     try:
-                        device = AbletonDevice(device_name, device_db)
+                        device = rack.create_device(device_name)
                         chain.add_device(device)
                     except Exception as e:
                         print(f"WARNING: Skipping device '{device_name}': {str(e)}")

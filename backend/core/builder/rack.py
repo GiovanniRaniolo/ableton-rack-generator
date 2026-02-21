@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 import os
 from typing import List, Dict, Optional
 from .chain import Chain
+from .device import AbletonDevice
 from .models import MacroMapping
 from .serialization import prettify_xml, save_adg
 from .authority import PARAMETER_AUTHORITY, SEMANTIC_MAP
@@ -31,6 +32,11 @@ class AudioEffectRack:
     def add_chain(self, chain: Chain):
         self.chains.append(chain)
     
+    def create_device(self, name: str) -> AbletonDevice:
+        """Create a device with a unique ID managed by this rack"""
+        did = self.get_next_device_id()
+        return AbletonDevice(name, self.device_db, device_id=did)
+
     def add_macro_mapping(self, mapping: MacroMapping):
         self.macro_mappings.append(mapping)
     
@@ -40,16 +46,22 @@ class AudioEffectRack:
         ai_mapping_plan = nlp_resp.get("macro_details", [])
         surgical_devices = nlp_resp.get("surgical_devices", [])
         
+        configured_instances = set()
         for s_dev in surgical_devices:
-            dev_name = s_dev.get("name", "").lower()
+            dev_name = str(s_dev.get("name", "")).lower()
             params = s_dev.get("parameters", {})
+            s_norm = dev_name.replace(" ", "").replace("-", "").replace("_", "")
+            
             for chain in self.chains:
                 for device in chain.devices:
+                    if device in configured_instances: continue
                     d_norm = device.name.lower().replace(" ", "").replace("-", "").replace("_", "")
-                    s_norm = dev_name.replace(" ", "").replace("-", "").replace("_", "")
                     if s_norm in d_norm or d_norm in s_norm:
+                        # Found matching UNCONFIGURED instance
                         for p_name, p_val in params.items():
                             device.set_initial_parameter(p_name, p_val)
+                        configured_instances.add(device)
+                        break
 
         macro_idx = 0
         used_macros = set()
@@ -72,6 +84,7 @@ class AudioEffectRack:
                         d_name_norm = device.name.lower().replace(" ", "").replace("_", "").replace("-", "").replace("2", "").replace("new", "")
                         
                         if target_dev_name in d_name_norm or d_name_norm in target_dev_name:
+                            # RESOLVE PARAMETER (same as before)
                             suggestions = self.device_db.get_macro_suggestions(device.name)
                             best_param = None
                             best_path = []
@@ -79,12 +92,9 @@ class AudioEffectRack:
                             
                             for sugg in suggestions:
                                 if target_param in sugg['param_name'].lower() or sugg['param_name'].lower() in target_param:
-                                    best_param = sugg['param_name']
-                                    min_v, max_v = sugg['min'], sugg['max']
-                                    break
+                                    best_param = sugg['param_name']; min_v, max_v = sugg['min'], sugg['max']; break
                             
                             s_key = device.name.lower().replace(" ", "").replace("_", "").replace("-", "")
-                            # Alias mapping
                             alias_map = {"autofilter": "autofilter2", "chorus": "chorus2", "autopan": "autopan2", "phaser": "phasernew", "redux": "redux2"}
                             for a_k, a_v in alias_map.items():
                                 if a_k in s_key: s_key = a_v; break
@@ -92,14 +102,11 @@ class AudioEffectRack:
                             device_semantic = {}
                             for k, v in SEMANTIC_MAP.items():
                                 if k.lower().replace(" ", "").replace("_", "").replace("-", "") == s_key:
-                                    device_semantic = v
-                                    break
+                                    device_semantic = v; break
                             
                             for intent, real_param in device_semantic.items():
                                 if intent.lower() == target_param or intent.lower() in target_param:
-                                    best_param = real_param
-                                    best_path = [] 
-                                    break
+                                    best_param = real_param; best_path = []; break
                             
                             if best_param == target_param:
                                 global_map = {"frequency": "Filter_Frequency", "cutoff": "Filter_Frequency", "freq": "Filter_Frequency", "resonance": "Filter_Resonance", "res": "Filter_Resonance", "drive": "DriveAmount", "output": "OutputGain", "gain": "OutputGain", "time": "DelayLine_TimeL", "feedback": "Feedback", "drywet": "DryWet"}
@@ -113,7 +120,6 @@ class AudioEffectRack:
                                     if target_param == p["name"].lower() or target_param in p["name"].lower() or p["name"].lower() in target_param:
                                         best_param = p["name"]; best_path = []; break
 
-                            # EQ8 special path logic
                             if best_param and device.xml_tag == "Eq8" and any(x in best_param for x in ["Freq", "Gain", "Q"]):
                                  best_path = ["Bands.0", "ParameterA"]
                                  if "Freq" in best_param: best_param = "Freq"
@@ -122,31 +128,33 @@ class AudioEffectRack:
 
                             if not best_param: continue
 
+                            # MULTI-INSTANCE DETECTION: Track (DeviceID, Param) globally to allow round-robin
+                            full_leaf_path = tuple(best_path + [best_param])
+                            global_instance_param_key = (device.device_id, full_leaf_path)
+                            
+                            if global_instance_param_key in global_param_paths:
+                                # This SPECIFIC parameter on this SPECIFIC device instance is already busy.
+                                # Continue to the NEXT device in the chain (multiplicity support)
+                                continue
+
+                            # SLOT SELECTION
                             t_macro_idx = plan_item.get("macro")
                             if t_macro_idx is not None:
-                                # AI explicitly specified macro number - RESPECT IT (multi-param mapping)
                                 t_macro_idx = int(t_macro_idx) - 1
                             else:
-                                # Auto-assign: find next unused macro slot
-                                while macro_idx < 16 and macro_idx in used_macros:
-                                    macro_idx += 1
+                                while macro_idx < 16 and macro_idx in used_macros: macro_idx += 1
                                 t_macro_idx = macro_idx
                             
                             if t_macro_idx >= 16: break
                             used_macros.add(t_macro_idx)
-
-                            full_path = tuple(best_path + [best_param])
-                            global_key = (t_macro_idx, full_path)
-                            if full_path in device.mappings or global_key in global_mapped_paths:
-                                # Already mapped this exact param on this macro - skip silently
-                                print(f"[DEDUP-RACK] Skipped same-macro duplicate: macro={t_macro_idx+1} path={full_path}")
+                            
+                            global_key = (t_macro_idx, global_instance_param_key)
+                            if global_key in global_mapped_paths:
+                                # Already mapped this exact instance param on this macro - skip
                                 local_found = True; break
-                            if full_path in global_param_paths:
-                                # Same param already mapped on a DIFFERENT macro - skip (cross-macro dedup)
-                                print(f"[DEDUP-CROSS-RACK] Skipped cross-macro duplicate: macro={t_macro_idx+1} path={full_path}")
-                                local_found = True; break
+                            
                             global_mapped_paths.add(global_key)
-                            global_param_paths.add(full_path)
+                            global_param_paths.add(global_instance_param_key)
 
                             macro_label = plan_item.get("name") or plan_item.get("label") or best_param
                             
