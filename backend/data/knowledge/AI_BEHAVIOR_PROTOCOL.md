@@ -409,6 +409,68 @@ Before mapping parameters from different devices together, ask:
 
 **If YES to any → Map together. If NO to all → Separate macros.**
 
+## 🎚️ MACRO POSITION PROTOCOL (V56 — MANDATORY ORDERING)
+
+**CRITICAL**: Macro positions are NOT random. They follow a **musical performance flow** — from tonal sculpting (left side of the rack) to master output (right side). A performer expects to find related controls adjacent to each other.
+
+### The Performance Flow (Default Layout):
+
+| Position | Musical Role | Typical Controls |
+|----------|-------------|-----------------|
+| **M1 – M2** | **Tonal / Filter** | Frequency sweeps, resonance, EQ, brightness/darkness, tone |
+| **M3 – M4** | **Character / Dynamics** | Drive, saturation, compression, punch, energy, grit |
+| **M5 – M6** | **Space / Time** | Reverb, delay, echo, width, modulation depth, feedback |
+| **M7 – M8** | **Utility / Performance** | Output level, master polish, kill switches, panic knob |
+
+### The Adjacency Rule (MANDATORY):
+
+**If two macros control the same musical gesture family, they MUST be on adjacent macro numbers.**
+
+This is the most important rule. Violations create unusable interfaces.
+
+```
+✅ CORRECT adjacency:
+   M1 = "Tone Sweep" (Filter Freq + Res)
+   M2 = "Filter Bite" (Filter Drive + LFO Amount)
+   → Both are filter controls, adjacent ✅
+
+❌ INCORRECT scattering:
+   M1 = "Tone Sweep" (Filter Freq + Res)
+   M3 = "Echo Depth" (Echo DryWet + Feedback)
+   M5 = "Filter Bite" (Filter Drive + LFO Amount)
+   → Filter controls on M1 and M5, Echo between them ❌ 
+   → Should be: M1=Tone Sweep, M2=Filter Bite, M3=Echo Depth
+```
+
+### Musical Gesture Families (Group These Together):
+
+1. **Filter/Tone Family**: Frequency, Resonance, Filter Drive, Filter Type, LFO Amount, LFO Rate, EQ
+2. **Saturation/Character Family**: Drive, Amount, Tone, Color, Type, DryWet (of saturation devices)
+3. **Dynamics Family**: Threshold, Ratio, Attack, Release, Makeup, Punch
+4. **Spatial Family**: Reverb DryWet, Decay, Pre-Delay, Size, Diffusion, Width, Stereo
+5. **Temporal Family**: Delay Time, Feedback, Echo DryWet, Modulation Rate, Ping-Pong
+6. **Utility/Output Family**: Gain, Volume, Mute, Limiter, Master Polish, Panic
+
+### Flexible Ordering (Adapt to Context):
+
+The M1-M2/M3-M4/M5-M6/M7-M8 layout is a **default guide**, not a hard constraint. Adapt based on the rack's purpose:
+
+- **Filter-heavy rack** (Dubstep, DJ): Filters occupy M1-M3, Space M4-M5, Character M6-M7, Output M8
+- **Reverb-focused rack** (Ambient): Space occupies M1-M3, Tone M4-M5, Modulation M6-M7, Output M8
+- **Saturation rack** (Distortion): Character M1-M3, Tone M4-M5, Dynamics M6-M7, Output M8
+
+**The ONLY hard rule is adjacency**: related controls MUST be next to each other, regardless of where they start.
+
+### Pre-Output Position Check (Add to Mental Sandbox):
+
+Before finalizing JSON, verify:
+1. Read macros M1→M8 in order. Does the layout make musical sense?
+2. Are same-family controls adjacent? (e.g., all filter macros together)
+3. Would a performer intuitively find related knobs next to each other?
+4. Is the flow logical? (sculpting → character → space → output)
+
+**If any check fails, reorder before outputting.**
+
 ## 🎧 DJ PERFORMANCE & MASTER BUS PROTOCOL (V52)
 
 When designing for **Live Performance**, **DJ Sets**, or **Master Bus** duties, you must think in terms of **Global Transformation** and **Bulletproof Gain Staging**.
@@ -685,6 +747,17 @@ Macro 8 should never be an afterthought. It should be the **Grand Finale** of th
 - Instead, make it a "Master Polish" that might control Utility Gain, Limiter Release, and a subtle Reverb DryWet all at once for a "finished" sound.
 - If the rack is industrial, Macro 8 could be "The Abyss" — increasing reverb, saturation, and bitcrushing simultaneously.
 - If the rack is clean, Macro 8 could be "The High End" — controlling sparkle, width, and air.
+
+**Check 5 — Macro Position Adjacency (CRITICAL - from V56 Protocol)**:
+List your macros M1→M8. For EACH device that appears on multiple macros, verify those macros are ADJACENT (no gaps). 
+
+**This is the most common failure mode.** Example:
+```
+Auto Filter on M1 and M4 → ❌ GAP (M2, M3 in between)
+Fix: Move Filter macros so they are M1, M2 (or M3, M4, etc.)
+```
+
+**How to fix**: Rearrange your macro numbers so that all macros touching the same device are consecutive. The musical flow (Tone→Character→Space→Output) is secondary to adjacency.
 
 DO NOT output this thought process. Output only the JSON.
 

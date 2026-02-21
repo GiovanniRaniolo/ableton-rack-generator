@@ -67,6 +67,11 @@ class AudioEffectRack:
         used_macros = set()
         global_mapped_paths = set()  # Track (macro_idx, full_path) - same param on same macro
         global_param_paths = set()   # Track full_path only - same param on ANY macro (cross-macro dedup)
+        
+        # V56: Reorder macro plan for device adjacency
+        if ai_mapping_plan:
+            ai_mapping_plan = self._reorder_macro_plan(ai_mapping_plan)
+        
         if ai_mapping_plan:
             for plan_item in ai_mapping_plan:
                 if macro_idx >= 16: break
@@ -316,6 +321,68 @@ class AudioEffectRack:
                              p_path = ["Bands.0", "ParameterA"]; p_name = p_name.replace("1 ", "").replace(" A", "")
                         mapping = MacroMapping(macro_index=macro_idx, device_id="0", param_path=p_path + [p_name], min_val=suggestion['min'], max_val=suggestion['max'], label=p_name)
                         device.add_mapping(mapping.param_path, mapping); self.add_macro_mapping(mapping); macro_idx += 1
+
+    def _reorder_macro_plan(self, plan: list) -> list:
+        """
+        V56: Reorder macro plan for device adjacency.
+        Groups macro items by macro number (atomic units), then sorts
+        groups so devices that touch the same gesture are adjacent.
+        Preserves multi-device mappings (all items on same macro stay together).
+        """
+        if not plan or len(plan) <= 1:
+            return plan
+        
+        # 1. Group items by their macro number (each group = one macro knob)
+        macro_groups = {}
+        group_order = []  # Preserve original order for tie-breaking
+        for item in plan:
+            m = item.get("macro", 0)
+            if m not in macro_groups:
+                macro_groups[m] = []
+                group_order.append(m)
+            macro_groups[m].append(item)
+        
+        if len(macro_groups) <= 1:
+            return plan
+        
+        # 2. For each group, compute its device set
+        group_devices = {}
+        for m, items in macro_groups.items():
+            devs = set()
+            for item in items:
+                dev = str(item.get("target_device", "")).lower().replace(" ", "").replace("-", "").replace("_", "")
+                if dev:
+                    devs.add(dev)
+            group_devices[m] = devs
+        
+        # 3. Greedy adjacency sort: start with first group, then pick the group
+        #    that shares the most devices with the current one
+        remaining = list(group_order)
+        sorted_groups = [remaining.pop(0)]
+        
+        while remaining:
+            current_devs = group_devices[sorted_groups[-1]]
+            best_idx = 0
+            best_score = -1
+            
+            for i, m in enumerate(remaining):
+                # Score = number of shared devices with current group
+                shared = len(current_devs & group_devices[m])
+                if shared > best_score:
+                    best_score = shared
+                    best_idx = i
+            
+            sorted_groups.append(remaining.pop(best_idx))
+        
+        # 4. Rebuild the plan with new sequential macro numbers
+        new_plan = []
+        for new_macro_num, old_macro in enumerate(sorted_groups, start=1):
+            for item in macro_groups[old_macro]:
+                new_item = dict(item)
+                new_item["macro"] = new_macro_num
+                new_plan.append(new_item)
+        
+        return new_plan
 
     def _interpret_parameter_range(self, param_name: str, min_v: float, max_v: float, p_meta: dict) -> tuple:
         """
