@@ -8,8 +8,12 @@ PARAMETER_AUTHORITY = {
     "PostDrive": "db_physical",
     "Threshold": "db_physical",
     "Volume": "db_physical",
-    "Gain": "db_physical",
-    "OutputGain": "db_physical",
+    "Gain": "linear_amplitude",       # V55: Utility Gain is LINEAR (1.0=0dB), NOT dB!
+    "LegacyGain": "db_physical",      # V55: LegacyGain IS actually dB (-35 to +35)
+    "OutputGain": "linear_amplitude",  # V55: Most OutputGain params are linear amplitude
+    "Input_InputGain": "linear_amplitude",  # V55: Roar Input Gain is linear
+    "StereoWidth": "stereo_width_linear",   # V55: 0-4 where 1.0=100%
+    "MidSideBalance": "stereo_width_linear", # V55: 0-2 where 1.0=center
     "Amount": "percentage",
     "DryWet": "percentage",
     "Stage1_Shaper_Amount": "percentage",

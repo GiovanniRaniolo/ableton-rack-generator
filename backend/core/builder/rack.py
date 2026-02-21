@@ -185,6 +185,8 @@ class AudioEffectRack:
 
                             # Audibility flags (MUST be set before nudge logic)
                             is_gain = any(x in best_param for x in ["Gain", "Threshold", "Volume", "OutputGain"])
+                            is_linear_amp = PARAMETER_AUTHORITY.get(best_param) == "linear_amplitude"
+                            is_stereo_width = PARAMETER_AUTHORITY.get(best_param) == "stereo_width_linear"
                             is_freq = any(x in best_param for x in ["Freq", "Frequency", "Cutoff"])
                             is_width = any(x in best_param for x in ["Width", "Stereo", "Spread"])
                             is_feedback = "Feedback" in best_param
@@ -214,8 +216,9 @@ class AudioEffectRack:
                                     max_v = -18.0 # Jump to highly audible level
                                     min_v = -1e9 # Restore -inf / silence
                                 elif is_width and min_v >= (p_max * 0.9): 
-                                    # Force escursione for things stuck at 400% or 100%
-                                    min_v = p_max * 0.75; max_v = p_max
+                                    # V55: Cap width nudge at 200% (2.0), not 400%
+                                    safe_w_max = min(p_max, 2.0) if is_stereo_width else p_max
+                                    min_v = safe_w_max * 0.5; max_v = safe_w_max
                                 elif abs(min_v - p_min) < p_range * 0.1:
                                     max_v = min_v + nudge
                                 elif abs(min_v - p_max) < p_range * 0.1:
@@ -224,10 +227,15 @@ class AudioEffectRack:
                                     min_v = min_v - (nudge/2); max_v = max_v + (nudge/2)
 
                             # 4. FINAL QUALITY POLISH (Audibility & Safety)
-                            if is_gain and abs(max_v - min_v) < 6.0:
-                                # Increase gain escursivity to at least 15dB
+                            if is_gain and not is_linear_amp and abs(max_v - min_v) < 6.0:
+                                # Increase gain escursivity to at least 15dB (only for actual dB params)
                                 if max_v >= min_v: max_v = min_v + 15.0
                                 else: min_v = max_v + 15.0
+                            elif is_linear_amp and abs(max_v - min_v) < 0.1:
+                                # V55: For linear amplitude, nudge by ±3dB equivalent
+                                min_v = max(p_min, min_v * 0.5)   # ≈ -6dB
+                                max_v = min(p_max, max_v * 2.0)   # ≈ +6dB
+                                if max_v < 0.1: max_v = 2.0       # Safety: if near silence, jump to 0dB
                             
                             if is_feedback:
                                 min_v = min(min_v, 95.0); max_v = min(max_v, 95.0)
@@ -311,13 +319,61 @@ class AudioEffectRack:
 
     def _interpret_parameter_range(self, param_name: str, min_v: float, max_v: float, p_meta: dict) -> tuple:
         """
-        UNIVERSAL PARAMETER INTERPRETER (V36.3)
+        UNIVERSAL PARAMETER INTERPRETER (V55)
         Heuristically determines the correct scaling for any Ableton parameter.
         """
+        import math
         p_max = p_meta.get("max", 1.0)
         p_min = p_meta.get("min", 0.0)
         auth_type = PARAMETER_AUTHORITY.get(param_name)
         
+        # 0. V55: LINEAR AMPLITUDE CONVERTER (dB -> linear)
+        # For params like Utility Gain (0-56.2) and Roar OutputGain (0-3.98)
+        # AI sends dB values (e.g. -6, +12), we convert to linear amplitude.
+        if auth_type == "linear_amplitude":
+            def db_to_linear(db_val):
+                """Convert dB to linear amplitude. 0dB=1.0, -6dB≈0.5, +6dB≈2.0"""
+                if db_val <= -70.0: return 0.0  # Silence
+                return 10.0 ** (db_val / 20.0)
+            
+            # If AI sent values that look like dB (negative or small positive numbers)
+            # convert them. If they're already in linear range (0-56), pass through.
+            if min_v < 0 or (0 <= min_v <= 1.1 and 0 <= max_v <= 1.1 and p_max > 2.0):
+                # AI sent 0-1 normalized OR dB values
+                if 0 <= min_v <= 1.1 and 0 <= max_v <= 1.1:
+                    # 0-1 projection: map to safe linear range
+                    # 0.0 -> p_min, 1.0 -> safe_max (capped at ~+12dB = 3.98)
+                    safe_max = min(p_max, 4.0)  # Cap at +12dB equivalent
+                    target_min = p_min + (safe_max - p_min) * min_v
+                    target_max = p_min + (safe_max - p_min) * max_v
+                    return target_min, target_max
+                else:
+                    # AI sent dB values directly (e.g. -6, +12)
+                    lin_min = db_to_linear(min_v)
+                    lin_max = db_to_linear(max_v)
+                    # Clamp to hardware
+                    lin_min = max(p_min, min(p_max, lin_min))
+                    lin_max = max(p_min, min(p_max, lin_max))
+                    return lin_min, lin_max
+            else:
+                # Values already in linear amplitude range, just clamp
+                return max(p_min, min(p_max, min_v)), max(p_min, min(p_max, max_v))
+        
+        # 0b. V55: STEREO WIDTH LINEAR (0-4 where 1.0=100%)
+        if auth_type == "stereo_width_linear":
+            if 0 <= min_v <= 1.1 and 0 <= max_v <= 1.1:
+                # 0-1 projection: map 0->0%, 0.5->100%, 1.0->200%
+                safe_max = min(p_max, 2.5)  # Cap at 250%
+                target_min = safe_max * min_v
+                target_max = safe_max * max_v
+                return target_min, target_max
+            elif max_v > 4.0:
+                # AI sent percentage (e.g. 100, 200) — convert to 0-4 scale
+                return min(p_max, min_v / 100.0), min(p_max, max_v / 100.0)
+            else:
+                # Already in correct 0-4 scale
+                return max(p_min, min(p_max, min_v)), max(p_min, min(p_max, max_v))
+
         # 1. AI 0.0-1.0 PROJECTOR (The Universal Scaler)
         if (0.0 <= min_v <= 1.1) and (0.0 <= max_v <= 1.1) and (p_max - p_min > 0.0):
              # V58 FIX: Handle -inf (effectively) to prevent NaN math
@@ -360,7 +416,7 @@ class AudioEffectRack:
             return min_v, max_v
 
         # 4. HEURISTIC DB/PERCENTAGE DETECTOR
-        if auth_type in ["db_physical", "percentage"] or any(x in param_name for x in ["Gain", "Threshold", "Volume", "Amount", "DryWet", "Mix", "Feedback"]):
+        if auth_type in ["db_physical", "percentage"] or any(x in param_name for x in ["Threshold", "Volume", "Amount", "DryWet", "Mix", "Feedback"]):
              # If already projection-handled, we skip. Otherwise, ensure it's clamped.
              return min_v, max_v
 
