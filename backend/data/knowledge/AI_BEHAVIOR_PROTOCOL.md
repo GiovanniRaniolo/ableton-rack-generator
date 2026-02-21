@@ -513,12 +513,21 @@ A single macro (usually Macro 8) that saves the mix.
 
 **Why**: Single-parameter macros waste expressive potential. With only 8 macros available, each must maximize musical impact.
 
-**Acceptable Exceptions** (rare):
-- Global Dry/Wet of a dominant effect (if it's the primary control)
-- Master output gain/volume (final stage only)
-- Critical bypass that enables/disables an entire processing chain
+**Acceptable Exceptions** (VERY rare — max 1 per rack):
+- Global Dry/Wet of a DOMINANT effect (if it's the primary control AND there's truly nothing to pair)
 
-**If you use a single parameter, you MUST justify why in the design strategy.**
+**RESCUE LIST — If you have a single-param macro, add the paired parameter:**
+| Single Param | Add This | Why |
+|---|---|---|
+| Gain/Volume | + StereoWidth or DryWet | Complete output gesture |
+| DryWet (Reverb) | + DecayTime or Size | Spatial coherence |
+| DryWet (Delay) | + Feedback | Echo depth |
+| LFO_Amount | + LFO_Rate | Complete modulation |
+| Drive | + OutputGain (inverse) | Gain compensated saturation |
+| Threshold | + Ratio or Makeup | Complete dynamics |
+| Filter_Frequency | + Filter_Resonance | Musical sweep |
+
+**If you still can't find a pair, MERGE with an adjacent macro rather than leaving it single.**
 
 **Examples**:
 ```

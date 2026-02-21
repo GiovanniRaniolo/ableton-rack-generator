@@ -324,17 +324,24 @@ class AudioEffectRack:
 
     def _reorder_macro_plan(self, plan: list) -> list:
         """
-        V56: Reorder macro plan for device adjacency.
-        Groups macro items by macro number (atomic units), then sorts
-        groups so devices that touch the same gesture are adjacent.
-        Preserves multi-device mappings (all items on same macro stay together).
+        V57: Cluster-based macro reorder for device adjacency.
+        
+        Algorithm:
+        1. Group items by macro number (atomic units)
+        2. Assign each macro group a "primary device" (most params)
+        3. Build device clusters: group macros by primary device
+        4. Order clusters using the AI's original first-appearance order
+        5. Within each cluster, put single-device macros first, multi-device bridges last
+        6. Reassign sequential macro numbers
+        
+        This ensures all macros touching the same device are adjacent.
         """
         if not plan or len(plan) <= 1:
             return plan
         
-        # 1. Group items by their macro number (each group = one macro knob)
+        # 1. Group items by macro number
         macro_groups = {}
-        group_order = []  # Preserve original order for tie-breaking
+        group_order = []
         for item in plan:
             m = item.get("macro", 0)
             if m not in macro_groups:
@@ -345,44 +352,70 @@ class AudioEffectRack:
         if len(macro_groups) <= 1:
             return plan
         
-        # 2. For each group, compute its device set
-        group_devices = {}
+        # 2. For each group, compute primary device (most params) and all devices
+        def norm_dev(name):
+            return str(name).lower().replace(" ", "").replace("-", "").replace("_", "")
+        
+        group_info = {}
         for m, items in macro_groups.items():
-            devs = set()
+            dev_counts = {}
             for item in items:
-                dev = str(item.get("target_device", "")).lower().replace(" ", "").replace("-", "").replace("_", "")
+                dev = norm_dev(item.get("target_device", ""))
                 if dev:
-                    devs.add(dev)
-            group_devices[m] = devs
-        
-        # 3. Greedy adjacency sort: start with first group, then pick the group
-        #    that shares the most devices with the current one
-        remaining = list(group_order)
-        sorted_groups = [remaining.pop(0)]
-        
-        while remaining:
-            current_devs = group_devices[sorted_groups[-1]]
-            best_idx = 0
-            best_score = -1
+                    dev_counts[dev] = dev_counts.get(dev, 0) + 1
             
-            for i, m in enumerate(remaining):
-                # Score = number of shared devices with current group
-                shared = len(current_devs & group_devices[m])
-                if shared > best_score:
-                    best_score = shared
-                    best_idx = i
-            
-            sorted_groups.append(remaining.pop(best_idx))
+            # Primary = device with most params in this group
+            primary = max(dev_counts, key=dev_counts.get) if dev_counts else ""
+            all_devs = set(dev_counts.keys())
+            group_info[m] = {
+                "primary": primary,
+                "all_devs": all_devs,
+                "is_multi": len(all_devs) > 1,
+                "original_pos": group_order.index(m)
+            }
         
-        # 4. Rebuild the plan with new sequential macro numbers
+        # 3. Build device clusters: group macros by primary device
+        # Preserve original order of first appearance for each device
+        device_first_pos = {}
+        for m in group_order:
+            primary = group_info[m]["primary"]
+            if primary not in device_first_pos:
+                device_first_pos[primary] = group_info[m]["original_pos"]
+        
+        clusters = {}
+        for m in group_order:
+            primary = group_info[m]["primary"]
+            if primary not in clusters:
+                clusters[primary] = []
+            clusters[primary].append(m)
+        
+        # 4. Order clusters by first appearance of their primary device
+        sorted_cluster_keys = sorted(clusters.keys(), key=lambda d: device_first_pos[d])
+        
+        # 5. Within each cluster: single-device macros first, multi-device last
+        # Multi-device macros at end of cluster act as "bridges" to next cluster
+        sorted_macros = []
+        for device_key in sorted_cluster_keys:
+            cluster_macros = clusters[device_key]
+            # Sort: single-device first (by original position), multi-device last
+            singles = [m for m in cluster_macros if not group_info[m]["is_multi"]]
+            multis = [m for m in cluster_macros if group_info[m]["is_multi"]]
+            # Sort each sub-list by original position
+            singles.sort(key=lambda m: group_info[m]["original_pos"])
+            multis.sort(key=lambda m: group_info[m]["original_pos"])
+            sorted_macros.extend(singles)
+            sorted_macros.extend(multis)
+        
+        # 6. Rebuild plan with new sequential macro numbers
         new_plan = []
-        for new_macro_num, old_macro in enumerate(sorted_groups, start=1):
+        for new_num, old_macro in enumerate(sorted_macros, start=1):
             for item in macro_groups[old_macro]:
                 new_item = dict(item)
-                new_item["macro"] = new_macro_num
+                new_item["macro"] = new_num
                 new_plan.append(new_item)
         
         return new_plan
+
 
     def _interpret_parameter_range(self, param_name: str, min_v: float, max_v: float, p_meta: dict) -> tuple:
         """
@@ -485,11 +518,26 @@ class AudioEffectRack:
         # 4. HEURISTIC DB/PERCENTAGE DETECTOR
         if auth_type in ["db_physical", "percentage"] or any(x in param_name for x in ["Threshold", "Volume", "Amount", "DryWet", "Mix", "Feedback"]):
              # If already projection-handled, we skip. Otherwise, ensure it's clamped.
-             return min_v, max_v
+             pass  # Fall through to universal safety clamp
 
-        # 5. DEFAULT: METADATA SCALER
-        # Fallback for enums or non-linear params that don't need scaling beyond the projector.
-        return min_v, max_v
+        # V57: UNIVERSAL SAFETY CLAMP
+        # Final safety net: if AI values exceed device bounds, fix them.
+        # Case 1: Values way above device max (AI sent percentage for a 0-1 param)
+        if p_max <= 1.1 and (min_v > 1.5 or max_v > 1.5):
+            # AI likely sent 0-100 for a 0-1 param → project to 0-1
+            min_v = min_v / 100.0
+            max_v = max_v / 100.0
+        
+        # Case 2: Values exceed device bounds → clamp
+        result_min = max(p_min, min(p_max, min_v))
+        result_max = max(p_min, min(p_max, max_v))
+        
+        # Ensure min < max
+        if result_min > result_max:
+            result_min, result_max = result_max, result_min
+        
+        return result_min, result_max
+
 
     def to_xml(self) -> ET.Element:
         template_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data", "template_rack.xml")
