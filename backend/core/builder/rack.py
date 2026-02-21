@@ -43,6 +43,10 @@ class AudioEffectRack:
     def auto_map_macros(self, nlp_resp: dict = None):
         if not nlp_resp: return
         
+        # V59: Self-Correcting Signal Flow
+        # Physically reorder devices based on musical hierarchy
+        self._reorder_signal_chain()
+        
         # V58: Validate signal chain order before mapping
         self._validate_signal_chain()
         
@@ -422,7 +426,7 @@ class AudioEffectRack:
 
     def _interpret_parameter_range(self, param_name: str, min_v: float, max_v: float, p_meta: dict) -> tuple:
         """
-        UNIVERSAL PARAMETER INTERPRETER (V55)
+        UNIVERSAL PARAMETER INTERPRETER (V55/59)
         Heuristically determines the correct scaling for any Ableton parameter.
         """
         import math
@@ -430,6 +434,19 @@ class AudioEffectRack:
         p_min = p_meta.get("min", 0.0)
         auth_type = PARAMETER_AUTHORITY.get(param_name)
         
+        # V59: SAFETY VALVES
+        # Clamp Feedback to 0.90 to prevent runaway oscillation
+        if any(x in param_name.lower() for x in ["feedback", "feedback_amount"]):
+            p_max = min(p_max, 0.90)
+            max_v = min(max_v, 0.90)
+            min_v = min(min_v, 0.90)
+            
+        # Clamp Dry/Wet for time-based FX to 0.85 to preserve dry signal
+        if any(x in param_name.lower() for x in ["drywet", "dry_wet", "mix"]):
+            p_max = min(p_max, 0.85)
+            max_v = min(max_v, 0.85)
+            min_v = min(min_v, 0.85)
+            
         # 0. V55: LINEAR AMPLITUDE CONVERTER (dB -> linear)
         # For params like Utility Gain (0-56.2) and Roar OutputGain (0-3.98)
         # AI sends dB values (e.g. -6, +12), we convert to linear amplitude.
@@ -544,7 +561,7 @@ class AudioEffectRack:
 
     def _validate_signal_chain(self):
         """
-        V58: Quality control check for signal chain order.
+        V58/59: Quality control check for signal chain order.
         Iterates through all chains and flags common musical flow inversions.
         """
         for chain in self.chains:
@@ -567,6 +584,27 @@ class AudioEffectRack:
                 if current_pos != -1:
                     prev_pos = current_pos
                     prev_name = d_name
+
+    def _reorder_signal_chain(self):
+        """
+        V59: Self-Correcting Signal Flow.
+        Physically reorders devices in each chain based on SIGNAL_CHAIN_HIERARCHY.
+        """
+        for chain in self.chains:
+            # Only reorder if there are multiple devices
+            if len(chain.devices) > 1:
+                def get_rank(device):
+                    # V59: More robust stripping for sorting (e.g. utility2 -> utility)
+                    d_name = device.name.lower()
+                    clean = "".join([c for c in d_name if not c.isdigit()]).strip().replace("_", " ").replace("-", " ")
+                    for h_name, pos in SIGNAL_CHAIN_HIERARCHY.items():
+                        if h_name in clean:
+                            return pos
+                    return 5 # Neutral position if not found
+                
+                # Sort stable to preserve original AI order within same rank
+                chain.devices.sort(key=get_rank)
+                print(f"  [AUTO-FIX]: Signal chain in '{chain.name}' reordered for optimal musical flow.")
 
     def _check_gain_compensation(self):
         """
