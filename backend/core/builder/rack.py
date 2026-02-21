@@ -297,7 +297,14 @@ class AudioEffectRack:
                                 if min_v == max_v:
                                     min_v, max_v = 64.0, 127.0
 
-                            mapping = MacroMapping(macro_index=t_macro_idx, device_id="0", param_path=best_path + [best_param], min_val=min_v, max_val=max_v, label=macro_label)
+                            mapping = MacroMapping(
+                                macro_index=t_macro_idx, 
+                                device_id=device.device_id, 
+                                param_path=best_path + [best_param], 
+                                min_val=min_v, 
+                                max_val=max_v, 
+                                label=macro_label
+                            )
                             device.add_mapping(best_path + [best_param], mapping)
                             self.add_macro_mapping(mapping)
                             if "macro" not in plan_item: macro_idx = t_macro_idx + 1
@@ -326,7 +333,14 @@ class AudioEffectRack:
                         
                         if device.xml_tag == "Eq8" and any(x in p_name for x in ["Freq", "Gain", "Q"]):
                              p_path = ["Bands.0", "ParameterA"]; p_name = p_name.replace("1 ", "").replace(" A", "")
-                        mapping = MacroMapping(macro_index=macro_idx, device_id="0", param_path=p_path + [p_name], min_val=suggestion['min'], max_val=suggestion['max'], label=p_name)
+                        mapping = MacroMapping(
+                            macro_index=macro_idx, 
+                            device_id=device.device_id, 
+                            param_path=p_path + [p_name], 
+                            min_val=suggestion['min'], 
+                            max_val=suggestion['max'], 
+                            label=p_name
+                        )
                         device.add_mapping(mapping.param_path, mapping); self.add_macro_mapping(mapping); macro_idx += 1
 
     def _reorder_macro_plan(self, plan: list) -> list:
@@ -621,10 +635,17 @@ class AudioEffectRack:
             # For each macro, find devices it controls
             dev_params = {}
             for map_item in mappings:
-                dev = map_item.target_device.name.lower()
-                param = map_item.target_parameter.lower()
-                if dev not in dev_params: dev_params[dev] = []
-                dev_params[dev].append(param)
+                # V59: Accurate device resolution for gain compensation check
+                target_dev = "Unknown"
+                for chain in self.chains:
+                    for dev in chain.devices:
+                        if dev.device_id == map_item.device_id:
+                            target_dev = dev.name.lower()
+                            break
+                
+                param = map_item.param_path[-1].lower()
+                if target_dev not in dev_params: dev_params[target_dev] = []
+                dev_params[target_dev].append(param)
             
             for dev, params in dev_params.items():
                 has_drive = any(p in params for p in ["drive", "driveamount", "inputgain", "gain"])
