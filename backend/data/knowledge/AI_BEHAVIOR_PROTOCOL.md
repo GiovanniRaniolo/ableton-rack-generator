@@ -567,10 +567,46 @@ A single macro (usually Macro 8) that saves the mix.
 
 ❌ BAD: "Delay_Feedback" (technical parameter)
 ✅ GOOD: "Echo Tail" or "Repeat Intensity" (musical gesture)
-
 ❌ BAD: "Filter_Frequency" (technical parameter)
 ✅ GOOD: "Brightness" or "Tone Sweep" (musical transformation)
-```
+
+### Rule 5 — Signal Flow Etiquette (CRITICAL - from V58 Protocol)
+
+Signal chain order is the foundation of a professional rack. You MUST follow this hierarchy when arranging devices:
+
+1.  **Correction & Prep**: `EQ Eight` (surgical), `Noise Gate`.
+2.  **Dynamics**: `Compressor`, `Glue Compressor`, `Multiband Dynamics`.
+3.  **Tone & Shaping**: `Auto Filter`, `Auto Pan`, `Spectral Resonator`.
+4.  **Character & Harmonic Distortion**: `Saturator`, `Roar`, `Pedal`, `Redux`, `Drum Buss`.
+5.  **Modulation**: `Chorus-Ensemble`, `Phaser-Flanger`, `Shifter`.
+6.  **Time & Space**: `Delay`, `Echo`, `Hybrid Reverb`, `Spectral Time`.
+7.  **Output & Polish**: `Limiter`, `Utility` (at the very end).
+
+**Exception**: Creative routing (e.g., distortion *after* reverb for "shoegaze" sounds) is allowed only if explicitly requested or essential to the sound design story.
+
+### Rule 6 — Crown Jewel Parameters (Mandatory Mapping)
+
+If you use these devices, you MUST map these specific parameters if they aren't already part of a multi-device cluster. These are the "Crown Jewels" that performers expect to control:
+
+| Device | Crown Jewel Parameters |
+|---|---|
+| **Roar** | `Input Gain`, `Drive`, `Feedback` |
+| **Limiter** | `Gain`, `Ceiling` |
+| **Hybrid Reverb** | `Decay`, `Dry/Wet`, `Size` |
+| **Auto Filter** | `Frequency`, `Resonance` |
+| **Compressor** | `Threshold`, `Ratio` |
+| **Chorus-Ensemble** | `Rate`, `Amount` |
+
+### Rule 7 — Automatic Gain Compensation (Pro Sound Design)
+
+**MANDATORY**: Any macro that increases `Drive`, `Gain`, or `Threshold` (input side) MUST include an inverse mapping of an `Output Gain`, `Volume`, or `Makeup` parameter on the same macro knob.
+
+**Example**:
+- Macro: "Crunch"
+- Mapping 1: `Saturator.Drive` (0dB to +18dB)
+- Mapping 2: `Saturator.Output` (0dB to -12dB) -> **Inverse mapping** prevents ear-splitting volume jumps.
+
+---
 
 ### Rule 3: Smart ON/OFF Integration
 

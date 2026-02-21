@@ -5,7 +5,7 @@ from .chain import Chain
 from .device import AbletonDevice
 from .models import MacroMapping
 from .serialization import prettify_xml, save_adg
-from .authority import PARAMETER_AUTHORITY, SEMANTIC_MAP
+from .authority import PARAMETER_AUTHORITY, SEMANTIC_MAP, SIGNAL_CHAIN_HIERARCHY
 
 class AudioEffectRack:
     """Main class for building an Audio Effect Rack - Orchestrator (Modular)"""
@@ -42,6 +42,9 @@ class AudioEffectRack:
     
     def auto_map_macros(self, nlp_resp: dict = None):
         if not nlp_resp: return
+        
+        # V58: Validate signal chain order before mapping
+        self._validate_signal_chain()
         
         ai_mapping_plan = nlp_resp.get("macro_details", [])
         surgical_devices = nlp_resp.get("surgical_devices", [])
@@ -538,6 +541,62 @@ class AudioEffectRack:
         
         return result_min, result_max
 
+
+    def _validate_signal_chain(self):
+        """
+        V58: Quality control check for signal chain order.
+        Iterates through all chains and flags common musical flow inversions.
+        """
+        for chain in self.chains:
+            prev_pos = -1
+            prev_name = ""
+            for device in chain.devices:
+                d_name = device.name.lower()
+                # Find best match in hierarchy
+                current_pos = -1
+                for h_name, pos in SIGNAL_CHAIN_HIERARCHY.items():
+                    if h_name in d_name:
+                        current_pos = pos
+                        break
+                
+                if current_pos != -1 and prev_pos != -1:
+                    if current_pos < prev_pos:
+                        print(f"  [DESIGN WARNING]: Signal flow inversion detected in '{chain.name}': "
+                              f"'{d_name}' (Hierarchy {current_pos}) placed after '{prev_name}' (Hierarchy {prev_pos}).")
+                
+                if current_pos != -1:
+                    prev_pos = current_pos
+                    prev_name = d_name
+
+    def _check_gain_compensation(self):
+        """
+        V58: Quality control check for gain compensation.
+        Warns if a macro controls 'Drive' but not 'Output Gain' on the same device.
+        """
+        macro_map = {}
+        for mapping in self.macro_mappings:
+            m = mapping.macro_index
+            if m not in macro_map: macro_map[m] = []
+            macro_map[m].append(mapping)
+            
+        for m, mappings in macro_map.items():
+            # For each macro, find devices it controls
+            dev_params = {}
+            for map_item in mappings:
+                dev = map_item.target_device.name.lower()
+                param = map_item.target_parameter.lower()
+                if dev not in dev_params: dev_params[dev] = []
+                dev_params[dev].append(param)
+            
+            for dev, params in dev_params.items():
+                has_drive = any(p in params for p in ["drive", "driveamount", "inputgain", "gain"])
+                has_output = any(p in params for p in ["output", "outputgain", "makup", "volume"])
+                
+                # Specifically targeting distortion devices
+                if has_drive and not has_output:
+                    if any(d in dev for d in ["saturator", "roar", "pedal", "overdrive", "distort"]):
+                        print(f"  [DESIGN WARNING]: Macro {m+1} controls 'Drive' on '{dev}' but lacks gain compensation. "
+                              f"Mapping an inverse 'Output Gain' is recommended.")
 
     def to_xml(self) -> ET.Element:
         template_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data", "template_rack.xml")
