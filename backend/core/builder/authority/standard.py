@@ -4,19 +4,10 @@ STANDARD_MAP = {
     },
     "GlueCompressor": {
         "thresh": "Threshold", "ratio": "Ratio", "makeup": "Makeup", "range": "Range", "attack": "Attack",
-        "focus": "Threshold", "sub": "Threshold", "compress": "Threshold"
-    },
-    "Roar": {
-        "drive": "Stage1_Shaper_Amount", "amount": "Stage1_Shaper_Amount", 
-        "cutoff": "Stage1_Filter_Frequency", "freq": "Stage1_Filter_Frequency",
-        "res": "Stage1_Filter_Resonance", "bias": "Stage1_Shaper_Bias",
-        "grit": "Stage1_Shaper_Amount", "tone": "Stage1_Filter_Frequency"
+        "focus": "Threshold", "sub": "Threshold", "compress": "Threshold", "drywet": "DryWet", "mix": "DryWet"
     },
     "Delay": {
         "time": "DelayLine_TimeL", "feedback": "Feedback", "drywet": "DryWet", "filter": "Filter_Frequency"
-    },
-    "Chorus2": {
-        "rate": "Rate", "amount": "Amount", "width": "Width", "warmth": "Warmth", "feed": "Feedback", "thick": "Amount"
     },
     "Chorus": {
         "rate": "Rate", "amount": "Amount", "width": "Width", "warmth": "Warmth", "feed": "Feedback", "thick": "Amount"

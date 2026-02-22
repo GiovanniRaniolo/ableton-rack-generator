@@ -16,11 +16,12 @@ class AbletonDevice:
         # FUZZY DB LOOKUP (V36.1)
         if not self.device_info:
             target_norm = name.lower().replace(" ", "").replace("_", "").replace("-", "").replace("2", "").replace("new", "")
-            for db_key in device_db.devices.keys():
+            available_devices = device_db.devices.get("devices", {}).get("audio_effects", {})
+            for db_key in available_devices.keys():
                 db_norm = db_key.lower().replace(" ", "").replace("_", "").replace("-", "").replace("2", "").replace("new", "")
                 if target_norm == db_norm or target_norm in db_norm or db_norm in target_norm:
                     self.device_info = device_db.get_device(db_key)
-                    self.name = db_key # Standardize to DB name
+                    self.name = db_key
                     break
         
         # SAFE FALLBACK LOGIC

@@ -26,7 +26,7 @@ class RackNLPParser:
         if api_key:
             try:
                 self.client = genai.Client(api_key=api_key)
-                self.model_id = 'gemini-2.5-flash'  # Upgraded from 2.0 - same price, better reasoning!
+                self.model_id = 'gemini-2.0-flash'
                 self.ai_enabled = True
             except Exception as e:
                 print(f"Warning: Failed to initialize Gemini Client: {e}")
@@ -82,20 +82,28 @@ class RackNLPParser:
                 for alias, target in params.items():
                     surgical_dict_text += f'        - "{alias}" -> Use `{target}` (for {dev})\n'
 
+        # V62: RESTRUCTURED PROMPT FOR STABILITY
         system_prompt = f"""
-        {self.behavior_protocol}
+ROLE: You are the Ultimate Ableton Sound Design Specialist. 
+TASK: Generate a complex, professional-grade Audio Effect Rack.
 
-        ## 📚 REFERENCE KNOWLEDGE (OFFICIAL MANUAL):
-        Use this knowledge to set accurate parameter values and types.
-        {self.knowledge_base[:300000]} 
+{self.behavior_protocol}
 
-        ## 🔧 SURGICAL PARAMETER DICTIONARY (USER CUSTOM ALIASES):
-        Use these internal mappings to ensure precision:
-        {surgical_dict_text}
+## 📚 REFERENCE KNOWLEDGE (OFFICIAL MANUAL):
+{self.knowledge_base[:50000]} 
 
-        ## 🎛️ AVAILABLE DEVICES:
-        {", ".join(sorted(set(available_devices)))}
-        """
+## 🔧 SURGICAL PARAMETER DICTIONARY:
+{surgical_dict_text}
+
+## 🎛️ AVAILABLE DEVICES:
+{", ".join(sorted(set(available_devices)))}
+
+## 🏁 FINAL CONSTRAINTS (MANDATORY):
+1. **ALWAYS 8 MACROS**: Even if the user only asks for 1 mapping, you MUST fill all 8 slots with professional sound design gestures.
+2. **MULTI-DEVICE DENSITY**: At least 4 out of 8 macros MUST control parameters across multiple devices.
+3. **GAIN STAGING**: Any 'Drive' or 'Threshold' mapping MUST have inverse 'Output Gain' compensation on the same knob.
+4. **JSON ONLY**: Return strictly valid JSON. No preamble.
+"""
         
         try:
             response = self.client.models.generate_content(
@@ -103,20 +111,31 @@ class RackNLPParser:
                 contents=f"{system_prompt}\n\nUSER PROMPT: {text}",
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
-                    thinking_config=types.ThinkingConfig(
-                        thinking_budget=12000  # Enable reasoning mode for complex sound design
-                    )
+                    temperature=0.1, # Keep it deterministic and focused
                 )
             )
             
-            # Clean prose/markdown if present
+            # Clean and Log Raw JSON for Debugging
             raw_text = response.text.strip()
+            
+            # V64: Robust Sanitization for non-standard JSON (handles -inf, inf, nan with any whitespace)
+            import re
+            raw_text = re.sub(r':\s*-?inf(inity)?\b', ': -999.0', raw_text, flags=re.IGNORECASE)
+            raw_text = re.sub(r':\s*nan\b', ': 0.0', raw_text, flags=re.IGNORECASE)
+            
+            with open("last_ai_response_raw.json", "w", encoding='utf-8') as f:
+                f.write(raw_text)
+            
             if "```json" in raw_text:
                 raw_text = raw_text.split("```json")[1].split("```")[0].strip()
             elif "```" in raw_text:
                 raw_text = raw_text.split("```")[1].split("```")[0].strip()
             
             data = json.loads(raw_text)
+            
+            # V65: Log the final processed spec for debugging
+            with open("last_spec_debug.json", "w", encoding='utf-8') as f:
+                json.dump(data, f, indent=2)
             
             # V40 Robustness: If AI returns a list, take the first element
             if isinstance(data, list) and len(data) > 0:

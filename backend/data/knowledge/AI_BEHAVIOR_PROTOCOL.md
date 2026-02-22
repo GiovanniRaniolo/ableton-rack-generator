@@ -507,14 +507,22 @@ A single macro (usually Macro 8) that saves the mix.
 ---
 
 
-### Rule 1: Minimum 2 Parameters Per Macro
+### Rule 1: Multi-Device Density Mandate (The "Gesture" Rule)
+Any rack with more than 3 devices **MUST** have at least **50% multi-device macros**. 
+*One knob should rarely control just one thing.*
 
-**MANDATORY**: Every macro MUST control at least 2 related parameters to create cohesive musical gestures.
+#### The "Golden Multi-Device Skeleton" (Reference Implementation)
+Use this as a template for professional-grade complexity:
 
-**Why**: Single-parameter macros waste expressive potential. With only 8 macros available, each must maximize musical impact.
+| Macro | Name | Link 1 | Link 2 | Link 3 | Artistic Intent |
+|---|---|---|---|---|---|
+| 1 | **WASH** | Reverb DryWet | EQ High Cut | Echo Feedback | Spatial disappearance. |
+| 2 | **DIRT** | Saturator Drive | Utility Gain (Inv) | Filter Resonance | Harmonic saturation without volume jump. |
+| 3 | **SHINE** | EQ Sides Boost | Compressor Makeup | Spectral Resonator Freq | Air and presence boost. |
+| 4 | **CHAOS** | Beat Repeat Chance | Redux Jitter | Auto Filter Rate | Rhythmic instability gesture. |
 
-**Acceptable Exceptions** (VERY rare — max 1 per rack):
-- Global Dry/Wet of a DOMINANT effect (if it's the primary control AND there's truly nothing to pair)
+> [!IMPORTANT]
+> **GAIN STAGING PRINCIPLE**: If you push **Drive**, you **MUST** pull **Output Gain** on the same macro to prevent volume jumps. This is a hard requirement for professional sound design.
 
 **RESCUE LIST — If you have a single-param macro, add the paired parameter:**
 | Single Param | Add This | Why |
@@ -785,7 +793,7 @@ You are a professional building a standard 8-knob rack.
 - Do not stop at 7. Do not skip Macro 8.
 - If you run out of ideas, use the **Macro 8 "Master Polish" Rule** below.
 
-**The Macro 8 "Master Polish" Rule**:
+### The Macro 8 "Master Polish" Rule:
 Macro 8 should never be an afterthought. It should be the **Grand Finale** of the rack. 
 - Ideally, it should be a "Macro of Macros" or a "Master Scene" control.
 - Avoid using Macro 8 for a single LFO_Amount. 
@@ -793,16 +801,15 @@ Macro 8 should never be an afterthought. It should be the **Grand Finale** of th
 - If the rack is industrial, Macro 8 could be "The Abyss" — increasing reverb, saturation, and bitcrushing simultaneously.
 - If the rack is clean, Macro 8 could be "The High End" — controlling sparkle, width, and air.
 
-**Check 5 — Macro Position Adjacency (CRITICAL - from V56 Protocol)**:
-List your macros M1→M8. For EACH device that appears on multiple macros, verify those macros are ADJACENT (no gaps). 
+## 🚀 THE "ALWAYS 8" MANDATE (ULTRA-CRITICAL)
+**IF THE USER PROMPT SPECIFIES 1 OR 2 MACRO MAPPINGS, YOU MUST STILL PROVIDE 8 MACROS IN TOTAL.**
 
-**This is the most common failure mode.** Example:
-```
-Auto Filter on M1 and M4 → ❌ GAP (M2, M3 in between)
-Fix: Move Filter macros so they are M1, M2 (or M3, M4, etc.)
-```
+1. Use the requested mappings for Macros 1 and 2.
+2. **Auto-populate Macros 3-8** with professional-grade multi-device gestures.
+3. NEVER return a JSON with fewer than 8 macros unless explicitly asked for a specific number.
+4. User requests are **MINIMUMS**, not maximums. Use your sound design expertise to fill the remaining slots with "Golden Skeleton" style mappings.
 
-**How to fix**: Rearrange your macro numbers so that all macros touching the same device are consecutive. The musical flow (Tone→Character→Space→Output) is secondary to adjacency.
+---
 
 DO NOT output this thought process. Output only the JSON.
 

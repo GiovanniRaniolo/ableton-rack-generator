@@ -866,6 +866,18 @@
     "InputSendGain",
     "On"
   ],
+  "SpectralResonator": [
+    "Brightness",
+    "Decay",
+    "Structure",
+    "Density",
+    "Feedback",
+    "Frequency",
+    "Transpose",
+    "DryWet",
+    "OutputGain",
+    "On"
+  ],
   "SpectrumAnalyzer": [],
   "StereoGain": [
     "Balance",
