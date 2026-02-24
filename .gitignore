@@ -33,6 +33,19 @@ yarn-error.log*
 .agents/
 .claude/
 
+# Temporary Build & Test Artifacts
+v*_master_gen.py
+build_v*_adg.py
+v21_test_gen.py
+v21_test_report.txt
+analyze_adg.py
+generate_final_set.py
+INDUSTRIAL_REPORT.md
+*.json
+!package.json
+!package-lock.json
+!backend/data/devices/*.json
+
 # Keys and Secrets
 *.pem
 *.key

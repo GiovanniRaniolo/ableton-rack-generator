@@ -21,9 +21,9 @@ def prettify_xml(elem):
     # Targeting Ableton 12.2.5 (Build 12203)
     root_tag = '<Ableton MajorVersion="5" MinorVersion="12.0_12203" SchemaChangeCount="3" Creator="Ableton Live 12.2.5" Revision="174fd107af43e88065794fb882063fd27e80439a">'
     
-    # 3. Concatenate without ANY newline after header
-    # V35/36: NO NEWLINE between header and root
-    xml_output = f'{header}{root_tag}{final_body}'
+    # 3. Concatenate with native newline and tab (V20 Forensic Model)
+    # This precisely matches native Ableton 12 save structure
+    xml_output = f'{header}\n{root_tag}\n\t{final_body}'
     
     # 4. Final character cleanup: space before self-closing tags
     xml_output = xml_output.replace('/>', ' />')

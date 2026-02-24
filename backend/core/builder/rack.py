@@ -33,9 +33,22 @@ class AudioEffectRack:
         self.chains.append(chain)
     
     def create_device(self, name: str) -> AbletonDevice:
-        """Create a device with a unique ID managed by this rack"""
+        """Create a device with a unique ID and track name duplicates (V64)"""
         did = self.get_next_device_id()
-        return AbletonDevice(name, self.device_db, device_id=did)
+        
+        # Track duplicate names to append (2), (3) etc.
+        if not hasattr(self, "_device_name_counts"):
+            self._device_name_counts = {}
+        
+        base_name = name
+        count = self._device_name_counts.get(base_name, 0) + 1
+        self._device_name_counts[base_name] = count
+        
+        final_name = base_name
+        if count > 1:
+            final_name = f"{base_name} ({count})"
+            
+        return AbletonDevice(final_name, self.device_db, device_id=did)
 
     def add_macro_mapping(self, mapping: MacroMapping):
         self.macro_mappings.append(mapping)
@@ -59,15 +72,26 @@ class AudioEffectRack:
                     d_norm = device.name.lower().replace(" ", "").replace("-", "").replace("_", "")
                     if dev_name in d_norm or d_norm in dev_name:
                         for p_name, p_val in params.items():
-                            device.set_initial_parameter(p_name, p_val)
+                            # V20: Translate 1-indexed surgical paths (Bands.1.X) to 0-indexed internal paths
+                            final_p_name = p_name
+                            if (d_norm == "eqeight" or d_norm == "eq8") and p_name.lower().startswith("bands."):
+                                parts = p_name.split(".")
+                                if len(parts) >= 2 and parts[1].isdigit():
+                                    idx = int(parts[1]) - 1
+                                    param = ".".join(parts[2:])
+                                    # Normalize to 'Bands.0.ParameterA.Gain' style
+                                    final_p_name = f"Bands.{idx}.ParameterA.{param.capitalize()}" if param else f"Bands.{idx}.ParameterA"
+                                    if "On" in final_p_name: final_p_name = final_p_name.replace("On", "IsOn")
+
+                            device.set_initial_parameter(final_p_name, p_val)
                         configured_instances.add(device)
                         break
 
         # 3. Resolve & Cluster Macro Details (The Brain)
         ai_mapping_plan = nlp_resp.get("macro_details", [])
         if ai_mapping_plan:
-            # Cluster-based Adjacency Polish
-            ai_mapping_plan = self._reorder_macro_plan(ai_mapping_plan)
+            # V64: Disabled intrusive adjacency reordering to respect user layout
+            # ai_mapping_plan = self._reorder_macro_plan(ai_mapping_plan)
             # Apply mappings via Semantic Clustering Engine
             self._apply_semantic_clustering(ai_mapping_plan)
         
@@ -75,31 +99,30 @@ class AudioEffectRack:
         self._check_gain_compensation()
 
     def _apply_semantic_clustering(self, plan: List[dict]):
-        """
-        V61: ENHANCED CLUSTERING ENGINE
-        Primary: Group by AI-suggested Index (if provided).
-        Secondary: Group by Name (Semantic Clustering).
-        """
+        
         candidates = []
         seen_instance_params = set()
         
         # Phase 1: Resolution
         for item in plan:
-            raw_target_dev = str(item.get("target_device") or "").lower().replace(" ", "").replace("_", "").replace("-", "")
+            # V64: Consistent normalization for naming resolution
+            raw_target_dev = str(item.get("target_device") or "").lower().replace(" ", "").replace("_", "").replace("-", "").replace("(", "").replace(")", "")
             target_param = str(item.get("target_parameter") or "").lower()
             if not raw_target_dev or not target_param: continue
 
             resolved = False
             for chain in self.chains:
                 for device in chain.devices:
-                    d_norm = device.name.lower().replace(" ", "").replace("-", "").replace("_", "").replace("2", "").replace("new", "").replace("repeat", "repeat")
+                    # Normalize names for fuzzy matching (V64: Improved numbering handle)
+                    d_norm = device.name.lower().replace(" ", "").replace("_", "").replace("-", "").replace("(", "").replace(")", "")
                     if raw_target_dev in d_norm or d_norm in raw_target_dev:
                         best_p, best_path, min_v, max_v = self._resolve_parameter_for_device(device, target_param)
                         if not best_p: continue
                         
                         inst_key = (device.device_id, tuple(best_path + [best_p]))
                         if inst_key in seen_instance_params: 
-                            resolved = True; break
+                            # If this specific instance/param is busy, keep looking for other instances!
+                            continue
                         
                         candidates.append({
                             "device": device, "param": best_p, "path": best_path,
@@ -114,6 +137,7 @@ class AudioEffectRack:
             if not resolved:
                 all_device_names = [d.name for chain in self.chains for d in chain.devices]
                 print(f"  [DEBUG] Failed to resolve: {item.get('target_device')} -> {target_param}")
+
 
         # Phase 2: Multi-Pass Clustering
         # Pass A: Group by explicit macro index (if AI specified one)
@@ -168,7 +192,7 @@ class AudioEffectRack:
             for c in group:
                 dev = c["device"]; p_name = c["param"]; p_path = c["path"]
                 p_meta = next((p for p in dev.device_info.get("parameters", []) if p["name"].lower() == p_name.lower()), None)
-                min_val, max_val = self._interpret_parameter_range(p_name, c["min"], c["max"], p_meta)
+                min_val, max_val = self._interpret_parameter_range(p_name, c["min"], c["max"], p_meta, p_path)
                 
                 mapping = MacroMapping(macro_index=m_idx, device_id=dev.device_id, param_path=p_path + [p_name], min_val=min_val, max_val=max_val, label=macro_label)
                 dev.add_mapping(mapping.param_path, mapping); self.add_macro_mapping(mapping)
@@ -196,11 +220,36 @@ class AudioEffectRack:
         for sugg in suggestions:
             if target_param in sugg['param_name'].lower() or sugg['param_name'].lower() in target_param:
                 best_param = sugg['param_name']; min_v, max_v = sugg['min'], sugg['max']; break
-        
+        if not best_param and "." in target_param:
+            parts = target_param.split(".")
+            # Handle Bands.i.Parameter (Eq8 specific)
+            if parts[0].lower() == "bands" and len(parts) >= 3:
+                # e.g. Bands.1.Gain -> ['Bands.0', 'ParameterA', 'Gain'] (V64: Corrected to 0-based index)
+                try:
+                    requested_idx = int(parts[1])
+                    band_idx = max(0, requested_idx - 1)
+                except ValueError:
+                    band_idx = 0
+                
+                best_path = [f"Bands.{band_idx}", "ParameterA"]
+                p_part = parts[2].lower()
+                
+                # Canonical Eq8 param names: IsOn, Mode, Freq, Gain, Q
+                if p_part in ["gain", "freq", "q", "mode"]:
+                    best_param = p_part.capitalize()
+                elif p_part in ["on", "ison"]:
+                    best_param = "IsOn"
+                else:
+                    best_param = parts[2]
+                
+                if best_param: return best_param, best_path, min_v, max_v
+
         # 2. Semantic Map
         s_key = device.name.lower().replace(" ", "").replace("_", "").replace("-", "")
         alias_map = {
             "autofilter": "autofilter2", 
+            "eqeight": "Eq8",
+            "eq8": "Eq8",
             "chorus": "chorus2", 
             "autopan": "autopan2", 
             "phaser": "phasernew", 
@@ -236,8 +285,12 @@ class AudioEffectRack:
             global_map = {"frequency": "Filter_Frequency", "cutoff": "Filter_Frequency", "freq": "Filter_Frequency", "resonance": "Filter_Resonance", "res": "Filter_Resonance", "drive": "DriveAmount", "output": "OutputGain", "gain": "OutputGain", "time": "DelayLine_TimeL", "feedback": "Feedback", "drywet": "DryWet"}
             lookup = target_param.lower().strip()
             for g_key, g_val in global_map.items():
-                 if g_key in lookup or lookup in g_key:
-                      best_param = g_val; break
+                 # V64 FIX: Strict check for short strings to prevent "on" matching "resonance"
+                 if len(lookup) <= 3:
+                     if lookup == g_key: best_param = g_val; break
+                 else:
+                     if g_key in lookup or lookup in g_key:
+                          best_param = g_val; break
         
         # 4. Device Metadata Fuzzy Match (Enhanced V63)
         if not best_param:
@@ -247,7 +300,7 @@ class AudioEffectRack:
                 p_norm = p_name.lower().replace("_", "").replace(" ", "").replace("-", "")
                 if t_norm == p_norm or t_norm in p_norm or p_norm in t_norm:
                     best_param = p_name; best_path = []; break
-
+                    
         return best_param, best_path, min_v, max_v
 
     def _reorder_macro_plan(self, plan: list) -> list:
@@ -291,20 +344,54 @@ class AudioEffectRack:
                 new_item = dict(item); new_item["macro"] = new_num; new_plan.append(new_item)
         return new_plan
 
-    def _interpret_parameter_range(self, param_name: str, min_v: float, max_v: float, p_meta: dict) -> tuple:
+    def _interpret_parameter_range(self, param_name: str, min_v: float, max_v: float, p_meta: dict, param_path: List[str] = None) -> tuple:
         """Preserved from V55/59: Universal Parameter Interpreter."""
-        if not p_meta: return min_v, max_v
-        p_max = p_meta.get("max", 1.0); p_min = p_meta.get("min", 0.0)
+        if not p_meta:
+            # V20: Provide sensible defaults for Eq8 bands if metadata is missing (prevents clamping to 0-1)
+            is_eq8_band = any("Bands." in str(p) for p in param_path or [])
+            if is_eq8_band:
+                if "Gain" in param_name: p_min, p_max = -15.0, 15.0
+                elif "Freq" in param_name: p_min, p_max = 10.0, 22000.0
+                elif "Q" in param_name: p_min, p_max = 0.1, 18.0
+                else: p_min, p_max = 0.0, 1.0
+            else:
+                p_min, p_max = 0.0, 1.0
+        else:
+            p_max = p_meta.get("max", 1.0); p_min = p_meta.get("min", 0.0)
+
         auth_type = PARAMETER_AUTHORITY.get(param_name)
-        if any(x in param_name.lower() for x in ["feedback", "feedback_amount"]): p_max = min(p_max, 0.90); max_v = min(max_v, 0.90); min_v = min(min_v, 0.90)
-        if any(x in param_name.lower() for x in ["drywet", "dry_wet", "mix"]): p_max = min(p_max, 0.85); max_v = min(max_v, 0.85); min_v = min(min_v, 0.85)
-        if auth_type == "linear_amplitude":
+        if any(x in param_name.lower() for x in ["feedback", "feedback_amount"]): 
+            p_max = min(p_max, 0.90); max_v = min(max_v, 0.90); min_v = min(min_v, 0.90)
+        if any(x in param_name.lower() for x in ["drywet", "dry_wet", "mix"]): 
+            # Consistent with V35: Cap max dry/wet at 85% for master safety
+            p_max = min(p_max, 0.85); max_v = min(max_v, 0.85); min_v = min(min_v, 0.85)
+
+        if auth_type == "linear_amplitude" or "Gain" in param_name:
+            # V20: FORCE SURGICAL RANGE for DJ Master Kills (EQ8 / Filters)
+            if any("Bands." in str(p) for p in param_path or []) and "Gain" in param_name:
+                # Force -15 to +15 range for EQ8 bands, bypassing any interpreted clamping
+                return max(-15.0, min(15.0, min_v)), max(-15.0, min(15.0, max_v))
+            
+            # V64: If this is EQ Eight (already handled above but safe)
+            if any("Bands." in str(p) for p in param_path or []) or p_min < -10:
+                 return max(p_min, min(p_max, min_v)), max(p_min, min(p_max, max_v))
+
             def db_to_linear(db_val):
                 if db_val <= -70.0: return 0.0
                 return 10.0 ** (db_val / 20.0)
-            if min_v < 0 or (0 <= min_v <= 1.1 and 0 <= max_v <= 1.1 and p_max > 2.0):
-                if 0 <= min_v <= 1.1: safe_max = min(p_max, 4.0); target_min = p_min + (safe_max - p_min) * min_v; target_max = p_min + (safe_max - p_min) * max_v; return target_min, target_max
-                else: lin_min = db_to_linear(min_v); lin_max = db_to_linear(max_v); return max(p_min, min(p_max, lin_min)), max(p_min, min(p_max, lin_max))
+            
+            # V64 FIX: If user provides negative values or absolute dB ranges for linear params
+            if min_v < 0 or max_v < 0 or (max_v < 0.1 and max_v != 0):
+                lin_min = db_to_linear(min_v)
+                lin_max = db_to_linear(max_v)
+                return max(p_min, min(p_max, lin_min)), max(p_min, min(p_max, lin_max))
+                
+            if (0 <= min_v <= 1.1 and 0 <= max_v <= 1.1 and p_max > 2.0):
+                 safe_max = min(p_max, 4.0)
+                 target_min = p_min + (safe_max - p_min) * min_v
+                 target_max = p_min + (safe_max - p_min) * max_v
+                 return target_min, target_max
+            
             return max(p_min, min(p_max, min_v)), max(p_min, min(p_max, max_v))
         if auth_type == "stereo_width_linear":
             if 0 <= min_v <= 1.1: safe_max = min(p_max, 2.5); return safe_max * min_v, safe_max * max_v
@@ -388,6 +475,8 @@ class AudioEffectRack:
         else:
             for child in list(bp_list): bp_list.remove(child)
         for i, chain in enumerate(self.chains):
+            # V64 REVERT: Populating ONLY BranchPresets (Persistent Data)
+            # Populating 'Branches' causes load failure (Forbidden Icon) in saved files.
             bp_list.append(chain.to_branch_preset_xml(branch_id=i, device_db=self))
         for i in range(16):
             dn = rack.find(f"MacroDisplayNames.{i}")

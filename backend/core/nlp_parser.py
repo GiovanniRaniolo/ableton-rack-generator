@@ -26,7 +26,9 @@ class RackNLPParser:
         if api_key:
             try:
                 self.client = genai.Client(api_key=api_key)
-                self.model_id = 'gemini-2.0-flash'
+                # V20: Upgraded to Gemini 3.1 Pro (Feb 19, 2026 Release)
+                # This model delivers a 94.3% GPQA score, making it the most intelligent reasoning model available.
+                self.model_id = 'gemini-3.1-pro-preview'
                 self.ai_enabled = True
             except Exception as e:
                 print(f"Warning: Failed to initialize Gemini Client: {e}")
@@ -99,10 +101,11 @@ TASK: Generate a complex, professional-grade Audio Effect Rack.
 {", ".join(sorted(set(available_devices)))}
 
 ## 🏁 FINAL CONSTRAINTS (MANDATORY):
-1. **ALWAYS 8 MACROS**: Even if the user only asks for 1 mapping, you MUST fill all 8 slots with professional sound design gestures.
-2. **MULTI-DEVICE DENSITY**: At least 4 out of 8 macros MUST control parameters across multiple devices.
-3. **GAIN STAGING**: Any 'Drive' or 'Threshold' mapping MUST have inverse 'Output Gain' compensation on the same knob.
-4. **JSON ONLY**: Return strictly valid JSON. No preamble.
+1. **PLATINUM ARCHITECTURE**: For DJ Master Racks, ALWAYS use `EQ Eight` for 'Mid Kill' frequency isolation.
+2. **ZERO-BLEED INITIALIZATION**: Always include `surgical_devices` that set `DryWet` to 0.0 for Reverb/Echo/Spectral effects.
+3. **ALWAYS 8 MACROS**: Fill all 8 slots with high-impact, professional sound design gestures.
+4. **MULTI-DEVICE DENSITY**: At least 4 out of 8 macros MUST control parameters across multiple devices.
+5. **JSON ONLY**: Return strictly valid JSON. No preamble.
 """
         
         try:

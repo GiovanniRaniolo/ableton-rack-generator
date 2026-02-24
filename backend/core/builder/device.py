@@ -21,7 +21,8 @@ class AbletonDevice:
                 db_norm = db_key.lower().replace(" ", "").replace("_", "").replace("-", "").replace("2", "").replace("new", "")
                 if target_norm == db_norm or target_norm in db_norm or db_norm in target_norm:
                     self.device_info = device_db.get_device(db_key)
-                    self.name = db_key
+                    # V64: Preserve the unique identity (don't overwrite self.name)
+                    # self.name = db_key 
                     break
         
         # SAFE FALLBACK LOGIC
@@ -53,26 +54,24 @@ class AbletonDevice:
     
     def set_initial_parameter(self, name: str, value: float):
         """Set an initial value for a parameter (Surgical Control)"""
-        self.parameter_overrides[name] = value
+        # V20: Hyper-Robust normalization (Dot-ignorant matching)
+        norm_name = name.lower().replace("_", "").replace(" ", "").replace("/", "").replace(".", "")
+        self.parameter_overrides[norm_name] = value
 
     def add_mapping(self, param_path: List[str], mapping: MacroMapping):
         self.mappings[tuple(param_path)] = mapping
 
     def _create_parameter(self, name: str, value: float, min_val: float = 0.0, max_val: float = 127.0, param_path: List[str] = []) -> ET.Element:
         """Create a full Ableton parameter element with optional macro mapping"""
-        if name in self.parameter_overrides:
-            val = self.parameter_overrides[name]
-            if isinstance(val, str):
-                val_lower = val.lower().strip()
-                if val_lower in ENUM_AUTHORITY:
-                    value = ENUM_AUTHORITY[val_lower]
-                else:
-                    try:
-                        value = float(val)
-                    except:
-                        pass
-            else:
-                value = val
+        # V20: Hyper-Robust path-aware normalized surgical override check
+        full_path_str = ".".join(param_path + [name])
+        norm_full = full_path_str.lower().replace("_", "").replace(" ", "").replace("/", "").replace(".", "")
+        norm_name = name.lower().replace("_", "").replace(" ", "").replace("/", "").replace(".", "")
+        
+        if norm_full in self.parameter_overrides:
+            value = self.parameter_overrides[norm_full]
+        elif norm_name in self.parameter_overrides:
+            value = self.parameter_overrides[norm_name]
 
         elem = ET.Element(name)
         ET.SubElement(elem, "LomId").set("Value", "0")
@@ -81,6 +80,11 @@ class AbletonDevice:
         mapping = self.mappings.get(full_path)
         
         if mapping:
+            # V20: Initialize manual value to mapping min to prevent bleed (e.g. 0% dry/wet)
+            # Fix V21: Using normalized keys for the override check
+            if not (norm_full in self.parameter_overrides or norm_name in self.parameter_overrides):
+                value = mapping.min_val
+
             connector = ET.SubElement(elem, "MacroControlConnector")
             connector.set("Id", "0")
             ET.SubElement(connector, "SourceDeviceId").set("Value", "0")
@@ -229,12 +233,13 @@ class AbletonDevice:
                 band = ET.SubElement(device_elem, f"Bands.{i}")
                 for side in ["ParameterA", "ParameterB"]:
                     p_side = ET.SubElement(band, side)
-                    p_path = [f"Bands.{i}", side]
-                    p_side.append(self._create_parameter("IsOn", 1.0, 0, 1, p_path))
-                    p_side.append(self._create_parameter("Mode", 3, 0, 7, p_path))
-                    p_side.append(self._create_parameter("Freq", 100 * (i+1), 10, 22000, p_path))
-                    p_side.append(self._create_parameter("Gain", 0.0, -15, 15, p_path))
-                    p_side.append(self._create_parameter("Q", 0.707, 0.1, 18, p_path))
+                    # V20: Unified path tracking for surgical and macro resolution
+                    base_path = [f"Bands.{i}", side]
+                    p_side.append(self._create_parameter("IsOn", 1.0, 0, 1, base_path))
+                    p_side.append(self._create_parameter("Mode", 3, 0, 7, base_path))
+                    p_side.append(self._create_parameter("Freq", 100 * (i+1), 10, 22000, base_path))
+                    p_side.append(self._create_parameter("Gain", 0.0, -15, 15, base_path))
+                    p_side.append(self._create_parameter("Q", 0.707, 0.1, 18, base_path))
         else:
             self._create_generic_device_xml(device_elem)
         
