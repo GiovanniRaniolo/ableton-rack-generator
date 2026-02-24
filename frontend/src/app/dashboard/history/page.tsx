@@ -91,6 +91,9 @@ export default function ArchivePage() {
                             file_url={gen.file_url}
                             rack_data={gen.rack_data}
                             prompt={gen.prompt}
+                            onDelete={(id) => {
+                                setGenerations(prev => prev.filter(g => g.id !== id));
+                            }}
                         />
                     );
                 })}

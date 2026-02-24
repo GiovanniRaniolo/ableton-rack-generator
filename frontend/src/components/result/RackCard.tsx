@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, MoreHorizontal, FileAudio, Disc, Mic, Zap, Music, Speaker, Sparkles, Cpu, Layers, Settings2, X, Info, Lightbulb, Activity } from "lucide-react";
+import { Download, MoreHorizontal, FileAudio, Disc, Mic, Zap, Music, Speaker, Sparkles, Cpu, Layers, Settings2, X, Info, Lightbulb, Activity, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils"; 
 import { MacroGrid } from "./MacroGrid"; 
+import { deleteGeneration } from "@/app/actions";
+import { useRouter } from "next/navigation";
 
 interface RackCardProps {
   id: string;
@@ -15,6 +17,7 @@ interface RackCardProps {
   file_url?: string;
   rack_data?: any; 
   prompt?: string; // Added prompt prop
+  onDelete?: (id: string) => void;
 }
 
 const getRackTypeStyle = (type: string) => {
@@ -27,10 +30,35 @@ const getRackTypeStyle = (type: string) => {
     return { color: "text-text-dim", bg: "bg-white/5", border: "border-white/10", icon: FileAudio, gradient: "from-white/10" };
 };
 
-export function RackCard({ id, name, type, date, tags, file_url, rack_data, prompt }: RackCardProps) {
+export function RackCard({ id, name, type, date, tags, file_url, rack_data, prompt, onDelete }: RackCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const router = useRouter();
   const style = getRackTypeStyle(type);
   const TypeIcon = style.icon;
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirmDelete) {
+        setConfirmDelete(true);
+        return;
+    }
+
+    setIsDeleting(true);
+    const res = await deleteGeneration(id);
+    if (res.success) {
+        if (onDelete) {
+            onDelete(id);
+        } else {
+            router.refresh();
+        }
+        setIsExpanded(false);
+    } else {
+        alert("Failed to delete: " + res.error);
+    }
+    setIsDeleting(false);
+  };
 
   return (
     <>
@@ -55,7 +83,31 @@ export function RackCard({ id, name, type, date, tags, file_url, rack_data, prom
             )}>
               <TypeIcon className="w-6 h-6" />
             </div>
-            <span className="text-xs font-medium font-mono text-white/60 bg-white/5 px-2 py-1 rounded-md border border-white/5">{date}</span>
+            
+            <div className="flex flex-col items-end gap-2">
+                <span className="text-xs font-medium font-mono text-white/60 bg-white/5 px-2 py-1 rounded-md border border-white/5">{date}</span>
+                <button 
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className={cn(
+                        "h-8 px-2 rounded-lg transition-all duration-300 border flex items-center gap-2 overflow-hidden",
+                        confirmDelete 
+                            ? "bg-red-600 text-white border-red-400 w-auto px-3 shadow-[0_0_15px_rgba(239,68,68,0.4)]" 
+                            : "bg-white/5 text-red-500 hover:text-red-400 hover:bg-red-500/10 border-white/5 opacity-40 group-hover:opacity-100"
+                    )}
+                >
+                    {isDeleting ? (
+                        <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                        <Trash2 className="w-4 h-4 shrink-0" />
+                    )}
+                    {confirmDelete && !isDeleting && (
+                        <span className="text-[10px] font-black uppercase tracking-tighter whitespace-nowrap">
+                            CONFIRM?
+                        </span>
+                    )}
+                </button>
+            </div>
         </div>
 
         <motion.h3 
@@ -117,7 +169,7 @@ export function RackCard({ id, name, type, date, tags, file_url, rack_data, prom
                     initial={{ opacity: 0 }} 
                     animate={{ opacity: 1 }} 
                     exit={{ opacity: 0 }}
-                    onClick={() => setIsExpanded(false)}
+                    onClick={() => { setIsExpanded(false); setConfirmDelete(false); }}
                     className="absolute inset-0 bg-black/80 backdrop-blur-md"
                 />
                 
@@ -128,7 +180,7 @@ export function RackCard({ id, name, type, date, tags, file_url, rack_data, prom
                     {/* Header */}
                     <div className="relative p-8 md:p-10 border-b border-white/5 bg-[#121214] flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                          <button 
-                            onClick={(e) => { e.stopPropagation(); setIsExpanded(false); }}
+                            onClick={(e) => { e.stopPropagation(); setIsExpanded(false); setConfirmDelete(false); }}
                             className="absolute top-4 right-4 p-2 rounded-full bg-white/5 hover:bg-white/10 text-text-dim hover:text-white transition-colors z-50"
                         >
                             <X className="w-6 h-6" />
@@ -158,6 +210,24 @@ export function RackCard({ id, name, type, date, tags, file_url, rack_data, prom
                         </div>
 
                         <div className="flex gap-3">
+                             <button 
+                                onClick={handleDelete}
+                                disabled={isDeleting}
+                                className={cn(
+                                    "px-6 py-3 font-black uppercase tracking-widest text-xs rounded-xl transition-all flex items-center gap-2 border",
+                                    confirmDelete 
+                                        ? "bg-red-600 text-white border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.5)]" 
+                                        : "bg-white/5 text-red-500 hover:bg-red-500/10 hover:text-red-400 border-white/5"
+                                )}
+                            >
+                                {isDeleting ? (
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                ) : (
+                                    <Trash2 className="w-4 h-4" />
+                                )}
+                                {confirmDelete ? "CONFIRM DELETE?" : "DELETE RACK"}
+                            </button>
+
                              {file_url ? (
                                 <a 
                                     href={file_url} 

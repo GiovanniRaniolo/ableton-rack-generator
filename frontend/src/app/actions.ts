@@ -266,3 +266,50 @@ export async function getUserLibrary() {
 
   return data;
 }
+
+export async function deleteGeneration(id: string) {
+  const user = await currentUser();
+  if (!user) return { success: false, error: "Unauthorized" };
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  try {
+    // 1. Get the generation record to find the filename
+    const { data: gen, error: fetchError } = await supabase
+      .from('generations')
+      .select('filename, user_id')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !gen) throw new Error("Generation not found");
+
+    // 2. Security: Ensure the user owns this generation
+    if (gen.user_id !== user.id) throw new Error("Unauthorized to delete this record");
+
+    // 3. Delete from Supabase Storage
+    const { error: storageError } = await supabase.storage
+      .from('racks')
+      .remove([gen.filename]);
+
+    if (storageError) {
+        console.warn(`Storage Deletion Warning: ${storageError.message}`);
+        // We continue even if storage delete fails (maybe file was already gone)
+    }
+
+    // 4. Delete from Database
+    const { error: dbError } = await supabase
+      .from('generations')
+      .delete()
+      .eq('id', id);
+
+    if (dbError) throw new Error(`Database Error: ${dbError.message}`);
+
+    return { success: true };
+  } catch (err: any) {
+    console.error("Delete Action Error:", err);
+    return { success: false, error: err.message || "Deletion failed" };
+  }
+}
