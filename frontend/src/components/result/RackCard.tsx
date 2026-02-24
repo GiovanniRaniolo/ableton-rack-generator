@@ -22,12 +22,12 @@ interface RackCardProps {
 
 const getRackTypeStyle = (type: string) => {
     const t = type.toLowerCase();
-    if (t.includes("bass")) return { color: "text-orange-500", bg: "bg-orange-500/10", border: "border-orange-500/20", icon: Speaker, gradient: "from-orange-500/20" };
-    if (t.includes("drum") || t.includes("perc")) return { color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/20", icon: Disc, gradient: "from-red-500/20" };
-    if (t.includes("synth") || t.includes("pad")) return { color: "text-cyan-400", bg: "bg-cyan-400/10", border: "border-cyan-400/20", icon: Music, gradient: "from-cyan-400/20" };
-    if (t.includes("vocal")) return { color: "text-pink-500", bg: "bg-pink-500/10", border: "border-pink-500/20", icon: Mic, gradient: "from-pink-500/20" };
-    if (t.includes("fx")) return { color: "text-yellow-400", bg: "bg-yellow-400/10", border: "border-yellow-400/20", icon: Zap, gradient: "from-yellow-400/20" };
-    return { color: "text-text-dim", bg: "bg-white/5", border: "border-white/10", icon: FileAudio, gradient: "from-white/10" };
+    if (t.includes("bass")) return { color: "text-orange-500", bg: "bg-orange-500/10", border: "border-orange-500/20", icon: Speaker, gradient: "from-orange-500/20", stripe: "from-orange-500" };
+    if (t.includes("drum") || t.includes("perc")) return { color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/20", icon: Disc, gradient: "from-red-500/20", stripe: "from-red-500" };
+    if (t.includes("synth") || t.includes("pad")) return { color: "text-cyan-400", bg: "bg-cyan-400/10", border: "border-cyan-400/20", icon: Music, gradient: "from-cyan-400/20", stripe: "from-cyan-400" };
+    if (t.includes("vocal")) return { color: "text-pink-500", bg: "bg-pink-500/10", border: "border-pink-500/20", icon: Mic, gradient: "from-pink-500/20", stripe: "from-pink-500" };
+    if (t.includes("fx")) return { color: "text-yellow-400", bg: "bg-yellow-400/10", border: "border-yellow-400/20", icon: Zap, gradient: "from-yellow-400/20", stripe: "from-yellow-400" };
+    return { color: "text-text-dim", bg: "bg-white/5", border: "border-white/10", icon: FileAudio, gradient: "from-white/10", stripe: "from-white/20" };
 };
 
 export function RackCard({ id, name, type, date, tags, file_url, rack_data, prompt, onDelete }: RackCardProps) {
@@ -72,7 +72,7 @@ export function RackCard({ id, name, type, date, tags, file_url, rack_data, prom
       whileHover={{ y: -5 }}
     >
       {/* Top Gradient Stripe */}
-      <div className={cn("absolute top-0 inset-x-0 h-1 bg-gradient-to-r", style.gradient.replace('from-', 'from-').replace('/20', ''), "to-transparent opacity-50")} />
+      <div className={cn("absolute top-0 inset-x-0 h-1 bg-gradient-to-r", style.stripe, "to-transparent opacity-80")} />
       
       {/* Content */}
       <div className="p-6">
