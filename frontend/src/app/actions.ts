@@ -484,6 +484,7 @@ export async function getCollectionGenerations(collectionId: string) {
             generations (*)
         `)
         .eq('collection_id', collectionId)
+        .order('sort_order', { ascending: true })
         .order('created_at', { ascending: false });
 
     if (error) {
@@ -492,4 +493,71 @@ export async function getCollectionGenerations(collectionId: string) {
     }
 
     return (data as any[]).map(item => item.generations).filter(Boolean);
+}
+
+export async function updateCollection(collectionId: string, name: string) {
+    const user = await currentUser();
+    if (!user) return { success: false, error: "Unauthorized" };
+
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const { error } = await supabase
+        .from('collections')
+        .update({ name })
+        .eq('id', collectionId);
+
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+}
+
+export async function deleteCollection(collectionId: string) {
+    const user = await currentUser();
+    if (!user) return { success: false, error: "Unauthorized" };
+
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    // collection_items will be deleted by ON DELETE CASCADE
+    const { error } = await supabase
+        .from('collections')
+        .delete()
+        .eq('id', collectionId);
+
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+}
+
+export async function reorderCollectionItems(collectionId: string, generationIds: string[]) {
+    const user = await currentUser();
+    if (!user) return { success: false, error: "Unauthorized" };
+
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    // We use a manual transaction-like approach or batch update
+    // Since Supabase doesn't have a built-in batch update for different IDs in one go easily without RPC
+    // we'll loop or use a clever update if possible. 
+    // For small collections, individual updates are okay, but RPC is better.
+    // Let's try individual updates for now as collections are usually small (< 50 items).
+    
+    const updates = generationIds.map((id, index) => 
+        supabase
+            .from('collection_items')
+            .update({ sort_order: index })
+            .eq('collection_id', collectionId)
+            .eq('generation_id', id)
+    );
+
+    const results = await Promise.all(updates);
+    const firstError = results.find(r => r.error);
+    
+    if (firstError?.error) return { success: false, error: firstError.error.message };
+    return { success: true };
 }

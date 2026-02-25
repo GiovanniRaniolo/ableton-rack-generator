@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS public.collection_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     collection_id UUID NOT NULL REFERENCES public.collections(id) ON DELETE CASCADE,
     generation_id UUID NOT NULL REFERENCES public.generations(id) ON DELETE CASCADE,
+    sort_order INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     UNIQUE(collection_id, generation_id)
 );
@@ -59,6 +60,13 @@ WITH CHECK (EXISTS (
 
 CREATE POLICY "Users can remove items from their collections" 
 ON public.collection_items FOR DELETE 
+USING (EXISTS (
+    SELECT 1 FROM public.collections 
+    WHERE id = collection_id AND (user_id = auth.uid()::text OR user_id = current_setting('request.jwt.claims', true)::json->>'sub')
+));
+
+CREATE POLICY "Users can update items in their collections" 
+ON public.collection_items FOR UPDATE 
 USING (EXISTS (
     SELECT 1 FROM public.collections 
     WHERE id = collection_id AND (user_id = auth.uid()::text OR user_id = current_setting('request.jwt.claims', true)::json->>'sub')

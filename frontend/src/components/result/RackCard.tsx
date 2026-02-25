@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, MoreHorizontal, FileAudio, Disc, Mic, Zap, Music, Speaker, Sparkles, Cpu, Layers, Settings2, X, Info, Lightbulb, Activity, Trash2, Plus, Heart, Loader2 } from "lucide-react";
+import { Download, MoreHorizontal, FileAudio, Disc, Mic, Zap, Music, Speaker, Sparkles, Cpu, Layers, Settings2, X, Info, Lightbulb, Activity, Trash2, Plus, Heart, Loader2, GripVertical } from "lucide-react";
 import { cn } from "@/lib/utils"; 
 import { MacroGrid } from "./MacroGrid"; 
 import { deleteGeneration, toggleFavorite } from "@/app/actions";
@@ -23,6 +23,7 @@ interface RackCardProps {
   onToggleFavorite?: (id: string, isFav: boolean) => void;
   onToggleCollection?: (id: string, collectionId: string, isActive: boolean) => void;
   onRemoveFromCollection?: (id: string) => void;
+  dragControls?: any;
 }
 
 const getRackTypeStyle = (type: string) => {
@@ -35,7 +36,7 @@ const getRackTypeStyle = (type: string) => {
     return { color: "text-text-dim", bg: "bg-white/5", border: "border-white/10", icon: FileAudio, gradient: "from-white/10", stripe: "from-white/20" };
 };
 
-export function RackCard({ id, name, type, date, tags, file_url, rack_data, prompt, onDelete, isFavoriteInitial, onToggleFavorite, onToggleCollection, onRemoveFromCollection }: RackCardProps) {
+export function RackCard({ id, name, type, date, tags, file_url, rack_data, prompt, onDelete, isFavoriteInitial, onToggleFavorite, onToggleCollection, onRemoveFromCollection, dragControls }: RackCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -103,10 +104,11 @@ export function RackCard({ id, name, type, date, tags, file_url, rack_data, prom
     <>
     {/* COLLAPSED CARD */}
     <motion.div
+      layout
       layoutId={`card-container-${id}`}
       onClick={() => setIsExpanded(true)}
       className={cn(
-        "relative rounded-3xl border border-white/5 bg-[#121214] hover:bg-[#18181b] hover:border-white/10 cursor-pointer group transition-all duration-500 min-h-[220px] flex flex-col justify-between",
+        "relative rounded-3xl border border-white/5 bg-[#121214] hover:bg-[#18181b] hover:border-white/10 cursor-pointer group transition-all duration-500 h-[300px] flex flex-col justify-between",
         !showCollections && "overflow-hidden"
       )}
       whileHover={{ y: -5 }}
@@ -128,6 +130,14 @@ export function RackCard({ id, name, type, date, tags, file_url, rack_data, prom
                 <span className="text-xs font-medium font-mono text-white/60 bg-white/5 px-2 py-1 rounded-md border border-white/5">{date}</span>
                 
                 <div className="flex items-center gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
+                    {dragControls && (
+                        <div 
+                            onPointerDown={(e) => dragControls.start(e)}
+                            className="p-1.5 rounded-lg bg-white/5 border border-white/10 text-white/20 hover:text-white cursor-grab active:cursor-grabbing transition-colors"
+                        >
+                            <GripVertical className="w-4 h-4" />
+                        </div>
+                    )}
                     <button 
                         onClick={handleToggleFav}
                         disabled={isTogglingFav}
@@ -234,7 +244,7 @@ export function RackCard({ id, name, type, date, tags, file_url, rack_data, prom
 
         <motion.h3 
             layoutId={`title-${id}`}
-            className="font-display font-bold text-xl text-white leading-tight mb-2 line-clamp-2 group-hover:text-brand-primary transition-colors"
+            className="font-display font-bold text-xl text-white leading-tight mb-2 line-clamp-2 group-hover:text-brand-primary transition-colors h-[52px] flex items-end"
         >
             {name}
         </motion.h3>
