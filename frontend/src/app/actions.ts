@@ -313,3 +313,183 @@ export async function deleteGeneration(id: string) {
     return { success: false, error: err.message || "Deletion failed" };
   }
 }
+
+// COLLECTIONS & FAVORITES ACTIONS
+
+export async function getUserCollections() {
+  const user = await currentUser();
+  if (!user) return [];
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { data, error } = await supabase
+    .from('collections')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('is_favorite', { ascending: false })
+    .order('name', { ascending: true });
+
+  if (error) {
+    console.error("Collections Fetch Error:", error);
+    return [];
+  }
+
+  // Ensure a Favorites collection exists if not found (fallback)
+  if (!data.find(c => c.is_favorite)) {
+    const { data: newFav } = await supabase
+      .from('collections')
+      .insert({ user_id: user.id, name: 'Favorites', is_favorite: true })
+      .select()
+      .single();
+    if (newFav) data.unshift(newFav);
+  }
+
+  return data;
+}
+
+export async function createCollection(name: string) {
+  const user = await currentUser();
+  if (!user) return { success: false, error: "Unauthorized" };
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { data, error } = await supabase
+    .from('collections')
+    .insert({ user_id: user.id, name, is_favorite: false })
+    .select()
+    .single();
+
+  if (error) return { success: false, error: error.message };
+  return { success: true, data };
+}
+
+export async function toggleFavorite(generationId: string) {
+  const user = await currentUser();
+  if (!user) return { success: false, error: "Unauthorized" };
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  // 1. Get Favorites collection ID
+  const { data: favColl } = await supabase
+    .from('collections')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('is_favorite', true)
+    .single();
+
+  if (!favColl) return { success: false, error: "Favorites collection not found" };
+
+  // 2. Check if item is already in favorites
+  const { data: existing } = await supabase
+    .from('collection_items')
+    .select('id')
+    .eq('collection_id', favColl.id)
+    .eq('generation_id', generationId)
+    .single();
+
+  if (existing) {
+    // Remove
+    await supabase.from('collection_items').delete().eq('id', existing.id);
+    return { success: true, action: 'removed' };
+  } else {
+    // Add
+    await supabase.from('collection_items').insert({
+      collection_id: favColl.id,
+      generation_id: generationId
+    });
+    return { success: true, action: 'added' };
+  }
+}
+
+export async function addToCollection(generationId: string, collectionId: string) {
+  const user = await currentUser();
+  if (!user) return { success: false, error: "Unauthorized" };
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { error } = await supabase
+    .from('collection_items')
+    .insert({ collection_id: collectionId, generation_id: generationId });
+
+  if (error) {
+    if (error.code === '23505') return { success: true, message: "Already in collection" };
+    return { success: false, error: error.message };
+  }
+  
+  return { success: true };
+}
+
+export async function removeFromCollection(generationId: string, collectionId: string) {
+  const user = await currentUser();
+  if (!user) return { success: false, error: "Unauthorized" };
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { error } = await supabase
+    .from('collection_items')
+    .delete()
+    .eq('collection_id', collectionId)
+    .eq('generation_id', generationId);
+
+  if (error) return { success: false, error: error.message };
+  return { success: true };
+}
+
+export async function getGenerationCollections(generationId: string) {
+    const user = await currentUser();
+    if (!user) return [];
+
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const { data, error } = await supabase
+        .from('collection_items')
+        .select('collection_id')
+        .eq('generation_id', generationId);
+
+    if (error) return [];
+    return data.map(item => item.collection_id);
+}
+
+export async function getCollectionGenerations(collectionId: string) {
+    const user = await currentUser();
+    if (!user) return [];
+
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const { data, error } = await supabase
+        .from('collection_items')
+        .select(`
+            generation_id,
+            generations (*)
+        `)
+        .eq('collection_id', collectionId)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error("Collection Items Fetch Error:", error);
+        return [];
+    }
+
+    return (data as any[]).map(item => item.generations).filter(Boolean);
+}

@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, MoreHorizontal, FileAudio, Disc, Mic, Zap, Music, Speaker, Sparkles, Cpu, Layers, Settings2, X, Info, Lightbulb, Activity, Trash2 } from "lucide-react";
+import { Download, MoreHorizontal, FileAudio, Disc, Mic, Zap, Music, Speaker, Sparkles, Cpu, Layers, Settings2, X, Info, Lightbulb, Activity, Trash2, Plus, Heart, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils"; 
 import { MacroGrid } from "./MacroGrid"; 
-import { deleteGeneration } from "@/app/actions";
+import { deleteGeneration, toggleFavorite } from "@/app/actions";
 import { useRouter } from "next/navigation";
+import { CollectionSelector } from "../library/CollectionSelector";
 
 interface RackCardProps {
   id: string;
@@ -18,6 +19,10 @@ interface RackCardProps {
   rack_data?: any; 
   prompt?: string; // Added prompt prop
   onDelete?: (id: string) => void;
+  isFavoriteInitial?: boolean;
+  onToggleFavorite?: (id: string, isFav: boolean) => void;
+  onToggleCollection?: (id: string, collectionId: string, isActive: boolean) => void;
+  onRemoveFromCollection?: (id: string) => void;
 }
 
 const getRackTypeStyle = (type: string) => {
@@ -30,10 +35,15 @@ const getRackTypeStyle = (type: string) => {
     return { color: "text-text-dim", bg: "bg-white/5", border: "border-white/10", icon: FileAudio, gradient: "from-white/10", stripe: "from-white/20" };
 };
 
-export function RackCard({ id, name, type, date, tags, file_url, rack_data, prompt, onDelete }: RackCardProps) {
+export function RackCard({ id, name, type, date, tags, file_url, rack_data, prompt, onDelete, isFavoriteInitial, onToggleFavorite, onToggleCollection, onRemoveFromCollection }: RackCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [showCollections, setShowCollections] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(isFavoriteInitial || false);
+  const [isTogglingFav, setIsTogglingFav] = useState(false);
+  const [confirmRemove, setConfirmRemove] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
   const router = useRouter();
   const style = getRackTypeStyle(type);
   const TypeIcon = style.icon;
@@ -60,6 +70,35 @@ export function RackCard({ id, name, type, date, tags, file_url, rack_data, prom
     setIsDeleting(false);
   };
 
+  const handleToggleFav = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsTogglingFav(true);
+    const res = await toggleFavorite(id);
+    if (res.success) {
+        const newFav = res.action === 'added';
+        setIsFavorite(newFav);
+        if (onToggleFavorite) onToggleFavorite(id, newFav);
+    }
+    setIsTogglingFav(false);
+  };
+
+  const handleRemoveFromCollection = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirmRemove) {
+        setConfirmRemove(true);
+        // Reset confirmation after 3 seconds
+        setTimeout(() => setConfirmRemove(false), 3000);
+        return;
+    }
+
+    if (onRemoveFromCollection) {
+        setIsRemoving(true);
+        await Promise.resolve(onRemoveFromCollection(id));
+        setIsRemoving(false);
+        setConfirmRemove(false);
+    }
+  };
+
   return (
     <>
     {/* COLLAPSED CARD */}
@@ -67,7 +106,8 @@ export function RackCard({ id, name, type, date, tags, file_url, rack_data, prom
       layoutId={`card-container-${id}`}
       onClick={() => setIsExpanded(true)}
       className={cn(
-        "relative rounded-3xl border border-white/5 bg-[#121214] hover:bg-[#18181b] hover:border-white/10 cursor-pointer overflow-hidden group transition-all duration-500 min-h-[220px] flex flex-col justify-between"
+        "relative rounded-3xl border border-white/5 bg-[#121214] hover:bg-[#18181b] hover:border-white/10 cursor-pointer group transition-all duration-500 min-h-[220px] flex flex-col justify-between",
+        !showCollections && "overflow-hidden"
       )}
       whileHover={{ y: -5 }}
     >
@@ -86,27 +126,109 @@ export function RackCard({ id, name, type, date, tags, file_url, rack_data, prom
             
             <div className="flex flex-col items-end gap-2">
                 <span className="text-xs font-medium font-mono text-white/60 bg-white/5 px-2 py-1 rounded-md border border-white/5">{date}</span>
-                <button 
-                    onClick={handleDelete}
-                    disabled={isDeleting}
-                    className={cn(
-                        "h-8 px-2 rounded-lg transition-all duration-300 border flex items-center gap-2 overflow-hidden",
-                        confirmDelete 
-                            ? "bg-red-600 text-white border-red-400 w-auto px-3 shadow-[0_0_15px_rgba(239,68,68,0.4)]" 
-                            : "bg-white/5 text-red-500 hover:text-red-400 hover:bg-red-500/10 border-white/5 opacity-40 group-hover:opacity-100"
+                
+                <div className="flex items-center gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
+                    <button 
+                        onClick={handleToggleFav}
+                        disabled={isTogglingFav}
+                        className={cn(
+                            "p-2 rounded-lg transition-all border border-white/5 bg-white/5",
+                            isFavorite 
+                                ? "text-red-500 bg-red-500/10 border-red-500/20" 
+                                : "text-text-dim hover:text-white hover:bg-white/10"
+                        )}
+                    >
+                        {isTogglingFav ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                            <Heart className={cn("w-4 h-4", isFavorite && "fill-current")} />
+                        )}
+                    </button>
+
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); setShowCollections(!showCollections); }}
+                        className={cn(
+                            "p-2 rounded-lg transition-all border border-white/5 bg-white/5 text-text-dim hover:text-white hover:bg-white/10 hover:border-white/10",
+                            showCollections && "bg-brand-primary/10 text-brand-primary border-brand-primary/20 opacity-100"
+                        )}
+                    >
+                        <Plus className="w-4 h-4" />
+                    </button>
+
+                    {onRemoveFromCollection && (
+                        <button 
+                            onClick={handleRemoveFromCollection}
+                            disabled={isRemoving}
+                            className={cn(
+                                "h-8 px-2 rounded-lg transition-all duration-300 border flex items-center gap-2 overflow-hidden",
+                                confirmRemove 
+                                    ? "bg-brand-primary text-black border-brand-primary/50 w-auto px-3 shadow-[0_0_15px_rgba(0,255,194,0.3)]" 
+                                    : "bg-white/5 text-text-dim hover:text-white hover:bg-white/10 border-white/5"
+                            )}
+                        >
+                            {isRemoving ? (
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                                <X className="w-4 h-4 shrink-0" />
+                            )}
+                            {confirmRemove && !isRemoving && (
+                                <span className="text-[10px] font-black uppercase tracking-tighter whitespace-nowrap">
+                                    REMOVE?
+                                </span>
+                            )}
+                        </button>
                     )}
-                >
-                    {isDeleting ? (
-                        <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : (
-                        <Trash2 className="w-4 h-4 shrink-0" />
+                    {/* ... (delete button continues) */}
+
+                    <button 
+                        onClick={handleDelete}
+                        disabled={isDeleting}
+                        className={cn(
+                            "h-8 px-2 rounded-lg transition-all duration-300 border flex items-center gap-2 overflow-hidden",
+                            confirmDelete 
+                                ? "bg-red-600 text-white border-red-400 w-auto px-3 shadow-[0_0_15px_rgba(239,68,68,0.4)]" 
+                                : "bg-white/5 text-red-500 hover:text-red-400 hover:bg-red-500/10 border-white/5"
+                        )}
+                    >
+                        {isDeleting ? (
+                            <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : (
+                            <Trash2 className="w-4 h-4 shrink-0" />
+                        )}
+                        {confirmDelete && !isDeleting && (
+                            <span className="text-[10px] font-black uppercase tracking-tighter whitespace-nowrap">
+                                CONFIRM?
+                            </span>
+                        )}
+                    </button>
+                </div>
+
+                {/* Collection Selector Popover & Overlay */}
+                <AnimatePresence>
+                    {showCollections && (
+                        <>
+                            {/* Subtle Overlay Backdrop */}
+                            <motion.div 
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={(e) => { e.stopPropagation(); setShowCollections(false); }}
+                                className="fixed inset-0 z-[115] bg-black/20 backdrop-blur-[2px]"
+                            />
+                            <CollectionSelector 
+                                generationId={id} 
+                                onClose={() => setShowCollections(false)} 
+                                onToggleFavorite={(isFav) => {
+                                    setIsFavorite(isFav);
+                                    if (onToggleFavorite) onToggleFavorite(id, isFav);
+                                }}
+                                onToggleCollection={(collId, isActive) => {
+                                    if (onToggleCollection) onToggleCollection(id, collId, isActive);
+                                }}
+                            />
+                        </>
                     )}
-                    {confirmDelete && !isDeleting && (
-                        <span className="text-[10px] font-black uppercase tracking-tighter whitespace-nowrap">
-                            CONFIRM?
-                        </span>
-                    )}
-                </button>
+                </AnimatePresence>
             </div>
         </div>
 
@@ -175,7 +297,10 @@ export function RackCard({ id, name, type, date, tags, file_url, rack_data, prom
                 
                 <motion.div
                     layoutId={`card-container-${id}`}
-                    className="relative w-full max-w-6xl max-h-[90vh] bg-[#0a0a0b] border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+                    className={cn(
+                        "relative w-full max-w-6xl max-h-[90vh] bg-[#0a0a0b] border border-white/10 rounded-3xl shadow-2xl flex flex-col transition-all duration-300",
+                        !showCollections && "overflow-hidden"
+                    )}
                 >
                     {/* Header */}
                     <div className="relative p-8 md:p-10 border-b border-white/5 bg-[#121214] flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -209,7 +334,44 @@ export function RackCard({ id, name, type, date, tags, file_url, rack_data, prom
                             </div>
                         </div>
 
-                        <div className="flex gap-3">
+                        <div className="flex gap-3 items-center">
+                             <button 
+                                onClick={handleToggleFav}
+                                disabled={isTogglingFav}
+                                className={cn(
+                                    "p-3 rounded-xl transition-all border border-white/5 bg-white/5",
+                                    isFavorite 
+                                        ? "text-red-500 bg-red-500/10 border-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.2)]" 
+                                        : "text-text-dim hover:text-white hover:bg-white/10"
+                                )}
+                            >
+                                {isTogglingFav ? (
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                ) : (
+                                    <Heart className={cn("w-5 h-5", isFavorite && "fill-current")} />
+                                )}
+                            </button>
+
+                             <div className="relative">
+                                <button 
+                                    onClick={(e) => { e.stopPropagation(); setShowCollections(!showCollections); }}
+                                    className={cn(
+                                        "p-3 rounded-xl transition-all border border-white/5 bg-white/5 text-text-dim hover:text-white hover:bg-white/10 hover:border-white/10",
+                                        showCollections && "bg-brand-primary/10 text-brand-primary border-brand-primary/20"
+                                    )}
+                                >
+                                    <Plus className="w-5 h-5" />
+                                </button>
+                                <AnimatePresence>
+                                    {showCollections && (
+                                        <CollectionSelector 
+                                            generationId={id} 
+                                            onClose={() => setShowCollections(false)} 
+                                        />
+                                    )}
+                                </AnimatePresence>
+                             </div>
+
                              <button 
                                 onClick={handleDelete}
                                 disabled={isDeleting}
